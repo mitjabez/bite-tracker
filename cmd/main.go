@@ -8,8 +8,10 @@ import (
 )
 
 func main() {
-	helloComponent := views.Base("bzy")
+	helloComponent := views.Base(views.Hello("bzy"), "Hello")
+	helpComponent := views.Base(views.Help(), "Help")
 
 	http.Handle("/", templ.Handler(helloComponent))
+	http.Handle("/help", templ.Handler(helpComponent))
 	http.ListenAndServe(":8000", nil)
 }

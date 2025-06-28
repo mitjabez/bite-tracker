@@ -1,10 +1,50 @@
 package views
 
-templ Base(name string) {
-	<!DOCTYPE html>
-	<html>
-		<body>
-			@Hello(name)
-		</body>
-	</html>
+templ Base(component templ.Component, title string) {
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			html,body {
+				background: black;
+				color: white;
+				height: 100%;
+			}
+			.flex-container {
+				display: flex;
+				flex-flow: column nowrap;
+				height: 100%;
+				min-height: 100%;
+			}
+			.flex-container > div {
+			  /*background-color: DodgerBlue;*/
+			  color: white;
+			  margin: 10px;
+			  text-align: center;
+			  line-height: 75px;
+			  font-size: 30px;
+			}
+
+			.navigation {
+			  height: 3em;
+			  background-color: LightGray;
+			  color: DarkGray
+			}
+
+		</style>
+		<title>{title}</title>
+
+	</head>
+    <body>
+        <div class="flex-container">
+			<div id="menu" class="navigation">Menu</div>
+            <div id="contents" style="flex: 1">@component</div>
+            <div id="footer" class="navigation">
+				<a href="/hello">Hello</a>
+				<a href="/help">Help</a>
+			</div>
+        </div>
+    </body>
+</html>
+
 }

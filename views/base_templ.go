@@ -8,7 +8,7 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Base(name string) templ.Component {
+func Base(component templ.Component, title string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,15 +29,28 @@ func Base(name string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><style>\n\t\t\thtml,body {\n\t\t\t\tbackground: black;\n\t\t\t\tcolor: white;\n\t\t\t\theight: 100%;\n\t\t\t}\n\t\t\t.flex-container {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-flow: column nowrap;\n\t\t\t\theight: 100%;\n\t\t\t\tmin-height: 100%;\n\t\t\t}\n\t\t\t.flex-container > div {\n\t\t\t  /*background-color: DodgerBlue;*/\n\t\t\t  color: white;\n\t\t\t  margin: 10px;\n\t\t\t  text-align: center;\n\t\t\t  line-height: 75px;\n\t\t\t  font-size: 30px;\n\t\t\t}\n\n\t\t\t.navigation {\n\t\t\t  height: 3em;\n\t\t\t  background-color: LightGray;\n\t\t\t  color: DarkGray\n\t\t\t}\n\n\t\t</style><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = Hello(name).Render(ctx, templ_7745c5c3_Buffer)
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/base.templ`, Line: 35, Col: 15}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title></head><body><div class=\"flex-container\"><div id=\"menu\" class=\"navigation\">Menu</div><div id=\"contents\" style=\"flex: 1\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = component.Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><div id=\"footer\" class=\"navigation\"><a href=\"/hello\">Hello</a> <a href=\"/help\">Help</a></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
