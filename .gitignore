@@ -1,0 +1,12 @@
+# Environment
+.env
+.envrc
+
+# Vim
+*.sw*
+
+# Misc
+*~
+tmp/*
+.DS_Store
+
