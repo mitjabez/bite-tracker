@@ -2,14 +2,20 @@
 
 ## Usage
 
-- Run locally:
+- Run locally with live reload and access on http://localhost:3000:
+
+```sh
+air
+```
+
+- Without live reload:
 
 ```sh
 make run
 ```
 
-- Build only:
+- Generate templ and tailwind only:
 
 ```sh
-make build
+make generate
 ```

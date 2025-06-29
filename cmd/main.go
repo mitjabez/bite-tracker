@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	helloComponent := views.Base(views.Hello("bzy"), "Hello")
+	helloComponent := views.Base(views.Hello("bzy 2"), "Hello")
 	helpComponent := views.Base(views.Help(), "Help")
 	assetsHandler := http.FileServer(http.Dir("views/assets"))
 
