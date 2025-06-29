@@ -8,6 +8,9 @@ build/
 # Vim
 *.sw*
 
+# Node
+node_modules
+
 # Misc
 *~
 tmp/*
