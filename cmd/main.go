@@ -7,12 +7,12 @@ import (
 )
 
 func main() {
-	helloComponent := views.Base(views.Hello("bzy 2"), "Hello")
-	helpComponent := views.Base(views.Help(), "Help")
+	logView := views.Base(views.Log(), "Bite Log")
+	addMealView := views.Base(views.AddMeal(), "Add meal")
 	assetsHandler := http.FileServer(http.Dir("views/assets"))
 
-	http.Handle("/", templ.Handler(helloComponent))
-	http.Handle("/help", templ.Handler(helpComponent))
+	http.Handle("/", templ.Handler(logView))
+	http.Handle("/add-meal", templ.Handler(addMealView))
 	http.Handle("/assets/", http.StripPrefix("/assets", assetsHandler))
 	http.ListenAndServe(":8000", nil)
 }

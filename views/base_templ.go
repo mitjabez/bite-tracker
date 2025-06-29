@@ -29,20 +29,20 @@ func Base(component templ.Component, title string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"/assets/css/tailwind.css\" rel=\"stylesheet\"><style>\nhtml,body {\n    background: black;\n    color: white;\n    height: 100%;\n}\n            .flex-container {\n                display: flex;\n                flex-flow: column nowrap;\n                height: 100%;\n                min-height: 100%;\n            }\n            .flex-container > div {\n                /*background-color: DodgerBlue;*/\n                color: white;\n                margin: 10px;\n                text-align: center;\n                line-height: 75px;\n                font-size: 30px;\n            }\n\n            .navigation {\n                height: 3em;\n                background-color: LightGray;\n                color: DarkGray\n            }\n\n        </style><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"/assets/css/tailwind.css\" rel=\"stylesheet\"><style>\nhtml,body {\n    background: black;\n    color: white;\n    height: 100%;\n}\n            .flex-container {\n                display: flex;\n                flex-flow: column nowrap;\n                height: 100%;\n                min-height: 100%;\n            }\n            .flex-container > div {\n                color: white;\n                margin: 10px;\n                text-align: center;\n                line-height: 75px;\n                font-size: 30px;\n            }\n\n            .navigation {\n                height: 3em;\n                background-color: LightGray;\n                color: DarkGray\n            }\n\n        </style><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/base.templ`, Line: 39, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/base.templ`, Line: 38, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title></head><body><div class=\"flex-container\"><div id=\"menu\" class=\"navigation\">Menu</div><div id=\"contents\" style=\"flex: 1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,7 +50,7 @@ func Base(component templ.Component, title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><div id=\"footer\" class=\"navigation\"><a href=\"/hello\">Hello</a> <a href=\"/help\">Help</a></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
