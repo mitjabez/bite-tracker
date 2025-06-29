@@ -2,14 +2,14 @@
 
 ## Usage
 
-Run locally:
+- Run locally:
 
 ```sh
-go run cmd/main.go
+make run
 ```
 
-Generate go templ files:
+- Build only:
 
 ```sh
-go tool templ generate
+make build
 ```

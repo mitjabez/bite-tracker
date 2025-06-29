@@ -1,0 +1,22 @@
+/*! tailwindcss v4.1.11 | MIT License | https://tailwindcss.com */
+.contents {
+  display: contents;
+}
+.flex {
+  display: flex;
+}
+@layer base {
+  pre {
+    overflow-x: auto;
+  }
+  ul, ol {
+    margin: revert;
+    padding: revert;
+  }
+  ul {
+    list-style-type: disc;
+  }
+  ol {
+    list-style-type: decimal;
+  }
+}

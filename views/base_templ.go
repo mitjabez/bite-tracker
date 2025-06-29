@@ -29,14 +29,14 @@ func Base(component templ.Component, title string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><style>\n\t\t\thtml,body {\n\t\t\t\tbackground: black;\n\t\t\t\tcolor: white;\n\t\t\t\theight: 100%;\n\t\t\t}\n\t\t\t.flex-container {\n\t\t\t\tdisplay: flex;\n\t\t\t\tflex-flow: column nowrap;\n\t\t\t\theight: 100%;\n\t\t\t\tmin-height: 100%;\n\t\t\t}\n\t\t\t.flex-container > div {\n\t\t\t  /*background-color: DodgerBlue;*/\n\t\t\t  color: white;\n\t\t\t  margin: 10px;\n\t\t\t  text-align: center;\n\t\t\t  line-height: 75px;\n\t\t\t  font-size: 30px;\n\t\t\t}\n\n\t\t\t.navigation {\n\t\t\t  height: 3em;\n\t\t\t  background-color: LightGray;\n\t\t\t  color: DarkGray\n\t\t\t}\n\n\t\t</style><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"/assets/css/tailwind.css\" rel=\"stylesheet\"><style>\nhtml,body {\n    background: black;\n    color: white;\n    height: 100%;\n}\n            .flex-container {\n                display: flex;\n                flex-flow: column nowrap;\n                height: 100%;\n                min-height: 100%;\n            }\n            .flex-container > div {\n                /*background-color: DodgerBlue;*/\n                color: white;\n                margin: 10px;\n                text-align: center;\n                line-height: 75px;\n                font-size: 30px;\n            }\n\n            .navigation {\n                height: 3em;\n                background-color: LightGray;\n                color: DarkGray\n            }\n\n        </style><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/base.templ`, Line: 35, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/base.templ`, Line: 39, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
