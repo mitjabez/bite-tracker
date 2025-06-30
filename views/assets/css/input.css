@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "tailwindcss";
+@source "./views/**/*.{html,templ,go}";
+
 @layer base {
     pre {
         overflow-x: auto;

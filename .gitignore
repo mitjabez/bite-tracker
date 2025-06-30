@@ -9,7 +9,7 @@ build/
 *.sw*
 
 # Node
-node_modules
+node_modules/
 
 # Misc
 *~

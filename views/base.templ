@@ -7,36 +7,7 @@ templ Base(component templ.Component, title string) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="/assets/css/tailwind.css" rel="stylesheet">
-
-        <style>
-html,body {
-    background: black;
-    color: white;
-    height: 100%;
-}
-            .flex-container {
-                display: flex;
-                flex-flow: column nowrap;
-                height: 100%;
-                min-height: 100%;
-            }
-            .flex-container > div {
-                color: white;
-                margin: 10px;
-                text-align: center;
-                line-height: 75px;
-                font-size: 30px;
-            }
-
-            .navigation {
-                height: 3em;
-                background-color: LightGray;
-                color: DarkGray
-            }
-
-        </style>
         <title>{title}</title>
-
     </head>
     <body>
         @component

@@ -29,7 +29,7 @@ func Log() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex-container\"><div id=\"menu\" class=\"navigation\">Menu</div><div id=\"contents\" style=\"flex: 1\">Log</div><div id=\"footer\" class=\"navigation\"><a href=\"/add-meal\">Add</a></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col items-center bg-blue-500 h-screen\"><div id=\"menu\" class=\"bg-amber-500 w-full basis-16 flex flex-row items-center\"><div class=\"basis-16\"></div><div class=\"w-full text-center\"><span class=\"font-bold text-lg\">Add Meal</span></div><div class=\"basis-16 text-center\"><button type=\"button\" class=\"font-bold text-lg\">X</button></div></div><div id=\"contents\" class=\"basis-1 w-full basis-full grow text-center p-4 text-lg\">Log</div><div id=\"footer\" class=\"bg-amber-500 w-full basis-16 flex-none content-center text-center\"><!-- <a href=\"/add-meal\">Add</a> --><button>Add meal</button></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
