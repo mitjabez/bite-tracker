@@ -2,14 +2,47 @@ package views
 
 templ Base(component templ.Component, title string) {
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- Inter web font from bunny.net (GDPR compliant) -->
+        <link rel="preconnect" href="https://fonts.bunny.net" />
+        <link
+            href="https://fonts.bunny.net/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+            rel="stylesheet"
+        />
+
         <link href="/assets/css/tailwind.css" rel="stylesheet">
+
+        <style type="text/tailwindcss">
+            /* Class based dark mode */
+            @custom-variant dark (&:where(.dark, .dark *));
+
+            /* Theme configuration */
+            @theme {
+                /* Fonts */
+                --default-font-family: "Inter";
+            }
+        </style>
+
+        <!-- Alpine.js -->
+        <script
+            defer
+            src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+        ></script>
+
+        <!-- Alpine.js (x-cloak - https://alpinejs.dev/directives/cloak) -->
+        <style>
+            [x-cloak] {
+                display: none !important;
+            }
+        </style>
+
         <title>{title}</title>
     </head>
-    <body>
+    <body class="font-[Inter]">
         @component
     </body>
 </html>

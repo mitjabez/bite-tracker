@@ -29,20 +29,20 @@ func Base(component templ.Component, title string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"/assets/css/tailwind.css\" rel=\"stylesheet\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><!-- Inter web font from bunny.net (GDPR compliant) --><link rel=\"preconnect\" href=\"https://fonts.bunny.net\"><link href=\"https://fonts.bunny.net/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap\" rel=\"stylesheet\"><link href=\"/assets/css/tailwind.css\" rel=\"stylesheet\"><style type=\"text/tailwindcss\">\n            /* Class based dark mode */\n            @custom-variant dark (&:where(.dark, .dark *));\n\n            /* Theme configuration */\n            @theme {\n                /* Fonts */\n                --default-font-family: \"Inter\";\n            }\n        </style><!-- Alpine.js --><script defer src=\"https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js\"></script><!-- Alpine.js (x-cloak - https://alpinejs.dev/directives/cloak) --><style>\n            [x-cloak] {\n                display: none !important;\n            }\n        </style><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/base.templ`, Line: 10, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/base.templ`, Line: 43, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title></head><body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title></head><body class=\"font-[Inter]\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

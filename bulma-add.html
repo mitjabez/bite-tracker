@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.7.0/css/all.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body>
+    <section class="hero is-primary">
+        <div class="hero-body">
+            <h1 class="title is-1">
+                <span class="icon">
+                    <i class="fa fa-lemon"></i>
+                </span>
+                &nbsp;Bite Tracker
+            </h1>
+        </div>
+    </section>
+    <section class="section">
+        <div class="container is-fluid">
+            <h1 class="title">Add Meal</h2>
+                <!-- <form action="/action_page.php"> -->
+                <div class="field">
+                    <label class="label" "for=" date">Date</label>
+                    <input class="input" type="date" id="date" name="date" value="1.1.2025">
+                </div>
+                <div class="field">
+                    <label class="label" for="time">Time</label>
+                    <input class="input" type="time" id="time" name="time" value="15:54">
+                </div>
+                <div class="field" x-data='{ meal: "" }'>
+                    <label class="label" for="meal">Meal</label>
+                    <input class="input" type="text" id="meal" name="meal" placeholder="Type or pick below"
+                        x-model="meal">
+                    <div class="tags mt-2">
+                        <button class="tag" x-on:click="meal='Chicken Rice'">Chicken Rice</button>
+                        <button class="tag" x-on:click="meal='Oatmeal'">Oatmeal</button>
+                        <button class="tag" x-on:click="meal='Salad'">Salad</button>
+                    </div>
+                </div>
+                <div class="field" x-data="{ range: 4 }">
+                    <label class="label" for="hunger">Hunger Level (1-not hungry, 5-starving)</label>
+                    <div class="field has-addons">
+                        <div class="control">
+                            <input class="input" type="range" x-model="range" min="1" max="5" id="hunger" name="hunger">
+                        </div>
+                        <div class="control">
+                            <span class="button is-info" x-text="range"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label" for="symptoms">Symptoms</label>
+                    <textarea class="textarea" id="symptoms" name="symptoms"></textarea>
+                </div>
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button is-link">Submit</button>
+                    </div>
+                    <div class="control">
+                        <button class="button is-link is-light">Cancel</button>
+                    </div>
+                </div>
+                <!-- </form> -->
+        </div>
+    </section>
+    <!-- <nav class="navbar"> -->
+    <!--     <div class="navbar-brand"> -->
+    <!--         <div class="navbar-item"> -->
+    <!--             <h1 class="title is-1 has-text-primary"> -->
+    <!--                 <span class="icon"> -->
+    <!--                     <i class="fa fa-lemon"></i> -->
+    <!--                 </span> -->
+    <!--             </h1> -->
+    <!--         </div> -->
+    <!--         <div class="navbar-item"> -->
+    <!--             <h1 class="title is-1 has-text-primary"> -->
+    <!--                 Bite Tracker -->
+    <!--             </h1> -->
+    <!--         </div> -->
+    <!--  -->
+    <!--     </div> -->
+    <!-- </nav> -->
+</body>
+
+</html>
