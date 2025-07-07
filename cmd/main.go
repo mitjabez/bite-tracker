@@ -8,7 +8,7 @@ import (
 
 func main() {
 	logView := views.Base(views.Log(), "Bite Log")
-	addMealView := views.Base(views.AddMeal(), "Add meal")
+	addMealView := views.Base(views.AddMeal(), "Add Meal")
 	assetsHandler := http.FileServer(http.Dir("views/assets"))
 
 	http.Handle("/", templ.Handler(logView))
