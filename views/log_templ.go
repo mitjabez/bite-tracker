@@ -8,7 +8,11 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Log() templ.Component {
+import (
+	"github.com/mitjabez/bite-tracker/models"
+)
+
+func Log(meals []models.Meal) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,12 +33,136 @@ func Log() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"section\"><div class=\"field is-grouped is-grouped-centered\"><p class=\"control\"><button class=\"button\">&lt;</button></p><p class=\"control\"><p class=\"is-size-4 is-align-self-center\"><span class=\"icon\"><i class=\"fas fa-calendar\"></i></span> <span class=\"ml-1\">Tue, Dec 31 2025</span></p></p><p class=\"control\"><button class=\"button\">&gt;</button></p></div></section><section class=\"section py-0\"><div class=\"card\"><div class=\"card-content\"><div class=\"columns is-centered is-vcentered mb-0\"><div class=\"column is-2 has-text-centered\"><span class=\"icon is-size-3\"><i class=\"fas fa-utensils\"></i></span></div><div class=\"column is-6\"><p class=\"is-size-5\"><strong>Kosilo</strong></p><p class=\"is-size-5\">Mali sendvič, ajdov kruh, ogrska salama, sir</p></div><div class=\"column is-2 has-text-centered has-text-grey\"><p class=\"is-size-5\"><span class=\"icon\"><i class=\"fas fa-clock\"></i></span> <span class=\"ml-1\">7:30</span></p></div></div><div class=\"columns is-centered\"><div class=\"column is-2\"></div><div class=\"column is-6 has-text-centered\"><a class=\"icon has-text-dark mr-4\" title=\"Felt fine after\" href=\"#\"><i class=\"fas fa-heart fa-lg\"></i></a> <a class=\"icon has-text-dark\" title=\"Felt issues after\" href=\"#\"><i class=\"fas fa-thumbs-down fa-lg\"></i></a></div><div class=\"column is-2\"></div></div></div></div></section><section class=\"section\"><div class=\"buttons is-centered\"><a class=\"button is-size-5 is-primary\" href=\"/add-meal\"><span class=\"icon\"><i class=\"fas fa-plus\"></i></span> <span>Add Meal</span></a></div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"section\"><div class=\"field is-grouped is-grouped-centered\"><p class=\"control\"><button class=\"button\">&lt;</button></p><p class=\"control\"><p class=\"is-size-4 is-align-self-center\"><span class=\"icon\"><i class=\"fas fa-calendar\"></i></span> <span class=\"ml-1\">Tue, Dec 31 2025</span></p></p><p class=\"control\"><button class=\"button\">&gt;</button></p></div></section><section class=\"section py-0\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, m := range meals {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"card\"><div class=\"card-content\"><div class=\"columns is-centered is-vcentered mb-0\"><div class=\"column is-2 has-text-centered\"><span class=\"icon is-size-3\"><i class=\"fas fa-utensils\"></i></span></div><div class=\"column is-6\"><p class=\"is-size-5\"><strong>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var2 string
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(m.Type)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 40, Col: 42}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</strong></p><p class=\"is-size-5\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(m.Description)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 42, Col: 21}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</p><p class=\"is-size-8 has-text-grey has-text-centered\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(m.Symptoms)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 45, Col: 18}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</p></div><div class=\"column is-2 has-text-centered has-text-grey\"><p class=\"is-size-5\"><span class=\"icon\"><i class=\"fas fa-clock\"></i></span> <span class=\"ml-1\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(m.Time.Format("15:04"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 53, Col: 49}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span></p></div></div><div class=\"columns is-centered\"><div class=\"column is-2\"></div><div class=\"column is-6 has-text-centered\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var6 = []any{feltFineColor(m)}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<a class=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var7 string
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var6).String())
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 1, Col: 0}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" title=\"Felt fine after\" href=\"#\"><i class=\"fas fa-heart fa-lg\"></i></a> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var8 = []any{hadIssuesColor(m)}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<a class=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var8).String())
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 1, Col: 0}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" title=\"Felt issues after\" href=\"#\"><i class=\"fas fa-thumbs-down fa-lg\"></i></a></div><div class=\"column is-2\"></div></div></div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</section><section class=\"section\"><div class=\"buttons is-centered\" hx-boost=\"true\"><a class=\"button is-size-5 is-primary\" href=\"/add-meal\"><span class=\"icon\"><i class=\"fas fa-plus\"></i></span> <span>Add Meal</span></a></div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
+}
+
+func feltFineColor(meal models.Meal) string {
+	if meal.FeltFineAfter {
+		return "icon mr-4 has-text-success"
+	}
+	return issuesColorDefault()
+}
+
+func hadIssuesColor(meal models.Meal) string {
+	if meal.HadIssuesAfter {
+		return "icon mr-4 has-text-danger"
+	}
+	return issuesColorDefault()
+}
+
+func issuesColorDefault() string {
+	return "icon mr-4 has-text-dark"
 }
 
 var _ = templruntime.GeneratedTemplate
