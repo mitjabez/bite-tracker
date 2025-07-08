@@ -41,9 +41,9 @@ templ Log(meals []models.Meal) {
 					<p class="is-size-5">
 						{ m.Description }
 					</p>
-					<p class="is-size-8 has-text-grey has-text-centered">
-						{ m.Symptoms }
-					</p>
+					<!-- <p class="is-size-8 has-text-grey has-text-centered"> -->
+					<!-- 	{ m.Symptoms } -->
+					<!-- </p> -->
 				</div>
 				<div class="column is-2 has-text-centered has-text-grey">
 					<p class="is-size-5">
@@ -56,13 +56,20 @@ templ Log(meals []models.Meal) {
 			</div>
 			<div class="columns is-centered">
 				<div class="column is-2"></div>
-				<div class="column is-6 has-text-centered">
-					<a class={ feltFineColor(m) } title="Felt fine after" href="#">
-						<i class="fas fa-heart fa-lg"></i>
+				<div class="column is-6 has-text-left">
+					if len(m.Symptoms) > 0 {
+					<a class="has-text-info" href="#">
+						<div class="tags">
+							for _, s := range symptoms(m) {
+							<button class="tag is-warning">{ s }</button>
+							}
+						</div>
 					</a>
-					<a class={ hadIssuesColor(m) } title="Felt issues after" href="#">
-						<i class="fas fa-thumbs-down fa-lg"></i>
+					} else {
+					<a class="has-text-grey" href="#">
+						no symptoms
 					</a>
+					}
 				</div>
 				<div class="column is-2"></div>
 			</div>
@@ -82,20 +89,21 @@ templ Log(meals []models.Meal) {
 </section>
 }
 
-func feltFineColor(meal models.Meal) string {
-if meal.FeltFineAfter {
-return "icon mr-4 has-text-success"
+func symptoms(meal models.Meal) []string {
+allSymptoms := []string{}
+for _, s := range meal.Symptoms {
+if s == models.Bloating {
+allSymptoms = append(allSymptoms, "bloating")
+} else if s == models.Gas {
+allSymptoms = append(allSymptoms, "gas")
+} else if s == models.Acid {
+allSymptoms = append(allSymptoms, "acid")
+} else if s == models.Full {
+allSymptoms = append(allSymptoms, "full")
+} else {
+allSymptoms = append(allSymptoms, "unknown")
 }
-return issuesColorDefault()
 }
+return allSymptoms
 
-func hadIssuesColor(meal models.Meal) string {
-if meal.HadIssuesAfter {
-return "icon mr-4 has-text-danger"
-}
-return issuesColorDefault()
-}
-
-func issuesColorDefault() string {
-return "icon mr-4 has-text-dark"
 }
