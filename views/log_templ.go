@@ -8,9 +8,7 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import (
-	"github.com/mitjabez/bite-tracker/models"
-)
+import "github.com/mitjabez/bite-tracker/models"
 
 func Log(meals []models.Meal) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -38,89 +36,125 @@ func Log(meals []models.Meal) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, m := range meals {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"card\"><div class=\"card-content\"><div class=\"columns is-centered is-vcentered mb-0\"><div class=\"column is-2 has-text-centered\"><span class=\"icon is-size-3\"><i class=\"fas fa-utensils\"></i></span></div><div class=\"column is-6\"><p class=\"is-size-5\"><strong>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"card\"><div class=\"card-content\"><div class=\"columns is-centered is-vcentered mb-0\"><div class=\"column is-2 has-text-centered\"><span class=\"icon is-size-3\"><i class=\"fas fa-utensils\"></i></span></div><div class=\"column is-8\"><p class=\"is-size-5\"><strong>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(m.Type)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 40, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 37, Col: 17}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</strong></p><p class=\"is-size-5\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</strong> <span class=\"is-size-6 has-text-grey ml-2\">&commat;")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(m.Description)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(m.Time.Format("15:04"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 42, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 39, Col: 83}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</p><!-- <p class=\"is-size-8 has-text-grey has-text-centered\"> --><!-- \t{ m.Symptoms } --><!-- </p> --></div><div class=\"column is-2 has-text-centered has-text-grey\"><p class=\"is-size-5\"><span class=\"icon\"><i class=\"fas fa-clock\"></i></span> <span class=\"ml-1\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span></p><p class=\"is-size-5\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(m.Time.Format("15:04"))
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(m.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 53, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 42, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span></p></div></div><div class=\"columns is-centered\"><div class=\"column is-2\"></div><div class=\"column is-6 has-text-left\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</p></div></div><div class=\"columns is-centered\"><div class=\"column is-2\"></div><div class=\"column is-8 has-text-left\"><div x-data=\"{ open: false }\"><div class=\"is-align-items-center\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if len(m.Symptoms) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a class=\"has-text-info\" href=\"#\"><div class=\"tags\">")
+			for _, s := range m.Symptoms {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a class=\"icon\" href=\"#\" title=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				for _, s := range symptoms(m) {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<button class=\"tag is-warning\">")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var5 string
-					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(s)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 64, Col: 41}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</button>")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(s)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 52, Col: 44}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></a>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<a class=\"has-text-grey\" href=\"#\">no symptoms</a>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var6 string
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(symptomEmoji(s))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 53, Col: 28}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</a> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div><div class=\"column is-2\"></div></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<a class=\"icon has-text-grey\" @click=\"open = !open\" href=\"#\" title=\"Add more symptoms\"><i class=\"fas fa-plus\"></i></a></div><div x-show=\"open\" class=\"mt-2\"><div class=\"is-flex is-align-items-center\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, s := range models.AllSymptoms {
+				if !hasSymptom(s, m) {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<a class=\"icon\" href=\"#\" title=\"")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var7 string
+					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(s)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 64, Col: 46}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var8 string
+					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(symptomEmoji(s))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 65, Col: 30}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</a>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div></div></div></div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</section><section class=\"section\"><div class=\"buttons is-centered\" hx-boost=\"true\"><a class=\"button is-size-5 is-primary\" href=\"/add-meal\"><span class=\"icon\"><i class=\"fas fa-plus\"></i></span> <span>Add Meal</span></a></div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</section><section class=\"section\"><div class=\"buttons is-centered\" hx-boost=\"true\"><a class=\"button is-size-5 is-primary\" href=\"/add-meal\"><span class=\"icon\"><i class=\"fas fa-plus\"></i></span> <span>Add Meal</span></a></div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -128,9 +162,10 @@ func Log(meals []models.Meal) templ.Component {
 	})
 }
 
-func symptoms(meal models.Meal) []string {
+func availableSymptoms(meal models.Meal) []string {
 	allSymptoms := []string{}
 	for _, s := range meal.Symptoms {
+
 		if s == models.Bloating {
 			allSymptoms = append(allSymptoms, "bloating")
 		} else if s == models.Gas {
@@ -145,6 +180,30 @@ func symptoms(meal models.Meal) []string {
 	}
 	return allSymptoms
 
+}
+
+func hasSymptom(symptom models.MealSymptom, meal models.Meal) bool {
+	for _, s := range meal.Symptoms {
+		if s == symptom {
+			return true
+		}
+	}
+	return false
+}
+
+func symptomEmoji(s models.MealSymptom) string {
+	switch s {
+	case models.Bloating:
+		return "🎈"
+	case models.Gas:
+		return "💨"
+	case models.Acid:
+		return "🔥"
+	case models.Full:
+		return "🍽️"
+	default:
+		return "N/A"
+	}
 }
 
 var _ = templruntime.GeneratedTemplate

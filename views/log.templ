@@ -1,109 +1,132 @@
 package views
 
-
-import (
-"github.com/mitjabez/bite-tracker/models"
-)
+import "github.com/mitjabez/bite-tracker/models"
 
 templ Log(meals []models.Meal) {
-<section class="section">
-	<div class="field is-grouped is-grouped-centered">
-		<p class="control">
-			<button class="button">&lt;</button>
-		</p>
-		<p class="control">
-		<p class="is-size-4 is-align-self-center">
-			<span class="icon">
-				<i class="fas fa-calendar"></i>
-			</span>
-			<span class="ml-1">Tue, Dec 31 2025</span>
-		</p>
-		</p>
-		<p class="control">
-			<button class="button">&gt;</button>
-		</p>
-	</div>
-</section>
-
-<section class="section py-0">
-	for _, m := range meals {
-
-	<div class="card">
-		<div class="card-content">
-			<div class="columns is-centered is-vcentered mb-0">
-				<div class="column is-2 has-text-centered">
-					<span class="icon is-size-3">
-						<i class="fas fa-utensils"></i>
+	<section class="section">
+		<div class="field is-grouped is-grouped-centered">
+			<p class="control">
+				<button class="button">&lt;</button>
+			</p>
+			<p class="control">
+				<p class="is-size-4 is-align-self-center">
+					<span class="icon">
+						<i class="fas fa-calendar"></i>
 					</span>
-				</div>
-				<div class="column is-6">
-					<p class="is-size-5"><strong>{ m.Type }</strong></p>
-					<p class="is-size-5">
-						{ m.Description }
-					</p>
-					<!-- <p class="is-size-8 has-text-grey has-text-centered"> -->
-					<!-- 	{ m.Symptoms } -->
-					<!-- </p> -->
-				</div>
-				<div class="column is-2 has-text-centered has-text-grey">
-					<p class="is-size-5">
-						<span class="icon">
-							<i class="fas fa-clock"></i>
-						</span>
-						<span class="ml-1">{ m.Time.Format("15:04") }</span>
-					</p>
-				</div>
-			</div>
-			<div class="columns is-centered">
-				<div class="column is-2"></div>
-				<div class="column is-6 has-text-left">
-					if len(m.Symptoms) > 0 {
-					<a class="has-text-info" href="#">
-						<div class="tags">
-							for _, s := range symptoms(m) {
-							<button class="tag is-warning">{ s }</button>
-							}
-						</div>
-					</a>
-					} else {
-					<a class="has-text-grey" href="#">
-						no symptoms
-					</a>
-					}
-				</div>
-				<div class="column is-2"></div>
-			</div>
+					<span class="ml-1">Tue, Dec 31 2025</span>
+				</p>
+			</p>
+			<p class="control">
+				<button class="button">&gt;</button>
+			</p>
 		</div>
-	</div>
+	</section>
+	<section class="section py-0">
+		for _, m := range meals {
+			<div class="card">
+				<div class="card-content">
+					<div class="columns is-centered is-vcentered mb-0">
+						<div class="column is-2 has-text-centered">
+							<span class="icon is-size-3">
+								<i class="fas fa-utensils"></i>
+							</span>
+						</div>
+						<div class="column is-8">
+							<p class="is-size-5">
+								<strong>
+									{ m.Type }
+								</strong>
+								<span class="is-size-6 has-text-grey ml-2">&commat;{ m.Time.Format("15:04") }</span>
+							</p>
+							<p class="is-size-5">
+								{ m.Description }
+							</p>
+						</div>
+					</div>
+					<div class="columns is-centered">
+						<div class="column is-2"></div>
+						<div class="column is-8 has-text-left">
+							<div x-data="{ open: false }">
+								<div class="is-align-items-center">
+									for _, s := range m.Symptoms {
+										<a class="icon" href="#" title={ s }>
+											{ symptomEmoji(s) }
+										</a>
+									}
+									<a class="icon has-text-grey" @click="open = !open" href="#" title="Add more symptoms">
+										<i class="fas fa-plus"></i>
+									</a>
+								</div>
+								<div x-show="open" class="mt-2">
+									<div class="is-flex is-align-items-center">
+										for _, s := range models.AllSymptoms {
+											if !hasSymptom(s, m) {
+												<a class="icon" href="#" title={ s }>
+													{ symptomEmoji(s) }
+												</a>
+											}
+										}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+	</section>
+	<section class="section">
+		<div class="buttons is-centered" hx-boost="true">
+			<a class="button is-size-5 is-primary" href="/add-meal">
+				<span class="icon">
+					<i class="fas fa-plus"></i>
+				</span>
+				<span>Add Meal</span>
+			</a>
+		</div>
+	</section>
+}
+
+func availableSymptoms(meal models.Meal) []string {
+	allSymptoms := []string{}
+	for _, s := range meal.Symptoms {
+
+		if s == models.Bloating {
+			allSymptoms = append(allSymptoms, "bloating")
+		} else if s == models.Gas {
+			allSymptoms = append(allSymptoms, "gas")
+		} else if s == models.Acid {
+			allSymptoms = append(allSymptoms, "acid")
+		} else if s == models.Full {
+			allSymptoms = append(allSymptoms, "full")
+		} else {
+			allSymptoms = append(allSymptoms, "unknown")
+		}
 	}
-</section>
-<section class="section">
-	<div class="buttons is-centered" hx-boost="true">
-		<a class="button is-size-5 is-primary" href="/add-meal">
-			<span class="icon">
-				<i class="fas fa-plus"></i>
-			</span>
-			<span>Add Meal</span>
-		</a>
-	</div>
-</section>
+	return allSymptoms
+
 }
 
-func symptoms(meal models.Meal) []string {
-allSymptoms := []string{}
-for _, s := range meal.Symptoms {
-if s == models.Bloating {
-allSymptoms = append(allSymptoms, "bloating")
-} else if s == models.Gas {
-allSymptoms = append(allSymptoms, "gas")
-} else if s == models.Acid {
-allSymptoms = append(allSymptoms, "acid")
-} else if s == models.Full {
-allSymptoms = append(allSymptoms, "full")
-} else {
-allSymptoms = append(allSymptoms, "unknown")
+func hasSymptom(symptom models.MealSymptom, meal models.Meal) bool {
+	for _, s := range meal.Symptoms {
+		if s == symptom {
+			return true
+		}
+	}
+	return false
 }
-}
-return allSymptoms
 
+func symptomEmoji(s models.MealSymptom) string {
+	switch s {
+	case models.Bloating:
+		return "🎈"
+	case models.Gas:
+		return "💨"
+	case models.Acid:
+		return "🔥"
+	case models.Full:
+		return "🍽️"
+	default:
+		return "N/A"
+	}
 }
