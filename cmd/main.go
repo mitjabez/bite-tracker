@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/a-h/templ"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/mitjabez/bite-tracker/db/sqlc"
 	"github.com/mitjabez/bite-tracker/models"
 	"github.com/mitjabez/bite-tracker/views"
 )
@@ -42,6 +47,8 @@ func main() {
 		},
 	}
 
+	doSQL()
+
 	logView := views.Base(views.Log(meals), "Bite Log")
 	addMealView := views.Base(views.AddMeal(), "Add Meal")
 	assetsHandler := http.FileServer(http.Dir("views/assets"))
@@ -50,4 +57,22 @@ func main() {
 	http.Handle("/add-meal", templ.Handler(addMealView))
 	http.Handle("/assets/", http.StripPrefix("/assets", assetsHandler))
 	http.ListenAndServe(":8000", nil)
+}
+
+func doSQL() {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	conn, err := pgx.Connect(ctx, "postgres://biteapp:superburrito@localhost:5432/bite_tracker?sslmode=disable")
+	if err != nil {
+		log.Fatal("Cannot open DB:", err)
+	}
+	defer conn.Close(ctx)
+
+	queries := sqlc.New(conn)
+	meals, err := queries.ListMeals(ctx, pgtype.Timestamptz{})
+	if err != nil {
+		log.Fatal("Error querying DB:", err)
+	}
+	log.Println("Got some meals:", len(meals))
 }
