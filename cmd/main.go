@@ -14,9 +14,10 @@ func main() {
 	// logView := views.Base(views.Log(meals), "Bite Log")
 	addMealView := views.Base(views.AddMeal(), "Add Meal")
 	assetsHandler := http.FileServer(http.Dir("views/assets"))
+	mealLogHandler := handlers.NewMealLogHandler()
 
 	// http.Handle("/", templ.Handler(logView))
-	http.HandleFunc("/", handlers.ServeHTTPLogs)
+	http.HandleFunc("/", mealLogHandler.ServeHTTPLogs)
 	http.Handle("/add-meal", templ.Handler(addMealView))
 	http.Handle("/assets/", http.StripPrefix("/assets", assetsHandler))
 	http.ListenAndServe(":8000", nil)

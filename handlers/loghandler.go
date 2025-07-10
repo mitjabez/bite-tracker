@@ -1,54 +1,36 @@
 package handlers
 
 import (
-	"context"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
-	"github.com/mitjabez/bite-tracker/db/sqlc"
 	"github.com/mitjabez/bite-tracker/models"
+	mealservice "github.com/mitjabez/bite-tracker/service"
 	"github.com/mitjabez/bite-tracker/views"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
-func ServeHTTPLogs(writer http.ResponseWriter, request *http.Request) {
-	meals := doSQL()
-	views.Base(views.Log(meals), "Meal Log").Render(request.Context(), writer)
+// TODO: Conolidate log/meallog
+type MealLogHandler struct {
+	dbConnection mealservice.DBConnection
 }
 
-func doSQL() []models.Meal {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	log.Print("Connecting to DB ...")
-	conn, err := pgx.Connect(ctx, "postgres://biteapp:superburrito@localhost:5432/bite_tracker?sslmode=disable")
+func NewMealLogHandler() MealLogHandler {
+	dbconn, err := mealservice.New()
 	if err != nil {
-		log.Fatal("Cannot open DB:", err)
+		log.Fatal("Error initializing DB", err)
 	}
-	defer conn.Close(ctx)
-	log.Println("DONE")
+	return MealLogHandler{dbConnection: dbconn}
 
-	queries := sqlc.New(conn)
-	myUUID, err := uuid.Parse("f41ad27a-881d-4f7f-a908-f16a26ce7b78")
+}
+
+func (mealLogHandler MealLogHandler) ServeHTTPLogs(writer http.ResponseWriter, request *http.Request) {
+	meals, err := mealLogHandler.dbConnection.GetMeals("f41ad27a-881d-4f7f-a908-f16a26ce7b78", time.Date(2025, 3, 1, 0, 0, 0, 0, time.Now().UTC().Location()))
 	if err != nil {
-		log.Fatal("Error parsing UUID", err)
+		log.Fatal("Error getting meals")
 	}
-
-	log.Print("Querying meals ...")
-	meals, err := queries.ListMealsByDate(ctx, sqlc.ListMealsByDateParams{
-		UserID:  myUUID,
-		ForDate: time.Date(2025, 3, 1, 0, 0, 0, 0, time.Now().UTC().Location()),
-	})
-	if err != nil {
-		log.Fatal("Error querying DB:", err)
-	}
-	log.Println("Got some meals:", len(meals))
-
 	httpMeals := []models.Meal{}
 	for _, m := range meals {
 		symptoms := []models.MealSymptom{}
@@ -66,5 +48,6 @@ func doSQL() []models.Meal {
 
 		httpMeals = append(httpMeals, meal)
 	}
-	return httpMeals
+
+	views.Base(views.Log(httpMeals), "Meal Log").Render(request.Context(), writer)
 }
