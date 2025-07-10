@@ -12,6 +12,8 @@ CREATE TABLE users (
   updated_at timestamp NOT NULL DEFAULT now()
 );
 
+CREATE INDEX idx_username ON users (username);
+
 CREATE TABLE meals (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES users(id) ON DELETE CASCADE,

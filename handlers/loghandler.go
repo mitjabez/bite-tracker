@@ -15,21 +15,18 @@ import (
 // TODO: Conolidate log/meallog
 type MealLogHandler struct {
 	dbConnection mealservice.DBConnection
+	username     string
 }
 
-func NewMealLogHandler() MealLogHandler {
-	dbconn, err := mealservice.New()
-	if err != nil {
-		log.Fatal("Error initializing DB", err)
-	}
-	return MealLogHandler{dbConnection: dbconn}
+func NewMealLogHandler(dbConnection mealservice.DBConnection, username string) MealLogHandler {
+	return MealLogHandler{dbConnection: dbConnection, username: username}
 
 }
 
 func (mealLogHandler MealLogHandler) ServeHTTPLogs(writer http.ResponseWriter, request *http.Request) {
-	meals, err := mealLogHandler.dbConnection.GetMeals("f41ad27a-881d-4f7f-a908-f16a26ce7b78", time.Date(2025, 3, 1, 0, 0, 0, 0, time.Now().UTC().Location()))
+	meals, err := mealLogHandler.dbConnection.GetMeals(mealLogHandler.username, time.Date(2025, 3, 1, 0, 0, 0, 0, time.Now().UTC().Location()))
 	if err != nil {
-		log.Fatal("Error getting meals")
+		log.Fatal("Error getting meals", err)
 	}
 	httpMeals := []models.Meal{}
 	for _, m := range meals {

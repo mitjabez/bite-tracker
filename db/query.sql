@@ -1,6 +1,7 @@
--- name: ListMealsByDate :many
-SELECT * FROM meals
-WHERE user_id = @user_id::uuid AND
+-- name: ListMealsByUsernameAndDate :many
+SELECT m.* FROM meals m
+JOIN users u ON m.user_id = u.id
+WHERE u.username = @username AND
 	time_of_meal > @for_date::timestamp AND time_of_meal < ( (@for_date::timestamp) + interval '1 day' )
 ORDER BY time_of_meal;
 

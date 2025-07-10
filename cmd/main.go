@@ -1,20 +1,35 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/a-h/templ"
 	"github.com/mitjabez/bite-tracker/handlers"
+	mealservice "github.com/mitjabez/bite-tracker/service"
 	"github.com/mitjabez/bite-tracker/views"
 )
 
+type Config struct {
+	Username         string
+	ConnectionString string
+}
+
 func main() {
 	// doSQL()
+	config := Config{
+		Username:         "salsajimmy",
+		ConnectionString: "postgres://biteapp:superburrito@localhost:5432/bite_tracker?sslmode=disable",
+	}
+	dbConnection, err := mealservice.New(config.ConnectionString)
+	if err != nil {
+		log.Fatal("Error initializing DB", err)
+	}
+	mealLogHandler := handlers.NewMealLogHandler(dbConnection, config.Username)
 
 	// logView := views.Base(views.Log(meals), "Bite Log")
 	addMealView := views.Base(views.AddMeal(), "Add Meal")
 	assetsHandler := http.FileServer(http.Dir("views/assets"))
-	mealLogHandler := handlers.NewMealLogHandler()
 
 	// http.Handle("/", templ.Handler(logView))
 	http.HandleFunc("/", mealLogHandler.ServeHTTPLogs)

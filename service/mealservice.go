@@ -2,11 +2,10 @@ package mealservice
 
 import (
 	"context"
-	"log"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/mitjabez/bite-tracker/db/sqlc"
 	"github.com/mitjabez/bite-tracker/models"
 )
@@ -20,12 +19,10 @@ type DBConnection struct {
 	queries *sqlc.Queries
 }
 
-func New() (DBConnection, error) {
+func New(connectionString string) (DBConnection, error) {
 	// TODO: Handle timeout
 	ctx := context.Background() //context.WithTimeout(context.Background(), 5*time.Second)
-
-	log.Print("Connecting to DB ...")
-	conn, err := pgx.Connect(ctx, "postgres://biteapp:superburrito@localhost:5432/bite_tracker?sslmode=disable")
+	conn, err := pgx.Connect(ctx, connectionString)
 	if err != nil {
 		return DBConnection{}, err
 	}
@@ -35,14 +32,12 @@ func New() (DBConnection, error) {
 	}, nil
 }
 
-func (conn DBConnection) GetMeals(userId string, date time.Time) ([]sqlc.Meal, error) {
-	myUUID, err := uuid.Parse(userId)
-	if err != nil {
-		return nil, err
-	}
-
-	meals, err := conn.queries.ListMealsByDate(conn.ctx, sqlc.ListMealsByDateParams{
-		UserID:  myUUID,
+func (conn DBConnection) GetMeals(username string, date time.Time) ([]sqlc.Meal, error) {
+	meals, err := conn.queries.ListMealsByUsernameAndDate(conn.ctx, sqlc.ListMealsByUsernameAndDateParams{
+		Username: pgtype.Text{
+			String: username,
+			Valid:  true,
+		},
 		ForDate: date,
 	})
 	if err != nil {

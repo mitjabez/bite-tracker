@@ -60,20 +60,21 @@ func (q *Queries) CreateMeal(ctx context.Context, arg CreateMealParams) (Meal, e
 	return i, err
 }
 
-const listMealsByDate = `-- name: ListMealsByDate :many
-SELECT id, user_id, meal_type, time_of_meal, description, hunger_level, symptoms, created_at, updated_at FROM meals
-WHERE user_id = $1::uuid AND
+const listMealsByUsernameAndDate = `-- name: ListMealsByUsernameAndDate :many
+SELECT m.id, m.user_id, m.meal_type, m.time_of_meal, m.description, m.hunger_level, m.symptoms, m.created_at, m.updated_at FROM meals m
+JOIN users u ON m.user_id = u.id
+WHERE u.username = $1 AND
 	time_of_meal > $2::timestamp AND time_of_meal < ( ($2::timestamp) + interval '1 day' )
 ORDER BY time_of_meal
 `
 
-type ListMealsByDateParams struct {
-	UserID  uuid.UUID
-	ForDate time.Time
+type ListMealsByUsernameAndDateParams struct {
+	Username pgtype.Text
+	ForDate  time.Time
 }
 
-func (q *Queries) ListMealsByDate(ctx context.Context, arg ListMealsByDateParams) ([]Meal, error) {
-	rows, err := q.db.Query(ctx, listMealsByDate, arg.UserID, arg.ForDate)
+func (q *Queries) ListMealsByUsernameAndDate(ctx context.Context, arg ListMealsByUsernameAndDateParams) ([]Meal, error) {
+	rows, err := q.db.Query(ctx, listMealsByUsernameAndDate, arg.Username, arg.ForDate)
 	if err != nil {
 		return nil, err
 	}
