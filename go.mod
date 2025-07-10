@@ -2,7 +2,11 @@ module github.com/mitjabez/bite-tracker
 
 go 1.24.4
 
-require github.com/a-h/templ v0.3.906
+require (
+	github.com/a-h/templ v0.3.906
+	github.com/google/uuid v1.6.0
+	github.com/jackc/pgx/v5 v5.7.5
+)
 
 require (
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
@@ -13,7 +17,6 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.7.5 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/natefinch/atomic v1.0.1 // indirect

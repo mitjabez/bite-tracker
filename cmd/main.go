@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/a-h/templ"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/mitjabez/bite-tracker/db/sqlc"
 	"github.com/mitjabez/bite-tracker/models"
 	"github.com/mitjabez/bite-tracker/views"
@@ -70,7 +70,15 @@ func doSQL() {
 	defer conn.Close(ctx)
 
 	queries := sqlc.New(conn)
-	meals, err := queries.ListMeals(ctx, pgtype.Timestamptz{})
+	myUUID, err := uuid.Parse("f41ad27a-881d-4f7f-a908-f16a26ce7b78")
+	if err != nil {
+		log.Fatal("Error parsing UUID", err)
+	}
+
+	meals, err := queries.ListMealsByDate(ctx, sqlc.ListMealsByDateParams{
+		UserID:  myUUID,
+		ForDate: time.Date(2025, 3, 1, 0, 0, 0, 0, time.Now().UTC().Location()),
+	})
 	if err != nil {
 		log.Fatal("Error querying DB:", err)
 	}

@@ -7,7 +7,9 @@ package sqlc
 
 import (
 	"context"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -28,7 +30,7 @@ RETURNING id, user_id, meal_type, time_of_meal, description, hunger_level, sympt
 type CreateMealParams struct {
 	UserID      pgtype.UUID
 	MealType    string
-	TimeOfMeal  pgtype.Timestamptz
+	TimeOfMeal  time.Time
 	Description string
 	HungerLevel pgtype.Int4
 	Symptoms    []string
@@ -58,14 +60,20 @@ func (q *Queries) CreateMeal(ctx context.Context, arg CreateMealParams) (Meal, e
 	return i, err
 }
 
-const listMeals = `-- name: ListMeals :many
+const listMealsByDate = `-- name: ListMealsByDate :many
 SELECT id, user_id, meal_type, time_of_meal, description, hunger_level, symptoms, created_at, updated_at FROM meals
-WHERE time_of_meal = $1
+WHERE user_id = $1::uuid AND
+	time_of_meal > $2::timestamptz AND time_of_meal < ( ($2::timestamptz) + interval '1 day' )
 ORDER BY time_of_meal
 `
 
-func (q *Queries) ListMeals(ctx context.Context, timeOfMeal pgtype.Timestamptz) ([]Meal, error) {
-	rows, err := q.db.Query(ctx, listMeals, timeOfMeal)
+type ListMealsByDateParams struct {
+	UserID  uuid.UUID
+	ForDate time.Time
+}
+
+func (q *Queries) ListMealsByDate(ctx context.Context, arg ListMealsByDateParams) ([]Meal, error) {
+	rows, err := q.db.Query(ctx, listMealsByDate, arg.UserID, arg.ForDate)
 	if err != nil {
 		return nil, err
 	}
@@ -106,13 +114,13 @@ WHERE id = $1
 `
 
 type UpdateMealParams struct {
-	ID          pgtype.UUID
+	ID          uuid.UUID
 	MealType    string
-	TimeOfMeal  pgtype.Timestamptz
+	TimeOfMeal  time.Time
 	Description string
 	HungerLevel pgtype.Int4
 	Symptoms    []string
-	UpdatedAt   pgtype.Timestamptz
+	UpdatedAt   time.Time
 }
 
 func (q *Queries) UpdateMeal(ctx context.Context, arg UpdateMealParams) error {

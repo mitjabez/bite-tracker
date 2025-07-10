@@ -1,6 +1,7 @@
--- name: ListMeals :many
+-- name: ListMealsByDate :many
 SELECT * FROM meals
-WHERE time_of_meal = $1
+WHERE user_id = @user_id::uuid AND
+	time_of_meal > @for_date::timestamptz AND time_of_meal < ( (@for_date::timestamptz) + interval '1 day' )
 ORDER BY time_of_meal;
 
 -- name: CreateMeal :one

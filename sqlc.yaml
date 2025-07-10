@@ -8,4 +8,11 @@ sql:
         package: "sqlc"
         out: "db/sqlc"
         sql_package: "pgx/v5"
+        overrides:
+          - db_type: "timestamptz"
+            go_type: "time.Time"
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
 

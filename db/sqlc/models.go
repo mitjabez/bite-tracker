@@ -5,24 +5,29 @@
 package sqlc
 
 import (
+	"time"
+
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Meal struct {
-	ID          pgtype.UUID
+	ID          uuid.UUID
 	UserID      pgtype.UUID
 	MealType    string
-	TimeOfMeal  pgtype.Timestamptz
+	TimeOfMeal  time.Time
 	Description string
 	HungerLevel pgtype.Int4
 	Symptoms    []string
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type User struct {
-	ID        pgtype.UUID
+	ID        uuid.UUID
 	Username  pgtype.Text
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
+	FirstName pgtype.Text
+	LastName  pgtype.Text
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
