@@ -63,11 +63,13 @@ func doSQL() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	log.Print("Connecting to DB ...")
 	conn, err := pgx.Connect(ctx, "postgres://biteapp:superburrito@localhost:5432/bite_tracker?sslmode=disable")
 	if err != nil {
 		log.Fatal("Cannot open DB:", err)
 	}
 	defer conn.Close(ctx)
+	log.Println("DONE")
 
 	queries := sqlc.New(conn)
 	myUUID, err := uuid.Parse("f41ad27a-881d-4f7f-a908-f16a26ce7b78")
@@ -75,6 +77,7 @@ func doSQL() {
 		log.Fatal("Error parsing UUID", err)
 	}
 
+	log.Print("Querying meals ...")
 	meals, err := queries.ListMealsByDate(ctx, sqlc.ListMealsByDateParams{
 		UserID:  myUUID,
 		ForDate: time.Date(2025, 3, 1, 0, 0, 0, 0, time.Now().UTC().Location()),

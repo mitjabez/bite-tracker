@@ -9,7 +9,7 @@ sql:
         out: "db/sqlc"
         sql_package: "pgx/v5"
         overrides:
-          - db_type: "timestamptz"
+          - db_type: "pg_catalog.timestamp"
             go_type: "time.Time"
           - db_type: "uuid"
             go_type:

@@ -63,7 +63,7 @@ func (q *Queries) CreateMeal(ctx context.Context, arg CreateMealParams) (Meal, e
 const listMealsByDate = `-- name: ListMealsByDate :many
 SELECT id, user_id, meal_type, time_of_meal, description, hunger_level, symptoms, created_at, updated_at FROM meals
 WHERE user_id = $1::uuid AND
-	time_of_meal > $2::timestamptz AND time_of_meal < ( ($2::timestamptz) + interval '1 day' )
+	time_of_meal > $2::timestamp AND time_of_meal < ( ($2::timestamp) + interval '1 day' )
 ORDER BY time_of_meal
 `
 
