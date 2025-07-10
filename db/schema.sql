@@ -18,7 +18,7 @@ CREATE TABLE meals (
   meal_type text NOT NULL,
   time_of_meal timestamp NOT NULL,
   description  text NOT NULL,
-  hunger_level integer,
+  hunger_level integer NOT NULL,
   symptoms text[] DEFAULT '{}',
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now()

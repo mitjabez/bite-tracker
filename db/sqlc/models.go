@@ -17,7 +17,7 @@ type Meal struct {
 	MealType    string
 	TimeOfMeal  time.Time
 	Description string
-	HungerLevel pgtype.Int4
+	HungerLevel int32
 	Symptoms    []string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time

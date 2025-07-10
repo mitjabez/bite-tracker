@@ -7,10 +7,10 @@ import (
 type MealSymptom string
 
 const (
-	Bloating MealSymptom = "Bloating"
-	Gas      MealSymptom = "Gas"
-	Acid     MealSymptom = "Acid"
-	Full     MealSymptom = "Full"
+	Bloating MealSymptom = "bloating"
+	Gas      MealSymptom = "gas"
+	Acid     MealSymptom = "acid"
+	Full     MealSymptom = "full"
 )
 
 var AllSymptoms = []MealSymptom{Bloating, Gas, Acid, Full}

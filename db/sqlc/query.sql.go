@@ -32,7 +32,7 @@ type CreateMealParams struct {
 	MealType    string
 	TimeOfMeal  time.Time
 	Description string
-	HungerLevel pgtype.Int4
+	HungerLevel int32
 	Symptoms    []string
 }
 
@@ -118,7 +118,7 @@ type UpdateMealParams struct {
 	MealType    string
 	TimeOfMeal  time.Time
 	Description string
-	HungerLevel pgtype.Int4
+	HungerLevel int32
 	Symptoms    []string
 	UpdatedAt   time.Time
 }
