@@ -1,50 +1,37 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/mitjabez/bite-tracker/models"
-	mealservice "github.com/mitjabez/bite-tracker/service"
+	db "github.com/mitjabez/bite-tracker/db/init"
+	"github.com/mitjabez/bite-tracker/db/sqlc"
 	"github.com/mitjabez/bite-tracker/views"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
-// TODO: Conolidate log/meallog
 type MealLogHandler struct {
-	dbConnection mealservice.DBConnection
-	username     string
+	queries  *sqlc.Queries
+	username string
 }
 
-func NewMealLogHandler(dbConnection mealservice.DBConnection, username string) MealLogHandler {
-	return MealLogHandler{dbConnection: dbConnection, username: username}
-
+func NewMealLogHandler(dbContext db.DBContext, username string) MealLogHandler {
+	return MealLogHandler{queries: dbContext.Queries, username: username}
 }
 
-func (mealLogHandler MealLogHandler) ServeHTTPLogs(writer http.ResponseWriter, request *http.Request) {
-	meals, err := mealLogHandler.dbConnection.GetMeals(mealLogHandler.username, time.Date(2025, 3, 1, 0, 0, 0, 0, time.Now().UTC().Location()))
+func (mealLogHandler MealLogHandler) ServeHTTPLogs(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+
+	params := sqlc.ListMealsByUsernameAndDateParams{
+		Username: mealLogHandler.username,
+		ForDate:  time.Date(2025, 3, 1, 0, 0, 0, 0, time.Now().UTC().Location()),
+	}
+	meals, err := mealLogHandler.queries.ListMealsByUsernameAndDate(ctx, params)
 	if err != nil {
-		log.Fatal("Error getting meals", err)
-	}
-	httpMeals := []models.Meal{}
-	for _, m := range meals {
-		symptoms := []models.MealSymptom{}
-		for _, s := range m.Symptoms {
-			symptoms = append(symptoms, models.MealSymptom(s))
-		}
-		meal := models.Meal{
-			Id:          m.ID.String(),
-			Type:        cases.Title(language.English, cases.Compact).String(m.MealType),
-			Time:        m.TimeOfMeal,
-			Description: m.Description,
-			HungerLevel: int64(m.HungerLevel),
-			Symptoms:    symptoms,
-		}
-
-		httpMeals = append(httpMeals, meal)
+		log.Fatal("Error retrieving meals", err)
 	}
 
-	views.Base(views.Log(httpMeals), "Meal Log").Render(request.Context(), writer)
+	views.Base(views.Log(meals), "Meal Log").Render(r.Context(), w)
 }

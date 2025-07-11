@@ -8,9 +8,12 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/mitjabez/bite-tracker/models"
+import (
+	"github.com/mitjabez/bite-tracker/db/sqlc"
+	"github.com/mitjabez/bite-tracker/models"
+)
 
-func Log(meals []models.Meal) templ.Component {
+func Log(meals []sqlc.Meal) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -41,9 +44,9 @@ func Log(meals []models.Meal) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(m.Type)
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(m.MealType)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 37, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 40, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -54,9 +57,9 @@ func Log(meals []models.Meal) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(m.Time.Format("15:04"))
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(m.TimeOfMeal.Format("15:04"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 39, Col: 83}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 42, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -69,7 +72,7 @@ func Log(meals []models.Meal) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(m.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 42, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 45, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -87,7 +90,7 @@ func Log(meals []models.Meal) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(s)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 52, Col: 44}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 55, Col: 44}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -98,9 +101,9 @@ func Log(meals []models.Meal) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var6 string
-				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(symptomEmoji(s))
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(symptomEmoji(models.MealSymptom(s)))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 53, Col: 28}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 56, Col: 48}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -124,7 +127,7 @@ func Log(meals []models.Meal) templ.Component {
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(s)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 64, Col: 46}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 67, Col: 46}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
@@ -137,7 +140,7 @@ func Log(meals []models.Meal) templ.Component {
 					var templ_7745c5c3_Var8 string
 					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(symptomEmoji(s))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 65, Col: 30}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `views/log.templ`, Line: 68, Col: 30}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 					if templ_7745c5c3_Err != nil {
@@ -162,37 +165,17 @@ func Log(meals []models.Meal) templ.Component {
 	})
 }
 
-func availableSymptoms(meal models.Meal) []string {
-	allSymptoms := []string{}
+func hasSymptom(symptom models.MealSymptom, meal sqlc.Meal) bool {
 	for _, s := range meal.Symptoms {
-
-		if s == models.Bloating {
-			allSymptoms = append(allSymptoms, "bloating")
-		} else if s == models.Gas {
-			allSymptoms = append(allSymptoms, "gas")
-		} else if s == models.Acid {
-			allSymptoms = append(allSymptoms, "acid")
-		} else if s == models.Full {
-			allSymptoms = append(allSymptoms, "full")
-		} else {
-			allSymptoms = append(allSymptoms, "unknown")
-		}
-	}
-	return allSymptoms
-
-}
-
-func hasSymptom(symptom models.MealSymptom, meal models.Meal) bool {
-	for _, s := range meal.Symptoms {
-		if s == symptom {
+		if models.MealSymptom(s) == symptom {
 			return true
 		}
 	}
 	return false
 }
 
-func symptomEmoji(s models.MealSymptom) string {
-	switch s {
+func symptomEmoji(symptom models.MealSymptom) string {
+	switch symptom {
 	case models.Bloating:
 		return "🎈"
 	case models.Gas:

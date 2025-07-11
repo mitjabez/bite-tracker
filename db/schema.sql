@@ -37,16 +37,16 @@ VALUES ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'salsajimmy', 'Salsa', 'Jimmy');
 -- Day 1
 INSERT INTO meals (user_id, meal_type, time_of_meal, description, hunger_level, symptoms)
 VALUES
-('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'breakfast', TIMESTAMP '2025-03-01 08:00:00', 'Oatmeal with fruit', 5, ARRAY[]::text[]),
-('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'lunch',     TIMESTAMP '2025-03-01 13:00:00', 'Grilled chicken sandwich', 6, ARRAY['bloating']),
-('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'dinner',    TIMESTAMP '2025-03-01 19:00:00', 'Pasta with tomato sauce', 7, ARRAY['full']);
+('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'Breakfast', TIMESTAMP '2025-03-01 08:00:00', 'Oatmeal with fruit', 5, ARRAY[]::text[]),
+('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'Lunch',     TIMESTAMP '2025-03-01 13:00:00', 'Grilled chicken sandwich', 6, ARRAY['bloating']),
+('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'Dinner',    TIMESTAMP '2025-03-01 19:00:00', 'Pasta with tomato sauce', 7, ARRAY['full']);
 
 -- Day 2
 INSERT INTO meals (user_id, meal_type, time_of_meal, description, hunger_level, symptoms)
 VALUES
-('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'breakfast', TIMESTAMP '2025-03-02 08:00:00', 'Yogurt and granola', 4, ARRAY[]::text[]),
-('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'lunch',     TIMESTAMP '2025-03-02 12:00:00', 'Turkey salad wrap', 6, ARRAY['gas']),
-('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'snack',     TIMESTAMP '2025-03-02 16:00:00', 'Apple slices', 3, ARRAY[]::text[]),
-('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'dinner',    TIMESTAMP '2025-03-02 20:00:00', 'Steamed vegetables and rice', 5, ARRAY['acid']);
+('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'Breakfast', TIMESTAMP '2025-03-02 08:00:00', 'Yogurt and granola', 4, ARRAY[]::text[]),
+('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'Lunch',     TIMESTAMP '2025-03-02 12:00:00', 'Turkey salad wrap', 6, ARRAY['gas']),
+('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'Snack',     TIMESTAMP '2025-03-02 16:00:00', 'Apple slices', 3, ARRAY[]::text[]),
+('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'Dinner',    TIMESTAMP '2025-03-02 20:00:00', 'Steamed vegetables and rice', 5, ARRAY['acid']);
 
 -- END: Seed data ---------------------------------------------

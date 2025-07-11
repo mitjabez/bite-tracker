@@ -1,9 +1,5 @@
 package models
 
-import (
-	"time"
-)
-
 type MealSymptom string
 
 const (
@@ -14,12 +10,3 @@ const (
 )
 
 var AllSymptoms = []MealSymptom{Bloating, Gas, Acid, Full}
-
-type Meal struct {
-	Id          string
-	Type        string
-	Time        time.Time
-	Description string
-	HungerLevel int64
-	Symptoms    []MealSymptom
-}

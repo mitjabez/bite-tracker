@@ -63,13 +63,13 @@ func (q *Queries) CreateMeal(ctx context.Context, arg CreateMealParams) (Meal, e
 const listMealsByUsernameAndDate = `-- name: ListMealsByUsernameAndDate :many
 SELECT m.id, m.user_id, m.meal_type, m.time_of_meal, m.description, m.hunger_level, m.symptoms, m.created_at, m.updated_at FROM meals m
 JOIN users u ON m.user_id = u.id
-WHERE u.username = $1 AND
+WHERE u.username = $1::text AND
 	time_of_meal > $2::timestamp AND time_of_meal < ( ($2::timestamp) + interval '1 day' )
 ORDER BY time_of_meal
 `
 
 type ListMealsByUsernameAndDateParams struct {
-	Username pgtype.Text
+	Username string
 	ForDate  time.Time
 }
 
