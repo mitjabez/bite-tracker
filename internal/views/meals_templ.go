@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "github.com/mitjabez/bite-tracker/internal/models"
 
-func Log(prevDate string, nextDate string, currentDate string, meals []models.MealView) templ.Component {
+func Meals(prevDate string, nextDate string, currentDate string, meals []models.MealView) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -38,7 +38,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 		var templ_7745c5c3_Var2 templ.SafeURL
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs("?date=" + prevDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/log.templ`, Line: 9, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 9, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -51,7 +51,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(currentDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/log.templ`, Line: 16, Col: 37}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 16, Col: 37}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -64,7 +64,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 		var templ_7745c5c3_Var4 templ.SafeURL
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinURLErrs("?date=" + nextDate)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/log.templ`, Line: 20, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 20, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -82,7 +82,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(m.MealType)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/log.templ`, Line: 37, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 37, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -95,7 +95,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(m.TimeOfMeal)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/log.templ`, Line: 39, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 39, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -108,7 +108,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(m.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/log.templ`, Line: 42, Col: 23}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 42, Col: 23}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -126,7 +126,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(s.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/log.templ`, Line: 52, Col: 49}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 52, Col: 49}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -139,7 +139,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(s.Emoji)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/log.templ`, Line: 53, Col: 20}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 53, Col: 20}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -162,7 +162,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(s.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/log.templ`, Line: 63, Col: 50}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 63, Col: 50}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -175,7 +175,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(s.Emoji)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/log.templ`, Line: 64, Col: 21}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 64, Col: 21}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -191,7 +191,7 @@ func Log(prevDate string, nextDate string, currentDate string, meals []models.Me
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</section><section class=\"section\"><div class=\"buttons is-centered\"><a class=\"button is-size-5 is-primary\" href=\"/add-meal\"><span class=\"icon\"><i class=\"fas fa-plus\"></i></span> <span>Add Meal</span></a></div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</section><section class=\"section\"><div class=\"buttons is-centered\"><a class=\"button is-size-5 is-primary\" href=\"/meals/new\"><span class=\"icon\"><i class=\"fas fa-plus\"></i></span> <span>Add Meal</span></a></div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -2,7 +2,7 @@ package views
 
 import "github.com/mitjabez/bite-tracker/internal/models"
 
-templ Log(prevDate string, nextDate string, currentDate string, meals []models.MealView) {
+templ Meals(prevDate string, nextDate string, currentDate string, meals []models.MealView) {
 	<section class="section">
 		<div class="field is-grouped is-grouped-centered" hx-boost="true">
 			<p class="control">
@@ -75,7 +75,7 @@ templ Log(prevDate string, nextDate string, currentDate string, meals []models.M
 	</section>
 	<section class="section">
 		<div class="buttons is-centered">
-			<a class="button is-size-5 is-primary" href="/add-meal">
+			<a class="button is-size-5 is-primary" href="/meals/new">
 				<span class="icon">
 					<i class="fas fa-plus"></i>
 				</span>

@@ -12,16 +12,16 @@ import (
 	"github.com/mitjabez/bite-tracker/internal/views"
 )
 
-type MealLogHandler struct {
+type Mealhandler struct {
 	queries  *sqlc.Queries
 	username string
 }
 
-func NewMealLogHandler(dbContext db.DBContext, username string) MealLogHandler {
-	return MealLogHandler{queries: dbContext.Queries, username: username}
+func NewMealHandler(dbContext db.DBContext, username string) Mealhandler {
+	return Mealhandler{queries: dbContext.Queries, username: username}
 }
 
-func (mealLogHandler MealLogHandler) ServeHTTPLogs(w http.ResponseWriter, r *http.Request) {
+func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	dateQuery := r.FormValue("date")
 	now := time.Now()
 	date := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
@@ -41,10 +41,10 @@ func (mealLogHandler MealLogHandler) ServeHTTPLogs(w http.ResponseWriter, r *htt
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 	params := sqlc.ListMealsByUsernameAndDateParams{
-		Username: mealLogHandler.username,
+		Username: h.username,
 		ForDate:  date,
 	}
-	meals, err := mealLogHandler.queries.ListMealsByUsernameAndDate(ctx, params)
+	meals, err := h.queries.ListMealsByUsernameAndDate(ctx, params)
 	if err != nil {
 		log.Fatal("Error retrieving meals", err)
 	}
@@ -62,7 +62,7 @@ func (mealLogHandler MealLogHandler) ServeHTTPLogs(w http.ResponseWriter, r *htt
 		})
 	}
 
-	views.Base(views.Log(prevDate, nextDate, currentDate, mealsView), "Meal Log").Render(r.Context(), w)
+	views.Layout(views.Meals(prevDate, nextDate, currentDate, mealsView), "Meal Log").Render(r.Context(), w)
 }
 
 func splitSymptoms(symptoms []string) (usedSymptoms, unusedSymptoms []models.MealSymptom) {

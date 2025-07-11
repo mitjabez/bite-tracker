@@ -19,13 +19,13 @@ func main() {
 	}
 	defer dbContext.Pool.Close()
 
-	mealLogHandler := handlers.NewMealLogHandler(dbContext, config.DefaultAppUsername)
+	mealLogHandler := handlers.NewMealHandler(dbContext, config.DefaultAppUsername)
 
-	addMealView := views.Base(views.AddMeal(), "Add Meal")
+	addMealView := views.Layout(views.MealsNew(), "New Meal")
 	assetsHandler := http.FileServer(http.Dir("views/assets"))
 
-	http.HandleFunc("/", mealLogHandler.ServeHTTPLogs)
-	http.Handle("/add-meal", templ.Handler(addMealView))
-	http.Handle("/assets/", http.StripPrefix("/assets", assetsHandler))
+	http.HandleFunc("GET /meals", mealLogHandler.ListMeals)
+	http.Handle("GET /meals/new", templ.Handler(addMealView))
+	http.Handle("GET /assets/", http.StripPrefix("/assets", assetsHandler))
 	http.ListenAndServe(":8000", nil)
 }
