@@ -14,5 +14,5 @@ db-delete:
 	docker compose down -v
 
 run: generate
-	go run cmd/main.go
+	go run cmd/bitetracker/main.go
 

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/mitjabez/bite-tracker/config"
-	"github.com/mitjabez/bite-tracker/db/sqlc"
+	"github.com/mitjabez/bite-tracker/internal/config"
+	"github.com/mitjabez/bite-tracker/internal/db/sqlc"
 )
 
 type DBContext struct {

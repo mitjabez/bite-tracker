@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	db "github.com/mitjabez/bite-tracker/db/init"
-	"github.com/mitjabez/bite-tracker/db/sqlc"
-	"github.com/mitjabez/bite-tracker/views"
+	db "github.com/mitjabez/bite-tracker/internal/db/init"
+	"github.com/mitjabez/bite-tracker/internal/db/sqlc"
+	"github.com/mitjabez/bite-tracker/internal/views"
 )
 
 type MealLogHandler struct {

@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/mitjabez/bite-tracker/config"
-	db "github.com/mitjabez/bite-tracker/db/init"
-	"github.com/mitjabez/bite-tracker/handlers"
-	"github.com/mitjabez/bite-tracker/views"
+	"github.com/mitjabez/bite-tracker/internal/config"
+	db "github.com/mitjabez/bite-tracker/internal/db/init"
+	"github.com/mitjabez/bite-tracker/internal/handlers"
+	"github.com/mitjabez/bite-tracker/internal/views"
 )
 
 func main() {
