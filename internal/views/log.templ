@@ -1,26 +1,23 @@
 package views
 
-import (
-	"github.com/mitjabez/bite-tracker/internal/db/sqlc"
-	"github.com/mitjabez/bite-tracker/internal/models"
-)
+import "github.com/mitjabez/bite-tracker/internal/models"
 
-templ Log(meals []sqlc.Meal) {
+templ Log(prevDate string, nextDate string, currentDate string, meals []models.MealView) {
 	<section class="section">
-		<div class="field is-grouped is-grouped-centered">
+		<div class="field is-grouped is-grouped-centered" hx-boost="true">
 			<p class="control">
-				<button class="button">&lt;</button>
+				<a class="button" href={ "?date=" + prevDate }>&lt;</a>
 			</p>
 			<p class="control">
 				<p class="is-size-4 is-align-self-center">
 					<span class="icon">
 						<i class="fas fa-calendar"></i>
 					</span>
-					<span class="ml-1">Tue, Dec 31 2025</span>
+					<span class="ml-1">{ currentDate } </span>
 				</p>
 			</p>
 			<p class="control">
-				<button class="button">&gt;</button>
+				<a class="button" href={ "?date=" + nextDate }>&gt;</a>
 			</p>
 		</div>
 	</section>
@@ -39,7 +36,7 @@ templ Log(meals []sqlc.Meal) {
 								<strong>
 									{ m.MealType }
 								</strong>
-								<span class="is-size-6 has-text-grey ml-2">&commat;{ m.TimeOfMeal.Format("15:04") }</span>
+								<span class="is-size-6 has-text-grey ml-2">&commat;{ m.TimeOfMeal }</span>
 							</p>
 							<p class="is-size-5">
 								{ m.Description }
@@ -51,9 +48,9 @@ templ Log(meals []sqlc.Meal) {
 						<div class="column is-8 has-text-left">
 							<div x-data="{ open: false }">
 								<div class="is-align-items-center">
-									for _, s := range m.Symptoms {
-										<a class="icon" href="#" title={ s }>
-											{ symptomEmoji(models.MealSymptom(s)) }
+									for _, s := range m.UsedSymptoms {
+										<a class="icon" href="#" title={ s.Name }>
+											{ s.Emoji }
 										</a>
 									}
 									<a class="icon has-text-grey" @click="open = !open" href="#" title="Add more symptoms">
@@ -62,12 +59,10 @@ templ Log(meals []sqlc.Meal) {
 								</div>
 								<div x-show="open" class="mt-2">
 									<div class="is-flex is-align-items-center">
-										for _, s := range models.AllSymptoms {
-											if !hasSymptom(s, m) {
-												<a class="icon" href="#" title={ s }>
-													{ symptomEmoji(s) }
-												</a>
-											}
+										for _, s := range m.UnusedSymptoms {
+											<a class="icon" href="#" title={ s.Name }>
+												{ s.Emoji }
+											</a>
 										}
 									</div>
 								</div>
@@ -79,7 +74,7 @@ templ Log(meals []sqlc.Meal) {
 		}
 	</section>
 	<section class="section">
-		<div class="buttons is-centered" hx-boost="true">
+		<div class="buttons is-centered">
 			<a class="button is-size-5 is-primary" href="/add-meal">
 				<span class="icon">
 					<i class="fas fa-plus"></i>
@@ -88,28 +83,4 @@ templ Log(meals []sqlc.Meal) {
 			</a>
 		</div>
 	</section>
-}
-
-func hasSymptom(symptom models.MealSymptom, meal sqlc.Meal) bool {
-	for _, s := range meal.Symptoms {
-		if models.MealSymptom(s) == symptom {
-			return true
-		}
-	}
-	return false
-}
-
-func symptomEmoji(symptom models.MealSymptom) string {
-	switch symptom {
-	case models.Bloating:
-		return "🎈"
-	case models.Gas:
-		return "💨"
-	case models.Acid:
-		return "🔥"
-	case models.Full:
-		return "🍽️"
-	default:
-		return "N/A"
-	}
 }

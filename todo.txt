@@ -1,3 +1,4 @@
 - Remove node stuff
 - sqlc to tools
 - Conolidate log/meallog naming
+- Logging
