@@ -16,7 +16,7 @@ CREATE INDEX idx_username ON users (username);
 
 CREATE TABLE meals (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES users(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   meal_type text NOT NULL,
   time_of_meal timestamp NOT NULL,
   description  text NOT NULL,

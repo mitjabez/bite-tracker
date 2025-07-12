@@ -4,8 +4,11 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	db "github.com/mitjabez/bite-tracker/internal/db/init"
 	"github.com/mitjabez/bite-tracker/internal/db/sqlc"
 	"github.com/mitjabez/bite-tracker/internal/models"
@@ -13,27 +16,21 @@ import (
 )
 
 type Mealhandler struct {
-	queries  *sqlc.Queries
-	username string
+	queries *sqlc.Queries
+	// TODO: Move to session
+	userId uuid.UUID
 }
 
-func NewMealHandler(dbContext db.DBContext, username string) Mealhandler {
-	return Mealhandler{queries: dbContext.Queries, username: username}
+func NewMealHandler(dbContext db.DBContext, userId string) Mealhandler {
+	userUUID, err := uuid.Parse(userId)
+	if err != nil {
+		log.Fatal("Error parsing uuid", userId, err)
+	}
+	return Mealhandler{queries: dbContext.Queries, userId: userUUID}
 }
 
 func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
-	dateQuery := r.FormValue("date")
-	now := time.Now()
-	date := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
-	if dateQuery != "" {
-		parsedDate, err := time.Parse("2006-01-02", dateQuery)
-		if err != nil {
-			log.Println("WARNING: Error parsing date", dateQuery)
-		} else {
-			date = parsedDate
-		}
-	}
-
+	date := dateParam(r)
 	currentDate := date.Format("2006-01-02")
 	prevDate := date.AddDate(0, 0, -1).Format("2006-01-02")
 	nextDate := date.AddDate(0, 0, 1).Format("2006-01-02")
@@ -41,8 +38,8 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 	params := sqlc.ListMealsByUsernameAndDateParams{
-		Username: h.username,
-		ForDate:  date,
+		UserID:  h.userId,
+		ForDate: date,
 	}
 	meals, err := h.queries.ListMealsByUsernameAndDate(ctx, params)
 	if err != nil {
@@ -54,6 +51,7 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 		usedSymptoms, unusedSymptoms := splitSymptoms(m.Symptoms)
 		mealsView = append(mealsView, models.MealView{
 			MealType:       m.MealType,
+			DateOfMeal:     m.TimeOfMeal.Format("2006-01-02"),
 			TimeOfMeal:     m.TimeOfMeal.Format("15:04"),
 			Description:    m.Description,
 			HungerLevel:    m.HungerLevel,
@@ -63,6 +61,108 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	}
 
 	views.Layout(views.Meals(prevDate, nextDate, currentDate, mealsView), "Meal Log").Render(r.Context(), w)
+}
+
+func (h Mealhandler) NewMeal(w http.ResponseWriter, r *http.Request) {
+	mealView := models.MealView{
+		DateOfMeal:  dateParam(r).Format("2006-01-02"),
+		TimeOfMeal:  time.Now().Format("15:04"),
+		HungerLevel: 4,
+	}
+	views.Layout(views.MealsNew(mealView, map[string]string{}), "New Meal").Render(r.Context(), w)
+}
+
+func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
+	dateParam := r.FormValue("date")
+	timeParam := r.FormValue("time")
+	mealParam := strings.Trim(r.FormValue("meal"), " ")
+	hungerParam := r.FormValue("hunger")
+
+	errors := map[string]string{}
+
+	if len(mealParam) == 0 {
+		errors["meal"] = "Meal is required"
+	}
+
+	_, err := time.Parse("2006-01-02", dateParam)
+	if err != nil {
+		errors["date"] = "Invalid date"
+	}
+
+	_, err = time.Parse("15:04", timeParam)
+	if err != nil {
+		errors["time"] = "Invalid time"
+	}
+	dateAndTime, err := time.Parse("2006-01-02 15:04", dateParam+" "+timeParam)
+	if err != nil {
+		errors["time"] = "Invalid date or time"
+		errors["date"] = "Invalid date or time"
+	}
+
+	if len(mealParam) == 0 {
+		errors["meal"] = "Meal is required"
+	}
+
+	hungerLevel, err := strconv.Atoi(hungerParam)
+	if err != nil || hungerLevel < 1 || hungerLevel > 5 {
+		errors["hunger"] = "Invalid hunger level"
+	}
+
+	mealsView := models.MealView{
+		DateOfMeal:  dateParam,
+		TimeOfMeal:  timeParam,
+		Description: mealParam,
+		HungerLevel: int32(hungerLevel),
+	}
+
+	if len(errors) > 0 {
+		views.Layout(views.MealsNew(mealsView, errors), "New Meal").Render(r.Context(), w)
+		return
+	}
+
+	mealType := "Dinner"
+	hour := dateAndTime.Hour()
+	switch {
+	case hour < 9:
+		mealType = "Breakfast"
+	case hour < 11:
+		mealType = "Brunch"
+	case hour < 15:
+		mealType = "Lunch"
+	default:
+		mealType = "Dinner"
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+	_, err = h.queries.CreateMeal(ctx, sqlc.CreateMealParams{
+		UserID:      h.userId,
+		MealType:    mealType,
+		TimeOfMeal:  dateAndTime,
+		Description: mealParam,
+		HungerLevel: int32(hungerLevel),
+		Symptoms:    []string{},
+	})
+	if err != nil {
+		log.Fatal("Cannot create meal:", err)
+	}
+
+	h.ListMeals(w, r)
+}
+
+func dateParam(r *http.Request) time.Time {
+	dateQuery := r.FormValue("date")
+	now := time.Now()
+	date := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	if dateQuery != "" {
+		parsedDate, err := time.Parse("2006-01-02", dateQuery)
+		if err != nil {
+			log.Println("WARNING: Error parsing date", dateQuery)
+		} else {
+			date = parsedDate
+		}
+	}
+	return date
 }
 
 func splitSymptoms(symptoms []string) (usedSymptoms, unusedSymptoms []models.MealSymptom) {

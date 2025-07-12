@@ -191,7 +191,20 @@ func Meals(prevDate string, nextDate string, currentDate string, meals []models.
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</section><section class=\"section\"><div class=\"buttons is-centered\"><a class=\"button is-size-5 is-primary\" href=\"/meals/new\"><span class=\"icon\"><i class=\"fas fa-plus\"></i></span> <span>Add Meal</span></a></div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</section><section class=\"section\"><div class=\"buttons is-centered\"><a class=\"button is-size-5 is-primary\" href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var12 templ.SafeURL
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs("/meals/new?date=" + currentDate)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/meals.templ`, Line: 78, Col: 81}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\"><span class=\"icon\"><i class=\"fas fa-plus\"></i></span> <span>Add Meal</span></a></div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

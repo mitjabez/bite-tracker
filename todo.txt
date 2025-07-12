@@ -1,5 +1,6 @@
 - Remove node stuff
 - Remove CONVENTIONS.md
 - sqlc to tools
+- sqlc to air
 - Conolidate log/meallog naming
 - Logging

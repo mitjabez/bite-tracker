@@ -1,54 +1,72 @@
 package views
 
-templ MealsNew() {
-<section class="section">
-	<div class="container">
-		<h1 class="title">Add Meal</h1>
-		<div class="field">
-			<label class="label" for="date">Date</label>
-			<input x-data x-init="$el.focus()" class="input" type="date" id="date" name="date" value="1.1.2025" />
-		</div>
-		<div class="field">
-			<label class="label" for="time">Time</label>
-			<input class="input" type="time" id="time" name="time" value="15:54" />
-		</div>
-		<div class="field" x-data='{ meal: "" }'>
-			<label class="label" for="meal">Meal</label>
-			<input class="input" type="text" id="meal" name="meal" placeholder="Type or pick below" x-model="meal" />
-			<div class="tags mt-2">
-				<button class="tag" x-on:click="meal='Chicken Rice'">Chicken Rice</button>
-				<button class="tag" x-on:click="meal='Oatmeal'">Oatmeal</button>
-				<button class="tag" x-on:click="meal='Salad'">Salad</button>
-			</div>
-		</div>
-		<div class="field" x-data="{ range: 4 }">
-			<label class="label" for="hunger">Hunger Level (1-not hungry, 5-starving)</label>
-			<div class="field has-addons">
-				<div class="control">
-					<input class="input" type="range" x-model="range" min="1" max="5" id="hunger" name="hunger" />
+import "fmt"
+import "github.com/mitjabez/bite-tracker/internal/models"
+
+templ MealsNew(meal models.MealView, errors map[string]string) {
+	<section class="section">
+		<div class="container">
+			<form hx-post="/meals/new" hx-target="body">
+				<h1 class="title">Add Meal</h1>
+				<div class="field">
+					<label class="label" for="date">Date</label>
+					<input class="input" type="date" id="date" name="date" value={ meal.DateOfMeal }/>
+					<span class="has-text-warning">{ errors["date"] }</span>
 				</div>
-				<div class="control">
-					<span class="button is-dark" x-text="range"></span>
+				<div class="field">
+					<label class="label" for="time">Time</label>
+					<input class="input" type="time" id="time" name="time" value={ meal.TimeOfMeal }/>
+					<span class="has-text-warning">{ errors["time"] }</span>
 				</div>
-			</div>
+				<div class="field" x-data={ fmt.Sprintf("{ meal: \"%s\" }", meal.Description) }>
+					<label class="label" for="meal">Meal</label>
+					<input
+						class="input"
+						type="text"
+						id="meal"
+						name="meal"
+						placeholder="Type or pick below"
+						x-data
+						x-init="$el.focus()"
+						x-model="meal"
+					/>
+					<span class="has-text-warning">{ errors["meal"] }</span>
+					<div class="tags mt-2">
+						<button class="tag" x-on:click="meal='Chicken Rice'">Chicken Rice</button>
+						<button class="tag" x-on:click="meal='Oatmeal'">Oatmeal</button>
+						<button class="tag" x-on:click="meal='Salad'">Salad</button>
+					</div>
+				</div>
+				<div class="field" x-data={ fmt.Sprintf("{ range: %d }", meal.HungerLevel) }>
+					<label class="label" for="hunger">Hunger Level (1-not hungry, 5-starving)</label>
+					<div class="field has-addons">
+						<div class="control">
+							<input class="input" type="range" x-model="range" min="1" max="5" id="hunger" name="hunger"/>
+							<span class="has-text-warning">{ errors["hunger"] }</span>
+						</div>
+						<div class="control">
+							<span class="button is-dark" x-text="range"></span>
+						</div>
+					</div>
+				</div>
+				<div class="field">
+					<label class="label" for="symptoms">Symptoms</label>
+					<div class="tags mt-2">
+						<button class="tag">Bloating</button>
+						<button class="tag">Gas</button>
+						<button class="tag">Acid</button>
+						<button class="tag">Full</button>
+					</div>
+				</div>
+				<div class="field is-grouped pt-5">
+					<div class="control">
+						<button type="submit" class="button is-primary">Submit</button>
+					</div>
+					<div class="control">
+						<a class="button is-primary is-light" href={ "/meals?date=" + meal.DateOfMeal }>Cancel</a>
+					</div>
+				</div>
+			</form>
 		</div>
-		<div class="field">
-			<label class="label" for="symptoms">Symptoms</label>
-			<div class="tags mt-2">
-				<button class="tag">Bloating</button>
-				<button class="tag">Gas</button>
-				<button class="tag">Acid</button>
-				<button class="tag">Full</button>
-			</div>
-		</div>
-		<div class="field is-grouped pt-5">
-			<div class="control">
-				<button class="button is-primary">Submit</button>
-			</div>
-			<div class="control">
-				<a class="button is-primary is-light" href="/meals">Cancel</a>
-			</div>
-		</div>
-	</div>
-</section>
+	</section>
 }

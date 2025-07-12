@@ -6,8 +6,9 @@ sql:
     gen:
       go:
         package: "sqlc"
-        out: "db/sqlc"
+        out: "internal/db/sqlc"
         sql_package: "pgx/v5"
+        emit_pointers_for_null_types: true
         overrides:
           - db_type: "pg_catalog.timestamp"
             go_type: "time.Time"

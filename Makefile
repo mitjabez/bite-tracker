@@ -13,6 +13,9 @@ db-stop:
 db-delete:
 	docker compose down -v
 
-run: generate
-	go run cmd/bitetracker/main.go
+build:
+	go build -o build/bite-tracker cmd/bitetracker/main.go
+
+run: build
+	build/bite-tracker
 

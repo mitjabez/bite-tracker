@@ -4,11 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/a-h/templ"
 	"github.com/mitjabez/bite-tracker/internal/config"
 	db "github.com/mitjabez/bite-tracker/internal/db/init"
 	"github.com/mitjabez/bite-tracker/internal/handlers"
-	"github.com/mitjabez/bite-tracker/internal/views"
 )
 
 func main() {
@@ -19,13 +17,13 @@ func main() {
 	}
 	defer dbContext.Pool.Close()
 
-	mealLogHandler := handlers.NewMealHandler(dbContext, config.DefaultAppUsername)
+	mealLogHandler := handlers.NewMealHandler(dbContext, config.DefaultAppUserId)
 
-	addMealView := views.Layout(views.MealsNew(), "New Meal")
 	assetsHandler := http.FileServer(http.Dir("views/assets"))
 
 	http.HandleFunc("GET /meals", mealLogHandler.ListMeals)
-	http.Handle("GET /meals/new", templ.Handler(addMealView))
+	http.HandleFunc("GET /meals/new", mealLogHandler.NewMeal)
+	http.HandleFunc("POST /meals/new", mealLogHandler.CreateMeal)
 	http.Handle("GET /assets/", http.StripPrefix("/assets", assetsHandler))
 	http.ListenAndServe(":8000", nil)
 }

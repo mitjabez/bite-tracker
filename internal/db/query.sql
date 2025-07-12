@@ -1,8 +1,7 @@
 -- name: ListMealsByUsernameAndDate :many
-SELECT m.* FROM meals m
-JOIN users u ON m.user_id = u.id
-WHERE u.username = @username::text AND
-	time_of_meal > @for_date::timestamp AND time_of_meal < ( (@for_date::timestamp) + interval '1 day' )
+SELECT * FROM meals
+WHERE user_id = @user_id AND
+	time_of_meal > @for_date AND time_of_meal < ( (@for_date) + interval '1 day' )
 ORDER BY time_of_meal;
 
 -- name: CreateMeal :one
@@ -28,3 +27,7 @@ UPDATE meals
   updated_at = $7
 WHERE id = $1;
 
+-- name: GetUser :one
+SELECT * FROM user
+WHERE u.username = @username::text
+LIMIT 1;

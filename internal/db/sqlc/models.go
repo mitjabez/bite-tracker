@@ -8,12 +8,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Meal struct {
 	ID          uuid.UUID
-	UserID      pgtype.UUID
+	UserID      uuid.UUID
 	MealType    string
 	TimeOfMeal  time.Time
 	Description string
@@ -25,9 +24,9 @@ type Meal struct {
 
 type User struct {
 	ID        uuid.UUID
-	Username  pgtype.Text
-	FirstName pgtype.Text
-	LastName  pgtype.Text
+	Username  *string
+	FirstName *string
+	LastName  *string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

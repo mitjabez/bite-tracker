@@ -75,7 +75,7 @@ templ Meals(prevDate string, nextDate string, currentDate string, meals []models
 	</section>
 	<section class="section">
 		<div class="buttons is-centered">
-			<a class="button is-size-5 is-primary" href="/meals/new">
+			<a class="button is-size-5 is-primary" href={ "/meals/new?date=" + currentDate }>
 				<span class="icon">
 					<i class="fas fa-plus"></i>
 				</span>

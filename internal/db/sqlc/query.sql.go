@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createMeal = `-- name: CreateMeal :one
@@ -28,7 +27,7 @@ RETURNING id, user_id, meal_type, time_of_meal, description, hunger_level, sympt
 `
 
 type CreateMealParams struct {
-	UserID      pgtype.UUID
+	UserID      uuid.UUID
 	MealType    string
 	TimeOfMeal  time.Time
 	Description string
@@ -60,21 +59,36 @@ func (q *Queries) CreateMeal(ctx context.Context, arg CreateMealParams) (Meal, e
 	return i, err
 }
 
+const getUser = `-- name: GetUser :one
+SELECT  FROM user
+WHERE u.username = $1::text
+LIMIT 1
+`
+
+type GetUserRow struct {
+}
+
+func (q *Queries) GetUser(ctx context.Context, username string) (GetUserRow, error) {
+	row := q.db.QueryRow(ctx, getUser, username)
+	var i GetUserRow
+	err := row.Scan()
+	return i, err
+}
+
 const listMealsByUsernameAndDate = `-- name: ListMealsByUsernameAndDate :many
-SELECT m.id, m.user_id, m.meal_type, m.time_of_meal, m.description, m.hunger_level, m.symptoms, m.created_at, m.updated_at FROM meals m
-JOIN users u ON m.user_id = u.id
-WHERE u.username = $1::text AND
-	time_of_meal > $2::timestamp AND time_of_meal < ( ($2::timestamp) + interval '1 day' )
+SELECT id, user_id, meal_type, time_of_meal, description, hunger_level, symptoms, created_at, updated_at FROM meals
+WHERE user_id = $1 AND
+	time_of_meal > $2 AND time_of_meal < ( ($2) + interval '1 day' )
 ORDER BY time_of_meal
 `
 
 type ListMealsByUsernameAndDateParams struct {
-	Username string
-	ForDate  time.Time
+	UserID  uuid.UUID
+	ForDate time.Time
 }
 
 func (q *Queries) ListMealsByUsernameAndDate(ctx context.Context, arg ListMealsByUsernameAndDateParams) ([]Meal, error) {
-	rows, err := q.db.Query(ctx, listMealsByUsernameAndDate, arg.Username, arg.ForDate)
+	rows, err := q.db.Query(ctx, listMealsByUsernameAndDate, arg.UserID, arg.ForDate)
 	if err != nil {
 		return nil, err
 	}

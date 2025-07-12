@@ -2,6 +2,7 @@ package models
 
 type MealView struct {
 	MealType       string
+	DateOfMeal     string
 	TimeOfMeal     string
 	Description    string
 	HungerLevel    int32

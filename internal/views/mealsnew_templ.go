@@ -8,7 +8,10 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func MealsNew() templ.Component {
+import "fmt"
+import "github.com/mitjabez/bite-tracker/internal/models"
+
+func MealsNew(meal models.MealView, errors map[string]string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,7 +32,124 @@ func MealsNew() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"section\"><div class=\"container\"><h1 class=\"title\">Add Meal</h1><div class=\"field\"><label class=\"label\" for=\"date\">Date</label> <input x-data x-init=\"$el.focus()\" class=\"input\" type=\"date\" id=\"date\" name=\"date\" value=\"1.1.2025\"></div><div class=\"field\"><label class=\"label\" for=\"time\">Time</label> <input class=\"input\" type=\"time\" id=\"time\" name=\"time\" value=\"15:54\"></div><div class=\"field\" x-data='{ meal: \"\" }'><label class=\"label\" for=\"meal\">Meal</label> <input class=\"input\" type=\"text\" id=\"meal\" name=\"meal\" placeholder=\"Type or pick below\" x-model=\"meal\"><div class=\"tags mt-2\"><button class=\"tag\" x-on:click=\"meal='Chicken Rice'\">Chicken Rice</button> <button class=\"tag\" x-on:click=\"meal='Oatmeal'\">Oatmeal</button> <button class=\"tag\" x-on:click=\"meal='Salad'\">Salad</button></div></div><div class=\"field\" x-data=\"{ range: 4 }\"><label class=\"label\" for=\"hunger\">Hunger Level (1-not hungry, 5-starving)</label><div class=\"field has-addons\"><div class=\"control\"><input class=\"input\" type=\"range\" x-model=\"range\" min=\"1\" max=\"5\" id=\"hunger\" name=\"hunger\"></div><div class=\"control\"><span class=\"button is-dark\" x-text=\"range\"></span></div></div></div><div class=\"field\"><label class=\"label\" for=\"symptoms\">Symptoms</label><div class=\"tags mt-2\"><button class=\"tag\">Bloating</button> <button class=\"tag\">Gas</button> <button class=\"tag\">Acid</button> <button class=\"tag\">Full</button></div></div><div class=\"field is-grouped pt-5\"><div class=\"control\"><button class=\"button is-primary\">Submit</button></div><div class=\"control\"><a class=\"button is-primary is-light\" href=\"/meals\">Cancel</a></div></div></div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"section\"><div class=\"container\"><form hx-post=\"/meals/new\" hx-target=\"body\"><h1 class=\"title\">Add Meal</h1><div class=\"field\"><label class=\"label\" for=\"date\">Date</label> <input class=\"input\" type=\"date\" id=\"date\" name=\"date\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(meal.DateOfMeal)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 13, Col: 83}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"> <span class=\"has-text-warning\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var3 string
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(errors["date"])
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 14, Col: 52}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</span></div><div class=\"field\"><label class=\"label\" for=\"time\">Time</label> <input class=\"input\" type=\"time\" id=\"time\" name=\"time\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(meal.TimeOfMeal)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 18, Col: 83}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"> <span class=\"has-text-warning\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(errors["time"])
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 19, Col: 52}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span></div><div class=\"field\" x-data=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{ meal: \"%s\" }", meal.Description))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 21, Col: 81}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"><label class=\"label\" for=\"meal\">Meal</label> <input class=\"input\" type=\"text\" id=\"meal\" name=\"meal\" placeholder=\"Type or pick below\" x-data x-init=\"$el.focus()\" x-model=\"meal\"> <span class=\"has-text-warning\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(errors["meal"])
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 33, Col: 52}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</span><div class=\"tags mt-2\"><button class=\"tag\" x-on:click=\"meal='Chicken Rice'\">Chicken Rice</button> <button class=\"tag\" x-on:click=\"meal='Oatmeal'\">Oatmeal</button> <button class=\"tag\" x-on:click=\"meal='Salad'\">Salad</button></div></div><div class=\"field\" x-data=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{ range: %d }", meal.HungerLevel))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 40, Col: 78}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\"><label class=\"label\" for=\"hunger\">Hunger Level (1-not hungry, 5-starving)</label><div class=\"field has-addons\"><div class=\"control\"><input class=\"input\" type=\"range\" x-model=\"range\" min=\"1\" max=\"5\" id=\"hunger\" name=\"hunger\"> <span class=\"has-text-warning\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(errors["hunger"])
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 45, Col: 56}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</span></div><div class=\"control\"><span class=\"button is-dark\" x-text=\"range\"></span></div></div></div><div class=\"field\"><label class=\"label\" for=\"symptoms\">Symptoms</label><div class=\"tags mt-2\"><button class=\"tag\">Bloating</button> <button class=\"tag\">Gas</button> <button class=\"tag\">Acid</button> <button class=\"tag\">Full</button></div></div><div class=\"field is-grouped pt-5\"><div class=\"control\"><button type=\"submit\" class=\"button is-primary\">Submit</button></div><div class=\"control\"><a class=\"button is-primary is-light\" href=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 templ.SafeURL
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs("/meals?date=" + meal.DateOfMeal)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 66, Col: 83}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\">Cancel</a></div></div></form></div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
