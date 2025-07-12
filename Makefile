@@ -1,3 +1,6 @@
+# TODO: Add other phonies
+.PHONY: build
+
 generate:
 	go tool templ generate
 
