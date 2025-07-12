@@ -11,26 +11,33 @@ templ MealsNew(meal models.MealView, errors map[string]string) {
 				<div class="field">
 					<label class="label" for="date">Date</label>
 					<input class="input" type="date" id="date" name="date" value={ meal.DateOfMeal }/>
-					<span class="has-text-warning">{ errors["date"] }</span>
+					<p class="help is-danger">{ errors["date"] }</p>
 				</div>
 				<div class="field">
 					<label class="label" for="time">Time</label>
 					<input class="input" type="time" id="time" name="time" value={ meal.TimeOfMeal }/>
-					<span class="has-text-warning">{ errors["time"] }</span>
+					<p class="help is-danger">{ errors["time"] }</p>
 				</div>
 				<div class="field" x-data={ fmt.Sprintf("{ meal: \"%s\" }", meal.Description) }>
 					<label class="label" for="meal">Meal</label>
-					<input
-						class="input"
-						type="text"
-						id="meal"
-						name="meal"
-						placeholder="Type or pick below"
-						x-data
-						x-init="$el.focus()"
-						x-model="meal"
-					/>
-					<span class="has-text-warning">{ errors["meal"] }</span>
+					<div class="control has-icons-right">
+						<input
+							class={ templ.KV("input is-danger", errors["meal"] !="" ), "input" }
+							type="text"
+							id="meal"
+							name="meal"
+							placeholder="Type or pick below"
+							x-data
+							x-init="$el.focus()"
+							x-model="meal"
+						/>
+						if errors["meal"] != "" {
+							<span class="icon is-small is-right">
+								<i class="fas fa-exclamation-triangle"></i>
+							</span>
+						}
+						<p class="help is-danger">{ errors["meal"] }</p>
+					</div>
 					<div class="tags mt-2">
 						<button class="tag" x-on:click="meal='Chicken Rice'">Chicken Rice</button>
 						<button class="tag" x-on:click="meal='Oatmeal'">Oatmeal</button>
@@ -42,7 +49,7 @@ templ MealsNew(meal models.MealView, errors map[string]string) {
 					<div class="field has-addons">
 						<div class="control">
 							<input class="input" type="range" x-model="range" min="1" max="5" id="hunger" name="hunger"/>
-							<span class="has-text-warning">{ errors["hunger"] }</span>
+							<p class="help is-danger">{ errors["hunger"] }</p>
 						</div>
 						<div class="control">
 							<span class="button is-dark" x-text="range"></span>
