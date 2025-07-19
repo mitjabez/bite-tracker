@@ -48,14 +48,14 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 
 	mealsView := []models.MealView{}
 	for _, m := range meals {
-		usedSymptoms, unusedSymptoms := splitSymptoms(m.Symptoms)
+		unusedSymptoms := getUnusedSymptoms(m.Symptoms)
 		mealsView = append(mealsView, models.MealView{
 			MealType:       m.MealType,
 			DateOfMeal:     m.TimeOfMeal.Format("2006-01-02"),
 			TimeOfMeal:     m.TimeOfMeal.Format("15:04"),
 			Description:    m.Description,
 			HungerLevel:    m.HungerLevel,
-			UsedSymptoms:   usedSymptoms,
+			UsedSymptoms:   m.Symptoms,
 			UnusedSymptoms: unusedSymptoms,
 		})
 	}
@@ -69,7 +69,7 @@ func (h Mealhandler) NewMeal(w http.ResponseWriter, r *http.Request) {
 		TimeOfMeal:  time.Now().Format("15:04"),
 		HungerLevel: 4,
 	}
-	views.Layout(views.MealsNew(mealView, map[string]string{}, models.SortedSymptomNames()), "New Meal").Render(r.Context(), w)
+	views.Layout(views.MealsNew(mealView, map[string]string{}, models.Symptoms), "New Meal").Render(r.Context(), w)
 }
 
 func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +117,7 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(errors) > 0 {
-		views.Layout(views.MealsNew(mealsView, errors, models.SortedSymptomNames()), "New Meal").Render(r.Context(), w)
+		views.Layout(views.MealsNew(mealsView, errors, models.Symptoms), "New Meal").Render(r.Context(), w)
 		return
 	}
 
@@ -166,18 +166,18 @@ func dateParam(r *http.Request) time.Time {
 	return date
 }
 
-func splitSymptoms(symptoms []string) (usedSymptoms, unusedSymptoms []models.MealSymptom) {
+// TODO: Optimize
+func getUnusedSymptoms(activeSymptoms []string) []string {
 	usedSymptomNames := map[string]bool{}
-	for _, name := range symptoms {
-		usedSymptomNames[name] = true
+	for _, s := range activeSymptoms {
+		usedSymptomNames[s] = true
 	}
 
-	for name, symptom := range models.AllSymptoms {
-		if usedSymptomNames[name] {
-			usedSymptoms = append(usedSymptoms, symptom)
-		} else {
-			unusedSymptoms = append(unusedSymptoms, symptom)
+	unusedSymptoms := []string{}
+	for _, s := range models.Symptoms {
+		if !usedSymptomNames[s] {
+			unusedSymptoms = append(unusedSymptoms, s)
 		}
 	}
-	return
+	return unusedSymptoms
 }

@@ -57,6 +57,7 @@ templ MealsNew(meal models.MealView, errors map[string]string, symptoms []string
 					</div>
 				</div>
 				<div class="field">
+					<label class="label">Symptoms</label>
 					<div class="tags">
 						for _, symptom := range symptoms {
 							<div x-data="{ selected: false }">

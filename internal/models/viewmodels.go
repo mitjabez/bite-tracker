@@ -1,15 +1,13 @@
 package models
 
-import "slices"
-
 type MealView struct {
 	MealType       string
 	DateOfMeal     string
 	TimeOfMeal     string
 	Description    string
 	HungerLevel    int32
-	UsedSymptoms   []MealSymptom
-	UnusedSymptoms []MealSymptom
+	UsedSymptoms   []string
+	UnusedSymptoms []string
 }
 
 type MealSymptom struct {
@@ -17,30 +15,9 @@ type MealSymptom struct {
 	Emoji string
 }
 
-var AllSymptoms = map[string]MealSymptom{
-	"Bloating": {
-		Name:  "Bloating",
-		Emoji: "🎈",
-	},
-	"Gas": {
-		Name:  "Gas",
-		Emoji: "💨",
-	},
-	"Acid": {
-		Name:  "Acid",
-		Emoji: "🔥",
-	},
-	"Full": {
-		Name:  "Full",
-		Emoji: "🍽️",
-	},
-}
-
-func SortedSymptomNames() []string {
-	names := []string{}
-	for s := range AllSymptoms {
-		names = append(names, s)
-	}
-	slices.Sort(names)
-	return names
+var Symptoms = []string{
+	"Acid",
+	"Bloating",
+	"Full",
+	"Gas",
 }

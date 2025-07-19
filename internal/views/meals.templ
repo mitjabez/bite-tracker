@@ -47,22 +47,23 @@ templ Meals(prevDate string, nextDate string, currentDate string, meals []models
 						<div class="column is-2"></div>
 						<div class="column is-8 has-text-left">
 							<div x-data="{ open: false }">
-								<div class="is-align-items-center">
+								<div class="tags">
 									for _, s := range m.UsedSymptoms {
-										<a class="icon" href="#" title={ s.Name }>
-											{ s.Emoji }
-										</a>
+										<button class="tag">
+											{ s }
+										</button>
 									}
-									<a class="icon has-text-grey" @click="open = !open" href="#" title="Add more symptoms">
-										<i class="fas fa-plus"></i>
+									<a class="icon has-text-grey" @click="open = !open" title="Add more symptoms">
+										<i x-show="!open" class="fas fa-plus"></i>
+										<i x-show="open" class="fas fa-minus"></i>
 									</a>
 								</div>
 								<div x-show="open" class="mt-2">
-									<div class="is-flex is-align-items-center">
+									<div class="tags">
 										for _, s := range m.UnusedSymptoms {
-											<a class="icon" href="#" title={ s.Name }>
-												{ s.Emoji }
-											</a>
+											<button class="tag">
+												{ s }
+											</button>
 										}
 									</div>
 								</div>

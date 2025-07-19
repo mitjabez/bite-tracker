@@ -1,5 +1,4 @@
-# TODO: Add other phonies
-.PHONY: build
+# TODO: Add phonies
 
 generate:
 	go tool templ generate
@@ -16,7 +15,7 @@ db-stop:
 db-delete:
 	docker compose down -v
 
-build:
+build: generate
 	go build -o build/bite-tracker cmd/bitetracker/main.go
 
 run: build
