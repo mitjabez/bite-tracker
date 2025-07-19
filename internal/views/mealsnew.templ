@@ -3,7 +3,7 @@ package views
 import "fmt"
 import "github.com/mitjabez/bite-tracker/internal/models"
 
-templ MealsNew(meal models.MealView, errors map[string]string) {
+templ MealsNew(meal models.MealView, errors map[string]string, symptoms []string) {
 	<section class="section">
 		<div class="container">
 			<form hx-post="/meals/new" hx-target="body">
@@ -57,13 +57,57 @@ templ MealsNew(meal models.MealView, errors map[string]string) {
 					</div>
 				</div>
 				<div class="field">
-					<label class="label" for="symptoms">Symptoms</label>
-					<div class="tags mt-2">
-						<button class="tag">Bloating</button>
-						<button class="tag">Gas</button>
-						<button class="tag">Acid</button>
-						<button class="tag">Full</button>
+					<div class="tags">
+						for _, symptom := range symptoms {
+							<div x-data="{ selected: false }">
+								<input type="checkbox" id={ symptom } name="symptoms" value={ symptom } style="display: none"/>
+								<label
+									x-bind:class="selected ? 'tag is-clickable is-info' : 'tag is-clickable'"
+									x-on:click="selected = !selected; console.log(selected);"
+									for={ symptom }
+								>
+									{ symptom }
+								</label>
+							</div>
+						}
 					</div>
+					<select id="symptoms" name="symptoms" multiple>
+						<option value="bluating">bloating</option>
+					</select>
+					<label class="label" for="symptoms">Symptoms</label>
+					<div x-data="tags">
+						<div x-show="selected" class="tags has-addons mt-2">
+							<button class="tag is-danger">Bloating</button>
+							<a class="tag is-delete" @click="toggle" href="#"></a>
+						</div>
+						<div x-show="!selected" class="tags mt-2">
+							<button class="tag" @click="toggle" href="#">Bloating</button>
+						</div>
+						<!--button class="tag">Gas</button>
+						<button class="tag">Acid</button>
+						<button class="tag">Full</button-->
+					</div>
+					<script>
+                    document.addEventListener('alpine:init', () => {
+                        Alpine.data('tags', () => ({
+                            selected: false,
+
+                            toggle() {
+                                this.selected = !this.selected
+                                for (const option of document.querySelectorAll('#myselect option')) {
+                                    console.log(option.value);
+                                    if (option.value == "bloating") {
+                                        if (selected) {
+                                            option.setAttribute("selected", "selected");
+                                        } else {
+                                            option.removeAttribute("selected");
+                                        }
+                                    }
+                                }
+                            }
+                        }))
+                    })
+                </script>
 				</div>
 				<div class="field is-grouped pt-5">
 					<div class="control">

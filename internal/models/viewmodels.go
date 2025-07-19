@@ -1,5 +1,7 @@
 package models
 
+import "slices"
+
 type MealView struct {
 	MealType       string
 	DateOfMeal     string
@@ -32,4 +34,13 @@ var AllSymptoms = map[string]MealSymptom{
 		Name:  "Full",
 		Emoji: "🍽️",
 	},
+}
+
+func SortedSymptomNames() []string {
+	names := []string{}
+	for s := range AllSymptoms {
+		names = append(names, s)
+	}
+	slices.Sort(names)
+	return names
 }

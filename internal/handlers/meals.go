@@ -43,7 +43,7 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	}
 	meals, err := h.queries.ListMealsByUsernameAndDate(ctx, params)
 	if err != nil {
-		log.Fatal("Error retrieving meals", err)
+		log.Fatal("Error retrieving meals: ", err)
 	}
 
 	mealsView := []models.MealView{}
@@ -69,7 +69,7 @@ func (h Mealhandler) NewMeal(w http.ResponseWriter, r *http.Request) {
 		TimeOfMeal:  time.Now().Format("15:04"),
 		HungerLevel: 4,
 	}
-	views.Layout(views.MealsNew(mealView, map[string]string{}), "New Meal").Render(r.Context(), w)
+	views.Layout(views.MealsNew(mealView, map[string]string{}, models.SortedSymptomNames()), "New Meal").Render(r.Context(), w)
 }
 
 func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
@@ -77,6 +77,7 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 	timeParam := r.FormValue("time")
 	mealParam := strings.Trim(r.FormValue("meal"), " ")
 	hungerParam := r.FormValue("hunger")
+	symptoms := r.PostForm["symptoms"]
 
 	errors := map[string]string{}
 
@@ -116,7 +117,7 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(errors) > 0 {
-		views.Layout(views.MealsNew(mealsView, errors), "New Meal").Render(r.Context(), w)
+		views.Layout(views.MealsNew(mealsView, errors, models.SortedSymptomNames()), "New Meal").Render(r.Context(), w)
 		return
 	}
 
@@ -141,7 +142,7 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 		TimeOfMeal:  dateAndTime,
 		Description: mealParam,
 		HungerLevel: int32(hungerLevel),
-		Symptoms:    []string{},
+		Symptoms:    symptoms,
 	})
 	if err != nil {
 		log.Fatal("Cannot create meal:", err)
