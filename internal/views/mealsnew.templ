@@ -71,43 +71,6 @@ templ MealsNew(meal models.MealView, errors map[string]string, symptoms []string
 							</div>
 						}
 					</div>
-					<select id="symptoms" name="symptoms" multiple>
-						<option value="bluating">bloating</option>
-					</select>
-					<label class="label" for="symptoms">Symptoms</label>
-					<div x-data="tags">
-						<div x-show="selected" class="tags has-addons mt-2">
-							<button class="tag is-danger">Bloating</button>
-							<a class="tag is-delete" @click="toggle" href="#"></a>
-						</div>
-						<div x-show="!selected" class="tags mt-2">
-							<button class="tag" @click="toggle" href="#">Bloating</button>
-						</div>
-						<!--button class="tag">Gas</button>
-						<button class="tag">Acid</button>
-						<button class="tag">Full</button-->
-					</div>
-					<script>
-                    document.addEventListener('alpine:init', () => {
-                        Alpine.data('tags', () => ({
-                            selected: false,
-
-                            toggle() {
-                                this.selected = !this.selected
-                                for (const option of document.querySelectorAll('#myselect option')) {
-                                    console.log(option.value);
-                                    if (option.value == "bloating") {
-                                        if (selected) {
-                                            option.setAttribute("selected", "selected");
-                                        } else {
-                                            option.removeAttribute("selected");
-                                        }
-                                    }
-                                }
-                            }
-                        }))
-                    })
-                </script>
 				</div>
 				<div class="field is-grouped pt-5">
 					<div class="control">

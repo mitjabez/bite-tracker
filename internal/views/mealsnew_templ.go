@@ -173,14 +173,14 @@ func MealsNew(meal models.MealView, errors map[string]string, symptoms []string)
 			return templ_7745c5c3_Err
 		}
 		for _, symptom := range symptoms {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, " <div x-data=\"{ selected: false }\"><input type=\"checkbox\" id=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div x-data=\"{ selected: false }\"><input type=\"checkbox\" id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(symptom)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 64, Col: 43}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 63, Col: 43}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -193,7 +193,7 @@ func MealsNew(meal models.MealView, errors map[string]string, symptoms []string)
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(symptom)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 64, Col: 77}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 63, Col: 77}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -206,7 +206,7 @@ func MealsNew(meal models.MealView, errors map[string]string, symptoms []string)
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(symptom)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 68, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 67, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
@@ -219,7 +219,7 @@ func MealsNew(meal models.MealView, errors map[string]string, symptoms []string)
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(symptom)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 70, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 69, Col: 18}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -230,14 +230,14 @@ func MealsNew(meal models.MealView, errors map[string]string, symptoms []string)
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div><select id=\"symptoms\" name=\"symptoms\" multiple><option value=\"bluating\">bloating</option></select> <label class=\"label\" for=\"symptoms\">Symptoms</label><div x-data=\"tags\"><div x-show=\"selected\" class=\"tags has-addons mt-2\"><button class=\"tag is-danger\">Bloating</button> <a class=\"tag is-delete\" @click=\"toggle\" href=\"#\"></a></div><div x-show=\"!selected\" class=\"tags mt-2\"><button class=\"tag\" @click=\"toggle\" href=\"#\">Bloating</button></div><!--button class=\"tag\">Gas</button>\n\t\t\t\t\t\t<button class=\"tag\">Acid</button>\n\t\t\t\t\t\t<button class=\"tag\">Full</button--></div><script>\n                    document.addEventListener('alpine:init', () => {\n                        Alpine.data('tags', () => ({\n                            selected: false,\n\n                            toggle() {\n                                this.selected = !this.selected\n                                for (const option of document.querySelectorAll('#myselect option')) {\n                                    console.log(option.value);\n                                    if (option.value == \"bloating\") {\n                                        if (selected) {\n                                            option.setAttribute(\"selected\", \"selected\");\n                                        } else {\n                                            option.removeAttribute(\"selected\");\n                                        }\n                                    }\n                                }\n                            }\n                        }))\n                    })\n                </script></div><div class=\"field is-grouped pt-5\"><div class=\"control\"><button type=\"submit\" class=\"button is-primary\">Submit</button></div><div class=\"control\"><a class=\"button is-primary is-light\" href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div></div><div class=\"field is-grouped pt-5\"><div class=\"control\"><button type=\"submit\" class=\"button is-primary\">Submit</button></div><div class=\"control\"><a class=\"button is-primary is-light\" href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var16 templ.SafeURL
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinURLErrs("/meals?date=" + meal.DateOfMeal)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 118, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/mealsnew.templ`, Line: 80, Col: 83}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {
