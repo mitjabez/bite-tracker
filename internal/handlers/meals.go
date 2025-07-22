@@ -50,7 +50,7 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	for _, m := range meals {
 		unusedSymptoms := getUnusedSymptoms(m.Symptoms)
 		mealsView = append(mealsView, models.MealView{
-			MealType:       m.MealType,
+			MealType:       m.MealTypeID,
 			DateOfMeal:     m.TimeOfMeal.Format("2006-01-02"),
 			TimeOfMeal:     m.TimeOfMeal.Format("15:04"),
 			Description:    m.Description,
@@ -138,7 +138,7 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 	_, err = h.queries.CreateMeal(ctx, sqlc.CreateMealParams{
 		UserID:      h.userId,
-		MealType:    mealType,
+		MealTypeID:  mealType,
 		TimeOfMeal:  dateAndTime,
 		Description: mealParam,
 		HungerLevel: int32(hungerLevel),

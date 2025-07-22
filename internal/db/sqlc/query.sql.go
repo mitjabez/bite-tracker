@@ -15,7 +15,7 @@ import (
 const createMeal = `-- name: CreateMeal :one
 INSERT INTO meals (
   user_id,
-  meal_type,
+  meal_type_id,
   time_of_meal,
   description,
   hunger_level,
@@ -23,12 +23,12 @@ INSERT INTO meals (
 ) VALUES (
   $1,$2,$3,$4,$5,$6
 )
-RETURNING id, user_id, meal_type, time_of_meal, description, hunger_level, symptoms, created_at, updated_at
+RETURNING id, user_id, meal_type_id, time_of_meal, description, hunger_level, symptoms, created_at, updated_at
 `
 
 type CreateMealParams struct {
 	UserID      uuid.UUID
-	MealType    string
+	MealTypeID  string
 	TimeOfMeal  time.Time
 	Description string
 	HungerLevel int32
@@ -38,7 +38,7 @@ type CreateMealParams struct {
 func (q *Queries) CreateMeal(ctx context.Context, arg CreateMealParams) (Meal, error) {
 	row := q.db.QueryRow(ctx, createMeal,
 		arg.UserID,
-		arg.MealType,
+		arg.MealTypeID,
 		arg.TimeOfMeal,
 		arg.Description,
 		arg.HungerLevel,
@@ -48,7 +48,7 @@ func (q *Queries) CreateMeal(ctx context.Context, arg CreateMealParams) (Meal, e
 	err := row.Scan(
 		&i.ID,
 		&i.UserID,
-		&i.MealType,
+		&i.MealTypeID,
 		&i.TimeOfMeal,
 		&i.Description,
 		&i.HungerLevel,
@@ -76,7 +76,7 @@ func (q *Queries) GetUser(ctx context.Context, username string) (GetUserRow, err
 }
 
 const listMealsByUsernameAndDate = `-- name: ListMealsByUsernameAndDate :many
-SELECT id, user_id, meal_type, time_of_meal, description, hunger_level, symptoms, created_at, updated_at FROM meals
+SELECT id, user_id, meal_type_id, time_of_meal, description, hunger_level, symptoms, created_at, updated_at FROM meals
 WHERE user_id = $1 AND
 	time_of_meal > $2 AND time_of_meal < ( ($2) + interval '1 day' )
 ORDER BY time_of_meal
@@ -99,7 +99,7 @@ func (q *Queries) ListMealsByUsernameAndDate(ctx context.Context, arg ListMealsB
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
-			&i.MealType,
+			&i.MealTypeID,
 			&i.TimeOfMeal,
 			&i.Description,
 			&i.HungerLevel,
@@ -117,9 +117,46 @@ func (q *Queries) ListMealsByUsernameAndDate(ctx context.Context, arg ListMealsB
 	return items, nil
 }
 
+const top3Meals = `-- name: Top3Meals :many
+SELECT description, times_used FROM meals_catalog
+WHERE user_id = $1 AND meal_type_id = $2
+ORDER BY times_used DESC
+LIMIT 3
+`
+
+type Top3MealsParams struct {
+	UserID     uuid.UUID
+	MealTypeID string
+}
+
+type Top3MealsRow struct {
+	Description string
+	TimesUsed   int32
+}
+
+func (q *Queries) Top3Meals(ctx context.Context, arg Top3MealsParams) ([]Top3MealsRow, error) {
+	rows, err := q.db.Query(ctx, top3Meals, arg.UserID, arg.MealTypeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Top3MealsRow
+	for rows.Next() {
+		var i Top3MealsRow
+		if err := rows.Scan(&i.Description, &i.TimesUsed); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateMeal = `-- name: UpdateMeal :exec
 UPDATE meals
-  SET meal_type = $2,
+  SET meal_type_id = $2,
   time_of_meal = $3,
   description = $4,
   hunger_level = $5,
@@ -130,7 +167,7 @@ WHERE id = $1
 
 type UpdateMealParams struct {
 	ID          uuid.UUID
-	MealType    string
+	MealTypeID  string
 	TimeOfMeal  time.Time
 	Description string
 	HungerLevel int32
@@ -141,12 +178,36 @@ type UpdateMealParams struct {
 func (q *Queries) UpdateMeal(ctx context.Context, arg UpdateMealParams) error {
 	_, err := q.db.Exec(ctx, updateMeal,
 		arg.ID,
-		arg.MealType,
+		arg.MealTypeID,
 		arg.TimeOfMeal,
 		arg.Description,
 		arg.HungerLevel,
 		arg.Symptoms,
 		arg.UpdatedAt,
 	)
+	return err
+}
+
+const updateMealsCatalog = `-- name: UpdateMealsCatalog :exec
+INSERT INTO meals_catalog (
+	user_id,
+	description,
+  meal_type_id
+) VALUES (
+	$1,
+	$2,
+	$3
+) ON CONFLICT(user_id, description, meal_type_id) DO UPDATE
+SET times_used = times_used + 1
+`
+
+type UpdateMealsCatalogParams struct {
+	UserID      uuid.UUID
+	Description string
+	MealTypeID  string
+}
+
+func (q *Queries) UpdateMealsCatalog(ctx context.Context, arg UpdateMealsCatalogParams) error {
+	_, err := q.db.Exec(ctx, updateMealsCatalog, arg.UserID, arg.Description, arg.MealTypeID)
 	return err
 }
