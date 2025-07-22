@@ -13,10 +13,12 @@ import (
 	"github.com/mitjabez/bite-tracker/internal/db/sqlc"
 	"github.com/mitjabez/bite-tracker/internal/models"
 	"github.com/mitjabez/bite-tracker/internal/views"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type Mealhandler struct {
-	queries *sqlc.Queries
+	dbContext db.DBContext
 	// TODO: Move to session
 	userId uuid.UUID
 }
@@ -26,7 +28,7 @@ func NewMealHandler(dbContext db.DBContext, userId string) Mealhandler {
 	if err != nil {
 		log.Fatal("Error parsing uuid", userId, err)
 	}
-	return Mealhandler{queries: dbContext.Queries, userId: userUUID}
+	return Mealhandler{dbContext: dbContext, userId: userUUID}
 }
 
 func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +43,7 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 		UserID:  h.userId,
 		ForDate: date,
 	}
-	meals, err := h.queries.ListMealsByUsernameAndDate(ctx, params)
+	meals, err := h.dbContext.Queries.ListMealsByUsernameAndDate(ctx, params)
 	if err != nil {
 		log.Fatal("Error retrieving meals: ", err)
 	}
@@ -50,7 +52,7 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	for _, m := range meals {
 		unusedSymptoms := getUnusedSymptoms(m.Symptoms)
 		mealsView = append(mealsView, models.MealView{
-			MealType:       m.MealTypeID,
+			MealType:       cases.Title(language.English).String(m.MealTypeID),
 			DateOfMeal:     m.TimeOfMeal.Format("2006-01-02"),
 			TimeOfMeal:     m.TimeOfMeal.Format("15:04"),
 			Description:    m.Description,
@@ -69,7 +71,22 @@ func (h Mealhandler) NewMeal(w http.ResponseWriter, r *http.Request) {
 		TimeOfMeal:  time.Now().Format("15:04"),
 		HungerLevel: 4,
 	}
-	views.Layout(views.MealsNew(mealView, map[string]string{}, models.Symptoms), "New Meal").Render(r.Context(), w)
+
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+	top3MealsResult, err := h.dbContext.Queries.Top3Meals(ctx, sqlc.Top3MealsParams{
+		UserID:     h.userId,
+		MealTypeID: resolveMealType(time.Now()),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	top3Meals := []string{}
+	for _, m := range top3MealsResult {
+		top3Meals = append(top3Meals, m.Description)
+	}
+	views.Layout(views.MealsNew(mealView, map[string]string{}, models.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
 }
 
 func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
@@ -117,26 +134,23 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(errors) > 0 {
-		views.Layout(views.MealsNew(mealsView, errors, models.Symptoms), "New Meal").Render(r.Context(), w)
+		views.Layout(views.MealsNew(mealsView, errors, models.Symptoms, []string{"kebab"}), "New Meal").Render(r.Context(), w)
 		return
 	}
 
-	mealType := "Dinner"
-	hour := dateAndTime.Hour()
-	switch {
-	case hour < 9:
-		mealType = "Breakfast"
-	case hour < 11:
-		mealType = "Brunch"
-	case hour < 15:
-		mealType = "Lunch"
-	default:
-		mealType = "Dinner"
-	}
-
-	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 4*time.Second)
 	defer cancel()
-	_, err = h.queries.CreateMeal(ctx, sqlc.CreateMealParams{
+
+	tx, err := h.dbContext.Pool.Begin(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+
+	qtx := h.dbContext.Queries.WithTx(tx)
+
+	mealType := resolveMealType(dateAndTime)
+	_, err = qtx.CreateMeal(ctx, sqlc.CreateMealParams{
 		UserID:      h.userId,
 		MealTypeID:  mealType,
 		TimeOfMeal:  dateAndTime,
@@ -145,10 +159,38 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 		Symptoms:    symptoms,
 	})
 	if err != nil {
-		log.Fatal("Cannot create meal:", err)
+		log.Fatal("Cannot create meal: ", err)
+	}
+
+	err = qtx.UpdateMealsCatalog(ctx, sqlc.UpdateMealsCatalogParams{
+		UserID:      h.userId,
+		Description: mealParam,
+		MealTypeID:  mealType,
+	})
+	if err != nil {
+		log.Fatal("Cannot create meals catalog: ", err)
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		log.Fatal("Cannot commit meals transaction: ", err)
 	}
 
 	h.ListMeals(w, r)
+}
+
+func resolveMealType(time time.Time) string {
+	hour := time.Hour()
+	switch {
+	case hour < 9:
+		return "breakfast"
+	case hour < 11:
+		return "brunch"
+	case hour < 15:
+		return "lunch"
+	default:
+		return "dinner"
+	}
 }
 
 func dateParam(r *http.Request) time.Time {

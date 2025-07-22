@@ -48,7 +48,10 @@ CREATE TABLE meals_catalog (
   updated_at timestamp NOT NULL DEFAULT now()
 );
 
-CREATE UNIQUE INDEX idx_meals_catalog_user_mealtype_usage ON meals_catalog (user_id,meal_type_id, times_used);
+CREATE INDEX idx_meals_catalog_user_mealtype_description_usage ON meals_catalog (user_id, meal_type_id, description, times_used);
+ALTER TABLE meals_catalog
+ADD CONSTRAINT uniq_user_meal_desc_type UNIQUE (user_id, description, meal_type_id);
+
 
 -- END: Schema --------------------------------------------------
 
@@ -76,7 +79,16 @@ INSERT INTO meals (user_id, meal_type_id, time_of_meal, description, hunger_leve
 VALUES
 ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'breakfast', TIMESTAMP '2025-03-02 08:00:00', 'Yogurt and granola', 4, ARRAY[]::text[]),
 ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'lunch',     TIMESTAMP '2025-03-02 12:00:00', 'Turkey salad wrap', 2, ARRAY['gas']),
-('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'dinner',     TIMESTAMP '2025-03-02 16:00:00', 'Apple slices', 1, ARRAY[]::text[]),
+('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'dinner',    TIMESTAMP '2025-03-02 16:00:00', 'Apple slices', 1, ARRAY[]::text[]),
 ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'dinner',    TIMESTAMP '2025-03-02 20:00:00', 'Steamed vegetables and rice', 4, ARRAY['acid']::text[]);
+
+INSERT INTO meals_catalog (
+	user_id,
+  meal_type_id,
+	times_used,
+	description
+) VALUES
+('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'dinner', 1, 'Ham&Cheese sandwich'),
+('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'dinner', 3, 'Cucumber salad');
 
 -- END: Seed data ---------------------------------------------

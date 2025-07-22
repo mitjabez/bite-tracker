@@ -3,7 +3,7 @@ package views
 import "fmt"
 import "github.com/mitjabez/bite-tracker/internal/models"
 
-templ MealsNew(meal models.MealView, errors map[string]string, symptoms []string) {
+templ MealsNew(meal models.MealView, errors map[string]string, symptoms []string, topMeals []string) {
 	<section class="section">
 		<div class="container">
 			<form hx-post="/meals/new" hx-target="body">
@@ -39,9 +39,9 @@ templ MealsNew(meal models.MealView, errors map[string]string, symptoms []string
 						<p class="help is-danger">{ errors["meal"] }</p>
 					</div>
 					<div class="tags mt-2">
-						<button type="button" class="tag" x-on:click="meal='Chicken Rice'">Chicken Rice</button>
-						<button type="button" class="tag" x-on:click="meal='Oatmeal'">Oatmeal</button>
-						<button type="button" class="tag" x-on:click="meal='Salad'">Salad</button>
+						for _, tm := range topMeals {
+							<button type="button" class="tag" x-on:click={ fmt.Sprintf("meal=\"%s\"", tm) }>{ tm }</button>
+						}
 					</div>
 				</div>
 				<div class="field" x-data={ fmt.Sprintf("{ range: %d }", meal.HungerLevel) }>

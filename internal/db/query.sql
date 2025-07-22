@@ -48,4 +48,4 @@ INSERT INTO meals_catalog (
 	@description,
 	@meal_type_id
 ) ON CONFLICT(user_id, description, meal_type_id) DO UPDATE
-SET times_used = times_used + 1;
+SET times_used = meals_catalog.times_used + 1;
