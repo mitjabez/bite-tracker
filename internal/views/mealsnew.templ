@@ -39,9 +39,9 @@ templ MealsNew(meal models.MealView, errors map[string]string, symptoms []string
 						<p class="help is-danger">{ errors["meal"] }</p>
 					</div>
 					<div class="tags mt-2">
-						<button class="tag" x-on:click="meal='Chicken Rice'">Chicken Rice</button>
-						<button class="tag" x-on:click="meal='Oatmeal'">Oatmeal</button>
-						<button class="tag" x-on:click="meal='Salad'">Salad</button>
+						<button type="button" class="tag" x-on:click="meal='Chicken Rice'">Chicken Rice</button>
+						<button type="button" class="tag" x-on:click="meal='Oatmeal'">Oatmeal</button>
+						<button type="button" class="tag" x-on:click="meal='Salad'">Salad</button>
 					</div>
 				</div>
 				<div class="field" x-data={ fmt.Sprintf("{ range: %d }", meal.HungerLevel) }>

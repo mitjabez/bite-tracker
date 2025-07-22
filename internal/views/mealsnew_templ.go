@@ -142,7 +142,7 @@ func MealsNew(meal models.MealView, errors map[string]string, symptoms []string)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</p></div><div class=\"tags mt-2\"><button class=\"tag\" x-on:click=\"meal='Chicken Rice'\">Chicken Rice</button> <button class=\"tag\" x-on:click=\"meal='Oatmeal'\">Oatmeal</button> <button class=\"tag\" x-on:click=\"meal='Salad'\">Salad</button></div></div><div class=\"field\" x-data=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</p></div><div class=\"tags mt-2\"><button type=\"button\" class=\"tag\" x-on:click=\"meal='Chicken Rice'\">Chicken Rice</button> <button type=\"button\" class=\"tag\" x-on:click=\"meal='Oatmeal'\">Oatmeal</button> <button type=\"button\" class=\"tag\" x-on:click=\"meal='Salad'\">Salad</button></div></div><div class=\"field\" x-data=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
