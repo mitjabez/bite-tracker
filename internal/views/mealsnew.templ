@@ -85,6 +85,7 @@ templ mealForm(action string, method string, meal models.MealView, errors map[st
 							</div>
 						}
 					</div>
+					<p class="help is-danger">{ errors["symptoms"] }</p>
 				</div>
 				<div class="field is-grouped pt-5">
 					<div class="control">

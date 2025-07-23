@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -160,6 +161,13 @@ func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
 	hungerLevel, err := strconv.Atoi(hungerParam)
 	if err != nil || hungerLevel < 1 || hungerLevel > 5 {
 		errors["hunger"] = "Invalid hunger level"
+	}
+
+	for _, s := range symptoms {
+		if !slices.Contains(models.Symptoms, s) {
+			errors["symptoms"] = "Symptom " + s + " doesn't exist"
+			break
+		}
 	}
 
 	mealsView := models.MealView{
