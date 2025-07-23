@@ -4,9 +4,22 @@ import "fmt"
 import "github.com/mitjabez/bite-tracker/internal/models"
 
 templ MealsNew(meal models.MealView, errors map[string]string, symptoms []string, topMeals []string) {
+	@mealForm("/meals/new", "POST", meal, errors, symptoms, topMeals)
+}
+
+templ MealsEdit(meal models.MealView, errors map[string]string, symptoms []string, topMeals []string) {
+	@mealForm("/meals/"+meal.Id+"/edit", "PUT", meal, errors, symptoms, topMeals)
+}
+
+templ mealForm(action string, method string, meal models.MealView, errors map[string]string, symptoms []string,
+	topMeals []string) {
 	<section class="section">
 		<div class="container">
-			<form hx-post="/meals/new" hx-target="body">
+			<form if method=="POST" {
+	hx-post={ action }
+} else {
+	hx-put={ action }
+} hx-target="body">
 				<h1 class="title">Add Meal</h1>
 				<div class="field">
 					<label class="label" for="date">Date</label>
@@ -60,7 +73,7 @@ templ MealsNew(meal models.MealView, errors map[string]string, symptoms []string
 					<label class="label">Symptoms</label>
 					<div class="tags">
 						for _, symptom := range symptoms {
-							<div x-data="{ selected: false }">
+							<div x-data={ fmt.Sprintf("{ selected: %t }", meal.IsSymptomUsed(symptom)) }>
 								<input type="checkbox" id={ symptom } name="symptoms" value={ symptom } style="display: none"/>
 								<label
 									x-bind:class="selected ? 'tag is-clickable is-info' : 'tag is-clickable'"

@@ -1,6 +1,11 @@
 package models
 
+import (
+	"slices"
+)
+
 type MealView struct {
+	Id             string
 	MealType       string
 	DateOfMeal     string
 	TimeOfMeal     string
@@ -16,8 +21,12 @@ type MealSymptom struct {
 }
 
 var Symptoms = []string{
-	"Acid",
-	"Bloating",
-	"Full",
-	"Gas",
+	"acid",
+	"bloating",
+	"full",
+	"gas",
+}
+
+func (mv MealView) IsSymptomUsed(symptom string) bool {
+	return slices.Contains(mv.UsedSymptoms, symptom)
 }

@@ -52,6 +52,7 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	for _, m := range meals {
 		unusedSymptoms := getUnusedSymptoms(m.Symptoms)
 		mealsView = append(mealsView, models.MealView{
+			Id:             m.ID.String(),
 			MealType:       cases.Title(language.English).String(m.MealTypeID),
 			DateOfMeal:     m.TimeOfMeal.Format("2006-01-02"),
 			TimeOfMeal:     m.TimeOfMeal.Format("15:04"),
@@ -72,24 +73,59 @@ func (h Mealhandler) NewMeal(w http.ResponseWriter, r *http.Request) {
 		HungerLevel: 4,
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
-	defer cancel()
-	top3MealsResult, err := h.dbContext.Queries.Top3Meals(ctx, sqlc.Top3MealsParams{
-		UserID:     h.userId,
-		MealTypeID: resolveMealType(time.Now()),
-	})
+	top3Meals, err := h.top3Meals(r.Context())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Error retrieving top meals for user: ", err)
 	}
 
-	top3Meals := []string{}
-	for _, m := range top3MealsResult {
-		top3Meals = append(top3Meals, m.Description)
-	}
 	views.Layout(views.MealsNew(mealView, map[string]string{}, models.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
 }
 
-func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
+func (h Mealhandler) EditMeal(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+	userIdParam := r.PathValue("id")
+	userUUID, err := uuid.Parse(userIdParam)
+	if err != nil {
+		log.Fatal("Invalid uuid ", userIdParam)
+	}
+
+	meal, err := h.dbContext.Queries.GetMeal(ctx, userUUID)
+	if err != nil {
+		log.Fatal("Error reading meal: ", err)
+	}
+
+	unusedSymptoms := getUnusedSymptoms(meal.Symptoms)
+	mealView := models.MealView{
+		Id:             userIdParam,
+		MealType:       meal.MealTypeID,
+		DateOfMeal:     meal.TimeOfMeal.Format("2006-01-02"),
+		TimeOfMeal:     meal.TimeOfMeal.Format("15:04"),
+		Description:    meal.Description,
+		HungerLevel:    meal.HungerLevel,
+		UsedSymptoms:   meal.Symptoms,
+		UnusedSymptoms: unusedSymptoms,
+	}
+
+	top3Meals, err := h.top3Meals(r.Context())
+	if err != nil {
+		log.Fatal("Error retrieving top meals for user: ", err)
+	}
+	views.Layout(views.MealsEdit(mealView, map[string]string{}, models.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
+}
+
+func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
+	mealIdParam := r.PathValue("id")
+	var mealUUID uuid.UUID
+	var err error
+	isNewMeal := r.Method == "POST"
+	if !isNewMeal {
+		mealUUID, err = uuid.Parse(mealIdParam)
+		if err != nil {
+			log.Fatal("Invalid meal uuid ", mealIdParam)
+		}
+	}
+
 	dateParam := r.FormValue("date")
 	timeParam := r.FormValue("time")
 	mealParam := strings.Trim(r.FormValue("meal"), " ")
@@ -102,7 +138,7 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 		errors["meal"] = "Meal is required"
 	}
 
-	_, err := time.Parse("2006-01-02", dateParam)
+	_, err = time.Parse("2006-01-02", dateParam)
 	if err != nil {
 		errors["date"] = "Invalid date"
 	}
@@ -134,7 +170,15 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(errors) > 0 {
-		views.Layout(views.MealsNew(mealsView, errors, models.Symptoms, []string{"kebab"}), "New Meal").Render(r.Context(), w)
+		top3Meals, err := h.top3Meals(r.Context())
+		if err != nil {
+			log.Fatal("Error obtaining top 3 meals")
+		}
+		if isNewMeal {
+			views.Layout(views.MealsNew(mealsView, errors, models.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
+		} else {
+			views.Layout(views.MealsEdit(mealsView, errors, models.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
+		}
 		return
 	}
 
@@ -150,25 +194,28 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 	qtx := h.dbContext.Queries.WithTx(tx)
 
 	mealType := resolveMealType(dateAndTime)
-	_, err = qtx.CreateMeal(ctx, sqlc.CreateMealParams{
-		UserID:      h.userId,
-		MealTypeID:  mealType,
-		TimeOfMeal:  dateAndTime,
-		Description: mealParam,
-		HungerLevel: int32(hungerLevel),
-		Symptoms:    symptoms,
-	})
-	if err != nil {
-		log.Fatal("Cannot create meal: ", err)
+	if isNewMeal {
+		_, err = qtx.CreateMeal(ctx, sqlc.CreateMealParams{
+			MealTypeID:  mealType,
+			TimeOfMeal:  dateAndTime,
+			Description: mealParam,
+			HungerLevel: int32(hungerLevel),
+			Symptoms:    symptoms,
+			UserID:      h.userId,
+		})
+	} else {
+		err = qtx.UpdateMeal(ctx, sqlc.UpdateMealParams{
+			ID:          mealUUID,
+			MealTypeID:  mealType,
+			TimeOfMeal:  dateAndTime,
+			Description: mealParam,
+			HungerLevel: int32(hungerLevel),
+			Symptoms:    symptoms,
+			UpdatedAt:   time.Now(),
+		})
 	}
-
-	err = qtx.UpdateMealsCatalog(ctx, sqlc.UpdateMealsCatalogParams{
-		UserID:      h.userId,
-		Description: mealParam,
-		MealTypeID:  mealType,
-	})
 	if err != nil {
-		log.Fatal("Cannot create meals catalog: ", err)
+		log.Fatal("Cannot create or update meal: ", err)
 	}
 
 	err = tx.Commit(ctx)
@@ -177,6 +224,23 @@ func (h Mealhandler) CreateMeal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.ListMeals(w, r)
+}
+
+func (h Mealhandler) top3Meals(parentContext context.Context) ([]string, error) {
+	ctx, cancel := context.WithTimeout(parentContext, 2*time.Second)
+	defer cancel()
+	top3MealsResult, err := h.dbContext.Queries.Top3Meals(ctx, sqlc.Top3MealsParams{
+		UserID:     h.userId,
+		MealTypeID: resolveMealType(time.Now()),
+	})
+	if err != nil {
+		return nil, err
+	}
+	top3Meals := []string{}
+	for _, m := range top3MealsResult {
+		top3Meals = append(top3Meals, m.Description)
+	}
+	return top3Meals, nil
 }
 
 func resolveMealType(time time.Time) string {

@@ -59,6 +59,28 @@ func (q *Queries) CreateMeal(ctx context.Context, arg CreateMealParams) (Meal, e
 	return i, err
 }
 
+const getMeal = `-- name: GetMeal :one
+SELECT id, user_id, meal_type_id, time_of_meal, description, hunger_level, symptoms, created_at, updated_at FROM meals
+WHERE id = $1
+`
+
+func (q *Queries) GetMeal(ctx context.Context, id uuid.UUID) (Meal, error) {
+	row := q.db.QueryRow(ctx, getMeal, id)
+	var i Meal
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.MealTypeID,
+		&i.TimeOfMeal,
+		&i.Description,
+		&i.HungerLevel,
+		&i.Symptoms,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT  FROM user
 WHERE u.username = $1::text

@@ -1,3 +1,7 @@
+-- name: GetMeal :one
+SELECT * FROM meals
+WHERE id = @id;
+
 -- name: ListMealsByUsernameAndDate :many
 SELECT * FROM meals
 WHERE user_id = @user_id AND

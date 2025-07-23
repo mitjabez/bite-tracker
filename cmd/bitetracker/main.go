@@ -21,9 +21,11 @@ func main() {
 
 	assetsHandler := http.FileServer(http.Dir("views/assets"))
 
+	http.HandleFunc("GET /meals/{id}", mealLogHandler.EditMeal)
 	http.HandleFunc("GET /meals", mealLogHandler.ListMeals)
 	http.HandleFunc("GET /meals/new", mealLogHandler.NewMeal)
-	http.HandleFunc("POST /meals/new", mealLogHandler.CreateMeal)
+	http.HandleFunc("PUT /meals/{id}/edit", mealLogHandler.HandleMealForm)
+	http.HandleFunc("POST /meals/new", mealLogHandler.HandleMealForm)
 	http.Handle("GET /assets/", http.StripPrefix("/assets", assetsHandler))
 	http.ListenAndServe(":8000", nil)
 }

@@ -22,57 +22,63 @@ templ Meals(prevDate string, nextDate string, currentDate string, meals []models
 		</div>
 	</section>
 	<section class="section py-0">
-		for _, m := range meals {
-			<div class="card">
-				<div class="card-content">
-					<div class="columns is-centered is-vcentered mb-0">
-						<div class="column is-2 has-text-centered">
-							<span class="icon is-size-3">
-								<i class="fas fa-utensils"></i>
-							</span>
+		<div class="container">
+			for _, m := range meals {
+				<div class="card">
+					<div class="card-content">
+						<div class="columns is-centered is-vcentered mb-0">
+							<div class="column is-2 has-text-centered">
+								<span class="icon is-size-3">
+									<i class="fas fa-utensils"></i>
+								</span>
+							</div>
+							<div class="column is-8">
+								<p class="is-size-5">
+									<strong>
+										{ m.MealType }
+									</strong>
+									<span class="is-size-6 has-text-grey ml-2">&commat;{ m.TimeOfMeal }</span>
+								</p>
+								<p class="is-size-5">
+									{ m.Description }
+								</p>
+							</div>
+							<div class="column is-2 has-text-centered">
+								<a class="button is-primary is-outlined" href={ "/meals/" + m.Id }>Edit</a>
+							</div>
 						</div>
-						<div class="column is-8">
-							<p class="is-size-5">
-								<strong>
-									{ m.MealType }
-								</strong>
-								<span class="is-size-6 has-text-grey ml-2">&commat;{ m.TimeOfMeal }</span>
-							</p>
-							<p class="is-size-5">
-								{ m.Description }
-							</p>
-						</div>
-					</div>
-					<div class="columns is-centered">
-						<div class="column is-2"></div>
-						<div class="column is-8 has-text-left">
-							<div x-data="{ open: false }">
-								<div class="tags">
-									for _, s := range m.UsedSymptoms {
-										<button class="tag">
-											{ s }
-										</button>
-									}
-									<a class="icon has-text-grey" @click="open = !open" title="Add more symptoms">
-										<i x-show="!open" class="fas fa-plus"></i>
-										<i x-show="open" class="fas fa-minus"></i>
-									</a>
-								</div>
-								<div x-show="open" class="mt-2">
+						<div class="columns is-centered">
+							<div class="column is-2"></div>
+							<div class="column is-8 has-text-left">
+								<div x-data="{ open: false }">
 									<div class="tags">
-										for _, s := range m.UnusedSymptoms {
+										for _, s := range m.UsedSymptoms {
 											<button class="tag">
 												{ s }
 											</button>
 										}
+										<a class="icon has-text-grey" @click="open = !open" title="Add more symptoms">
+											<i x-show="!open" class="fas fa-plus"></i>
+											<i x-show="open" class="fas fa-minus"></i>
+										</a>
+									</div>
+									<div x-show="open" class="mt-2">
+										<div class="tags">
+											for _, s := range m.UnusedSymptoms {
+												<button class="tag">
+													{ s }
+												</button>
+											}
+										</div>
 									</div>
 								</div>
 							</div>
+							<div class="column is-2 has-text-centered"></div>
 						</div>
 					</div>
 				</div>
-			</div>
-		}
+			}
+		</div>
 	</section>
 	<section class="section">
 		<div class="buttons is-centered">
