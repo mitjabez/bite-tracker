@@ -1,4 +1,4 @@
-# TODO: Add phonies
+# .PHONY: generate db-init db-start db-stop db-delete
 
 generate:
 	go tool templ generate

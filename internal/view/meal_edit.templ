@@ -1,17 +1,17 @@
-package views
+package view
 
 import "fmt"
-import "github.com/mitjabez/bite-tracker/internal/models"
+import "github.com/mitjabez/bite-tracker/internal/model"
 
-templ MealsNew(meal models.MealView, errors map[string]string, symptoms []string, topMeals []string) {
+templ MealNew(meal model.MealView, errors map[string]string, symptoms []string, topMeals []string) {
 	@mealForm("/meals/new", "POST", meal, errors, symptoms, topMeals)
 }
 
-templ MealsEdit(meal models.MealView, errors map[string]string, symptoms []string, topMeals []string) {
+templ MealEdit(meal model.MealView, errors map[string]string, symptoms []string, topMeals []string) {
 	@mealForm("/meals/"+meal.Id+"/edit", "PUT", meal, errors, symptoms, topMeals)
 }
 
-templ mealForm(action string, method string, meal models.MealView, errors map[string]string, symptoms []string,
+templ mealForm(action string, method string, meal model.MealView, errors map[string]string, symptoms []string,
 	topMeals []string) {
 	<section class="section">
 		<div class="container">
@@ -23,12 +23,12 @@ templ mealForm(action string, method string, meal models.MealView, errors map[st
 				<h1 class="title">Add Meal</h1>
 				<div class="field">
 					<label class="label" for="date">Date</label>
-					<input class="input" type="date" id="date" name="date" value={ meal.DateOfMeal }/>
+					<input class="input" type="date" id="date" name="date" value={ meal.TimeOfMeal.Format("2006-01-02") }/>
 					<p class="help is-danger">{ errors["date"] }</p>
 				</div>
 				<div class="field">
 					<label class="label" for="time">Time</label>
-					<input class="input" type="time" id="time" name="time" value={ meal.TimeOfMeal }/>
+					<input class="input" type="time" id="time" name="time" value={ meal.TimeOfMeal.Format("15:04") }/>
 					<p class="help is-danger">{ errors["time"] }</p>
 				</div>
 				<div class="field" x-data={ fmt.Sprintf("{ meal: \"%s\" }", meal.Description) }>
@@ -92,7 +92,10 @@ templ mealForm(action string, method string, meal models.MealView, errors map[st
 						<button type="submit" class="button is-primary">Submit</button>
 					</div>
 					<div class="control">
-						<a class="button is-primary is-light" href={ "/meals?date=" + meal.DateOfMeal }>Cancel</a>
+						<a
+							class="button is-primary is-light"
+							href={ "/meals?date=" + meal.TimeOfMeal.Format("2006-01-02") }
+						>Cancel</a>
 					</div>
 				</div>
 			</form>

@@ -1,8 +1,8 @@
-package views
+package view
 
-import "github.com/mitjabez/bite-tracker/internal/models"
+import "github.com/mitjabez/bite-tracker/internal/model"
 
-templ Meals(prevDate string, nextDate string, currentDate string, meals []models.MealView) {
+templ Meals(prevDate string, nextDate string, currentDate string, meals []model.MealView) {
 	<section class="section">
 		<div class="field is-grouped is-grouped-centered" hx-boost="true">
 			<p class="control">
@@ -37,7 +37,7 @@ templ Meals(prevDate string, nextDate string, currentDate string, meals []models
 									<strong>
 										{ m.MealType }
 									</strong>
-									<span class="is-size-6 has-text-grey ml-2">&commat;{ m.TimeOfMeal }</span>
+									<span class="is-size-6 has-text-grey ml-2">&commat;{ m.TimeOfMeal.Format("15:04") }</span>
 								</p>
 								<p class="is-size-5">
 									{ m.Description }
@@ -52,10 +52,12 @@ templ Meals(prevDate string, nextDate string, currentDate string, meals []models
 							<div class="column is-8 has-text-left">
 								<div x-data="{ open: false }">
 									<div class="tags">
-										for _, s := range m.UsedSymptoms {
-											<button class="tag">
-												{ s }
-											</button>
+										for _, s := range m.Symptoms {
+											if m.IsSymptomUsed(s) {
+												<button class="tag">
+													{ s }
+												</button>
+											}
 										}
 										<a class="icon has-text-grey" @click="open = !open" title="Add more symptoms">
 											<i x-show="!open" class="fas fa-plus"></i>
@@ -64,10 +66,12 @@ templ Meals(prevDate string, nextDate string, currentDate string, meals []models
 									</div>
 									<div x-show="open" class="mt-2">
 										<div class="tags">
-											for _, s := range m.UnusedSymptoms {
-												<button class="tag">
-													{ s }
-												</button>
+											for _, s := range m.Symptoms {
+												if !m.IsSymptomUsed(s) {
+													<button class="tag">
+														{ s }
+													</button>
+												}
 											}
 										</div>
 									</div>

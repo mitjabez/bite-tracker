@@ -1,70 +1,58 @@
-# Go + ah templ Meals App Conventions
+# Project Conventions
 
-## Project structure
+## 1. Package Naming
+
+- Use singular, lowercase names: `handler`, `service`, `repository`, `model`
+- Avoid stutter: `service.UserService` is acceptable but keep names short.
+
+## 2. Project Structure
 
 ```
-/internal
-├── handlers
-│   └── meal.go        // package handlers
-├── models
-│   └── meal.go        // package models
-├── templates
-│   ├── layout.templ
-│   ├── meals.templ
-│   ├── meals_new.templ
-│   ├── meal.templ
-│   └── meal_edit.templ
-/cmd
-└── main.go
+internal/
+├── handler/ # HTTP handlers (input parsing, response)
+├── service/ # Business logic (validation, orchestration)
+├── repository/ # Wraps sqlc for DB operations
+├── model/ # Domain structs shared across layers
+└── db/
+├── generated/ # sqlc-generated code
+└── queries/ # .sql query files
 ```
 
-## Package names
+## 3. HTTP Routes
 
-- `handlers/meal.go` → package handlers
-- `models/meal.go` → package models
+- Use plural nouns: `/users`, `/users/{id}`, `/users/register`
+- Handlers for all routes live in `internal/handler`.
 
-## Structs
+## 4. sqlc
 
-- `MealHandler` (in handlers): holds DB & context, handles `/meals` HTTP routes
-- `Meal` (in models): data struct with fields like ID, Name, Date
+- `.sql` files go in `internal/db/queries`
+- Generated code goes in `internal/db/sqlc`, package name `sqlc`
+- Repositories call sqlc; services never call sqlc directly.
 
----
+## 5. Handlers
 
-## Handler functions (in handlers/meal.go)
+- Parse HTTP input → call service → send response
+- Do not put business logic in handlers.
 
-```go
-func (h MealHandler) ListMeals(w http.ResponseWriter, r *http.Request)
-func (h MealHandler) ShowMeal(w http.ResponseWriter, r *http.Request)
-func (h MealHandler) NewMeal(w http.ResponseWriter, r *http.Request)
-func (h MealHandler) CreateMeal(w http.ResponseWriter, r *http.Request)
-func (h MealHandler) EditMeal(w http.ResponseWriter, r *http.Request)
-func (h MealHandler) UpdateMeal(w http.ResponseWriter, r *http.Request)
-func (h MealHandler) DeleteMeal(w http.ResponseWriter, r *http.Request)
-```
+## 6. Services
 
-## Model functions (in models/meal.go)
+- Contain business rules (validation, orchestration)
+- Do not access database directly; only call repository functions.
 
-```go
-func GetAllMeals() ([]Meal, error)
-func GetMealByID(id int) (Meal, error)
-func CreateMeal(m *Meal) error
-func UpdateMeal(m *Meal) error
-func DeleteMeal(id int) error
-```
+## 7. Repositories
 
-## Templates
+- Wrap sqlc queries to abstract persistence layer
+- Keep them thin, only responsible for DB operations.
 
-- `layout.templ` → shared HTML layout
-- `meals.templ` → list of meals page
-- `meals_new.templ` → form to add a meal
-- `meal.templ` → show single meal
-- `meal_edit.templ` → form to edit meal
+## 8. Testing
 
----
+- Prefer real database tests (Postgres testcontainer or SQLite in-memory)
+- Avoid interfaces unless mocking is required for unit tests
+- If needed, define interfaces where they are consumed (e.g., in service tests).
 
-## Summary of conventions
+## 9. Imports
 
-- Group by resource, not by individual page.
-- Keep all `/meals` HTTP handlers in `meal.go`.
-- Use plural names for collections (`meals.templ`), singular for single items (`meal.templ`).
-- Do all logic in Go, pass prepared data to templates, keep templates purely for rendering.
+- `internal/handler` → `handler.RegisterRoutes(mux, services...)`
+- `internal/service` → `service.NewUserService(repo)`
+- `internal/repository` → `repository.NewUserRepository(db)`
+- `internal/db/generated` → `db.New()`

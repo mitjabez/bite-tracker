@@ -6,7 +6,8 @@ import (
 
 	"github.com/mitjabez/bite-tracker/internal/config"
 	db "github.com/mitjabez/bite-tracker/internal/db/init"
-	"github.com/mitjabez/bite-tracker/internal/handlers"
+	"github.com/mitjabez/bite-tracker/internal/handler"
+	"github.com/mitjabez/bite-tracker/internal/repository"
 )
 
 func main() {
@@ -17,7 +18,10 @@ func main() {
 	}
 	defer dbContext.Pool.Close()
 
-	mealLogHandler := handlers.NewMealHandler(dbContext, config.DefaultAppUserId)
+	repository := repository.MealRepo{
+		DBContext: dbContext,
+	}
+	mealLogHandler := handler.NewMealHandler(&repository, config.DefaultAppUserId)
 
 	assetsHandler := http.FileServer(http.Dir("views/assets"))
 
