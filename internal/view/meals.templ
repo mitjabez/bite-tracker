@@ -4,7 +4,7 @@ import "github.com/mitjabez/bite-tracker/internal/model"
 
 templ Meals(prevDate string, nextDate string, currentDate string, meals []model.MealView) {
 	<section class="section">
-		<div class="field is-grouped is-grouped-centered" hx-boost="true">
+		<div class="field is-grouped is-grouped-centered">
 			<p class="control">
 				<a class="button" href={ "?date=" + prevDate }>&lt;</a>
 			</p>

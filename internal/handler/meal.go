@@ -162,7 +162,7 @@ func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Cannot create or update meal: ", err)
 	}
 
-	h.ListMeals(w, r)
+	http.Redirect(w, r, "/meals", http.StatusSeeOther)
 }
 
 func dateParam(r *http.Request) time.Time {

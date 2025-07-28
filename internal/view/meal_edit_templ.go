@@ -132,7 +132,7 @@ func mealForm(action string, method string, meal model.MealView, errors map[stri
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " hx-target=\"body\"><h1 class=\"title\">Add Meal</h1><div class=\"field\"><label class=\"label\" for=\"date\">Date</label> <input class=\"input\" type=\"date\" id=\"date\" name=\"date\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, " hx-target=\"body\" hx-push-url=\"true\"><h1 class=\"title\">Add Meal</h1><div class=\"field\"><label class=\"label\" for=\"date\">Date</label> <input class=\"input\" type=\"date\" id=\"date\" name=\"date\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
