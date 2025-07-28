@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/mitjabez/bite-tracker/internal/config"
 	db "github.com/mitjabez/bite-tracker/internal/db/init"
 	"github.com/mitjabez/bite-tracker/internal/handler"
+	"github.com/mitjabez/bite-tracker/internal/middleware"
 	"github.com/mitjabez/bite-tracker/internal/repository"
 )
 
@@ -25,11 +28,13 @@ func main() {
 
 	assetsHandler := http.FileServer(http.Dir("internal/view/assets"))
 
-	http.HandleFunc("GET /meals", mealLogHandler.ListMeals)
-	http.HandleFunc("GET /meals/{id}", mealLogHandler.EditMeal)
-	http.HandleFunc("PUT /meals/{id}", mealLogHandler.HandleMealForm)
-	http.HandleFunc("GET /meals/new", mealLogHandler.NewMeal)
-	http.HandleFunc("POST /meals/new", mealLogHandler.HandleMealForm)
-	http.Handle("GET /assets/", http.StripPrefix("/assets", assetsHandler))
+	http.Handle("GET /meals", middleware.Logger(http.HandlerFunc(mealLogHandler.ListMeals)))
+	http.Handle("GET /meals/{id}", middleware.Logger(http.HandlerFunc(mealLogHandler.EditMeal)))
+	http.Handle("PUT /meals/{id}", middleware.Logger(http.HandlerFunc(mealLogHandler.HandleMealForm)))
+	http.Handle("GET /meals/new", middleware.Logger(http.HandlerFunc(mealLogHandler.NewMeal)))
+	http.Handle("POST /meals/new", middleware.Logger(http.HandlerFunc(mealLogHandler.HandleMealForm)))
+	http.Handle("GET /assets/", middleware.Logger(http.StripPrefix("/assets", assetsHandler)))
+
+	fmt.Println("Server started!")
 	http.ListenAndServe(":8000", nil)
 }
