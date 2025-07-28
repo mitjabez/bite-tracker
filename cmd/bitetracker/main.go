@@ -23,7 +23,7 @@ func main() {
 	}
 	mealLogHandler := handler.NewMealHandler(&repository, config.DefaultAppUserId)
 
-	assetsHandler := http.FileServer(http.Dir("views/assets"))
+	assetsHandler := http.FileServer(http.Dir("internal/view/assets"))
 
 	http.HandleFunc("GET /meals", mealLogHandler.ListMeals)
 	http.HandleFunc("GET /meals/{id}", mealLogHandler.EditMeal)
