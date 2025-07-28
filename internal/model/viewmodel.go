@@ -26,6 +26,7 @@ var Symptoms = []string{
 	"gas",
 }
 
+// TODO: Optimize if needed
 func (mv MealView) IsSymptomUsed(symptom string) bool {
 	return slices.Contains(mv.Symptoms, symptom)
 }

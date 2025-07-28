@@ -49,7 +49,7 @@ func (r *MealRepo) CreateMeal(ctx context.Context, userId uuid.UUID, mealView mo
 }
 
 func (r *MealRepo) UpdateMeal(ctx context.Context, userId uuid.UUID, mealId uuid.UUID, mealView model.MealView) error {
-	return r.createOrUpdateMeal(ctx, true, userId, mealId, mealView)
+	return r.createOrUpdateMeal(ctx, false, userId, mealId, mealView)
 }
 
 func (r *MealRepo) createOrUpdateMeal(ctx context.Context, isNewMeal bool, userId uuid.UUID, mealId uuid.UUID, mealView model.MealView) error {

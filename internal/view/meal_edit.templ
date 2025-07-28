@@ -8,7 +8,7 @@ templ MealNew(meal model.MealView, errors map[string]string, symptoms []string, 
 }
 
 templ MealEdit(meal model.MealView, errors map[string]string, symptoms []string, topMeals []string) {
-	@mealForm("/meals/"+meal.Id+"/edit", "PUT", meal, errors, symptoms, topMeals)
+	@mealForm("/meals/"+meal.Id, "PUT", meal, errors, symptoms, topMeals)
 }
 
 templ mealForm(action string, method string, meal model.MealView, errors map[string]string, symptoms []string,
@@ -74,7 +74,14 @@ templ mealForm(action string, method string, meal model.MealView, errors map[str
 					<div class="tags">
 						for _, symptom := range symptoms {
 							<div x-data={ fmt.Sprintf("{ selected: %t }", meal.IsSymptomUsed(symptom)) }>
-								<input type="checkbox" id={ symptom } name="symptoms" value={ symptom } style="display: none"/>
+								<input
+									type="checkbox"
+									id={ symptom }
+									name="symptoms"
+									value={ symptom }
+									style="display: none"
+									checked?={ meal.IsSymptomUsed(symptom) }
+								/>
 								<label
 									x-bind:class="selected ? 'tag is-clickable is-info' : 'tag is-clickable'"
 									x-on:click="selected = !selected; console.log(selected);"
