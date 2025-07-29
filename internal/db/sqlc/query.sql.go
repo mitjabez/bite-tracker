@@ -59,6 +59,32 @@ func (q *Queries) CreateMeal(ctx context.Context, arg CreateMealParams) (Meal, e
 	return i, err
 }
 
+const createUser = `-- name: CreateUser :one
+INSERT INTO users (email, full_name, password_hash)
+VALUES ($1, $2, $3)
+RETURNING id, email, full_name, password_hash, created_at, updated_at
+`
+
+type CreateUserParams struct {
+	Email        string
+	FullName     string
+	PasswordHash *string
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, createUser, arg.Email, arg.FullName, arg.PasswordHash)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FullName,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const getMeal = `-- name: GetMeal :one
 SELECT id, user_id, meal_type_id, time_of_meal, description, hunger_level, symptoms, created_at, updated_at FROM meals
 WHERE id = $1
@@ -82,18 +108,22 @@ func (q *Queries) GetMeal(ctx context.Context, id uuid.UUID) (Meal, error) {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT  FROM user
-WHERE u.username = $1::text
+SELECT id, email, full_name, password_hash, created_at, updated_at FROM users
+WHERE email = $1
 LIMIT 1
 `
 
-type GetUserRow struct {
-}
-
-func (q *Queries) GetUser(ctx context.Context, username string) (GetUserRow, error) {
-	row := q.db.QueryRow(ctx, getUser, username)
-	var i GetUserRow
-	err := row.Scan()
+func (q *Queries) GetUser(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, getUser, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FullName,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
 	return i, err
 }
 

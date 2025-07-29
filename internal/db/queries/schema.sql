@@ -7,14 +7,15 @@ DROP TABLE IF EXISTS users CASCADE;
 
 CREATE TABLE users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  username text NOT NULL,
-  first_name text NOT NULL,
-  last_name text NOT NULL,
+  email text NOT NULL,
+  full_name text NOT NULL,
+	-- TODO: Should be NOT NULL
+	password_hash text,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now()
 );
 
-CREATE UNIQUE INDEX uniq_users_username ON users (username);
+CREATE UNIQUE INDEX uniq_users_email ON users (email);
 
 CREATE TABLE meal_types (
   id text PRIMARY KEY,
@@ -57,8 +58,8 @@ ADD CONSTRAINT uniq_user_meal_desc_type UNIQUE (user_id, description, meal_type_
 
 -- START: Seed data ---------------------------------------------
 -- Insert user with fixed UUID
-INSERT INTO users (id, username, first_name, last_name)
-VALUES ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'salsajimmy', 'Salsa', 'Jimmy');
+INSERT INTO users (id, email, full_name)
+VALUES ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'sjimmy@example.com', 'Salsa Jimmy');
 
 INSERT INTO meal_types (id, start_time, end_time)
 VALUES

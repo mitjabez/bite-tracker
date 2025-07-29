@@ -42,10 +42,10 @@ type MealsCatalog struct {
 }
 
 type User struct {
-	ID        uuid.UUID
-	Username  string
-	FirstName string
-	LastName  string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID           uuid.UUID
+	Email        string
+	FullName     string
+	PasswordHash *string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }

@@ -20,19 +20,21 @@ func main() {
 	}
 	defer dbContext.Pool.Close()
 
-	repository := repository.MealRepo{
-		DBContext: dbContext,
-	}
-	mealLogHandler := handler.NewMealHandler(&repository, config.DefaultAppUserId)
+	mealRepo := repository.MealRepo{DBContext: dbContext}
+	userRepo := repository.UserRepo{DBContext: dbContext}
+	mealLogHandler := handler.NewMealHandler(&mealRepo, config.DefaultAppUserId)
+	authHandler := handler.NewAuthHandler(&userRepo)
 
 	assetsHandler := http.FileServer(http.Dir("internal/view/assets"))
 
-	http.Handle("GET /meals", middleware.Chain(http.HandlerFunc(mealLogHandler.ListMeals)))
-	http.Handle("GET /meals/{id}", middleware.Logger(http.HandlerFunc(mealLogHandler.EditMeal)))
-	http.Handle("PUT /meals/{id}", middleware.Logger(http.HandlerFunc(mealLogHandler.HandleMealForm)))
-	http.Handle("GET /meals/new", middleware.Logger(http.HandlerFunc(mealLogHandler.NewMeal)))
-	http.Handle("POST /meals/new", middleware.Logger(http.HandlerFunc(mealLogHandler.HandleMealForm)))
-	http.Handle("GET /assets/", middleware.Logger(http.StripPrefix("/assets", assetsHandler)))
+	http.Handle("GET /auth/register", middleware.All(http.HandlerFunc(authHandler.GetRegisterForm)))
+	http.Handle("POST /auth/register", middleware.All(http.HandlerFunc(authHandler.PostRegisterForm)))
+	http.Handle("GET /meals", middleware.All(http.HandlerFunc(mealLogHandler.ListMeals)))
+	http.Handle("GET /meals/{id}", middleware.All(http.HandlerFunc(mealLogHandler.EditMeal)))
+	http.Handle("PUT /meals/{id}", middleware.All(http.HandlerFunc(mealLogHandler.HandleMealForm)))
+	http.Handle("GET /meals/new", middleware.All(http.HandlerFunc(mealLogHandler.NewMeal)))
+	http.Handle("POST /meals/new", middleware.All(http.HandlerFunc(mealLogHandler.HandleMealForm)))
+	http.Handle("GET /assets/", middleware.All(http.StripPrefix("/assets", assetsHandler)))
 
 	fmt.Println("Server started!")
 	http.ListenAndServe(":8000", nil)

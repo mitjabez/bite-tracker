@@ -32,9 +32,14 @@ UPDATE meals
 WHERE id = $1;
 
 -- name: GetUser :one
-SELECT * FROM user
-WHERE u.username = @username::text
+SELECT * FROM users
+WHERE email = @email
 LIMIT 1;
+
+-- name: CreateUser :one
+INSERT INTO users (email, full_name, password_hash)
+VALUES (@email, @full_name, @password_hash)
+RETURNING *;
 
 -- name: Top3Meals :many
 SELECT description, times_used FROM meals_catalog
