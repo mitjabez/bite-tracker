@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/mitjabez/bite-tracker/internal/config"
 	db "github.com/mitjabez/bite-tracker/internal/db/init"
@@ -28,7 +27,7 @@ func main() {
 
 	assetsHandler := http.FileServer(http.Dir("internal/view/assets"))
 
-	http.Handle("GET /meals", middleware.Logger(http.HandlerFunc(mealLogHandler.ListMeals)))
+	http.Handle("GET /meals", middleware.Chain(http.HandlerFunc(mealLogHandler.ListMeals)))
 	http.Handle("GET /meals/{id}", middleware.Logger(http.HandlerFunc(mealLogHandler.EditMeal)))
 	http.Handle("PUT /meals/{id}", middleware.Logger(http.HandlerFunc(mealLogHandler.HandleMealForm)))
 	http.Handle("GET /meals/new", middleware.Logger(http.HandlerFunc(mealLogHandler.NewMeal)))
