@@ -6,7 +6,7 @@ templ LoginForm(user model.User, errors map[string]string) {
 	<section class="section">
 		<div class="container is-max-tablet">
 			<h1 class="title">Login</h1>
-			<form class="box" hx-post="/auth/login" hx-target="body">
+			<form class="box" hx-post="/auth/login" hx-target="body" hx-push-url="true">
 				<div class="field">
 					<label class="label" for="email">Email</label>
 					<div class="control">

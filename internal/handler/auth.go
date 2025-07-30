@@ -1,10 +1,13 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/mail"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/mitjabez/bite-tracker/internal/model"
 	"github.com/mitjabez/bite-tracker/internal/repository"
 	"github.com/mitjabez/bite-tracker/internal/view"
@@ -12,12 +15,15 @@ import (
 )
 
 type AuthHandler struct {
-	repo *repository.UserRepo
+	repo            *repository.UserRepo
+	hmacTokenSecret []byte
 }
 
 func NewAuthHandler(repo *repository.UserRepo) AuthHandler {
 	return AuthHandler{
 		repo: repo,
+		// TODO: move to config
+		hmacTokenSecret: []byte("1WSB6LaNNLfxi.JbTxrao0s3b4wTpH"),
 	}
 }
 
@@ -101,5 +107,32 @@ func (h *AuthHandler) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
 		errors["password"] = "Valid user"
 	}
 
-	view.Layout(view.LoginForm(user, errors), "Login").Render(r.Context(), w)
+	exp := time.Now().Add(time.Duration(time.Hour * 24))
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": user.Id,
+		"iat": time.Now().Unix(),
+		"exp": exp.Unix(),
+	})
+
+	tokenString, err := token.SignedString(h.hmacTokenSecret)
+	if err != nil {
+		fmt.Printf("Error creating token: %s\n", err)
+		http.Error(w, "Internal error signing in", 500)
+		return
+	}
+	fmt.Println("token: ", tokenString)
+
+	// TODO: Hardening
+	cookie := http.Cookie{
+		Name:     "token",
+		Value:    tokenString,
+		Path:     "/",
+		Expires:  exp,
+		MaxAge:   3600 * 24,
+		Secure:   false,
+		HttpOnly: false,
+		SameSite: http.SameSiteStrictMode,
+	}
+	http.SetCookie(w, &cookie)
+	http.Redirect(w, r, "/meals", 303)
 }

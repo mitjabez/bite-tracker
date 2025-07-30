@@ -31,7 +31,7 @@ func LoginForm(user model.User, errors map[string]string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"section\"><div class=\"container is-max-tablet\"><h1 class=\"title\">Login</h1><form class=\"box\" hx-post=\"/auth/login\" hx-target=\"body\"><div class=\"field\"><label class=\"label\" for=\"email\">Email</label><div class=\"control\"><input class=\"input\" name=\"email\" type=\"email\" minlength=\"6\" placeholder=\"john@example.com\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"section\"><div class=\"container is-max-tablet\"><h1 class=\"title\">Login</h1><form class=\"box\" hx-post=\"/auth/login\" hx-target=\"body\" hx-push-url=\"true\"><div class=\"field\"><label class=\"label\" for=\"email\">Email</label><div class=\"control\"><input class=\"input\" name=\"email\" type=\"email\" minlength=\"6\" placeholder=\"john@example.com\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
