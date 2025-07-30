@@ -11,7 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 import "fmt"
 import "github.com/mitjabez/bite-tracker/internal/model"
 
-func MealNew(meal model.MealView, errors map[string]string, symptoms []string, topMeals []string) templ.Component {
+func NewMealForm(meal model.Meal, errors map[string]string, symptoms []string, topMeals []string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -40,7 +40,7 @@ func MealNew(meal model.MealView, errors map[string]string, symptoms []string, t
 	})
 }
 
-func MealEdit(meal model.MealView, errors map[string]string, symptoms []string, topMeals []string) templ.Component {
+func EditMealForm(meal model.Meal, errors map[string]string, symptoms []string, topMeals []string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -69,7 +69,7 @@ func MealEdit(meal model.MealView, errors map[string]string, symptoms []string, 
 	})
 }
 
-func mealForm(action string, method string, meal model.MealView, errors map[string]string, symptoms []string,
+func mealForm(action string, method string, meal model.Meal, errors map[string]string, symptoms []string,
 	topMeals []string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

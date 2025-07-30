@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type MealView struct {
+type Meal struct {
 	Id          string
 	MealType    string
 	TimeOfMeal  time.Time
@@ -27,7 +27,7 @@ var Symptoms = []string{
 }
 
 // TODO: Optimize if needed
-func (mv MealView) IsSymptomUsed(symptom string) bool {
+func (mv Meal) IsSymptomUsed(symptom string) bool {
 	return slices.Contains(mv.Symptoms, symptom)
 }
 

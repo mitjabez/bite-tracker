@@ -10,13 +10,17 @@ import (
 )
 
 type UserRepo struct {
-	DBContext db.DBContext
+	dbContext *db.DBContext
+}
+
+func NewUserRepo(dbContext *db.DBContext) UserRepo {
+	return UserRepo{dbContext}
 }
 
 func (r *UserRepo) UserExists(ctx context.Context, email string) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
-	_, err := r.DBContext.Queries.GetUser(ctx, email)
+	_, err := r.dbContext.Queries.GetUser(ctx, email)
 	if err == pgx.ErrNoRows {
 		return false, nil
 	} else if err != nil {
@@ -33,7 +37,7 @@ func (r *UserRepo) CreateUser(ctx context.Context, fullName string, email string
 		FullName:     fullName,
 		PasswordHash: &passwordHash,
 	}
-	_, err := r.DBContext.Queries.CreateUser(ctx, params)
+	_, err := r.dbContext.Queries.CreateUser(ctx, params)
 	if err != nil {
 		return err
 	}

@@ -20,21 +20,21 @@ func main() {
 	}
 	defer dbContext.Pool.Close()
 
-	mealRepo := repository.MealRepo{DBContext: dbContext}
-	userRepo := repository.UserRepo{DBContext: dbContext}
-	mealLogHandler := handler.NewMealHandler(&mealRepo, config.DefaultAppUserId)
+	mealRepo := repository.NewMealRepo(&dbContext)
+	userRepo := repository.NewUserRepo(&dbContext)
+	mealHandler := handler.NewMealHandler(&mealRepo, config.DefaultAppUserId)
 	authHandler := handler.NewAuthHandler(&userRepo)
 
-	assetsHandler := http.FileServer(http.Dir("internal/view/assets"))
+	assetHandler := http.FileServer(http.Dir("internal/view/assets"))
 
-	http.Handle("GET /auth/register", middleware.All(http.HandlerFunc(authHandler.GetRegisterForm)))
-	http.Handle("POST /auth/register", middleware.All(http.HandlerFunc(authHandler.PostRegisterForm)))
-	http.Handle("GET /meals", middleware.All(http.HandlerFunc(mealLogHandler.ListMeals)))
-	http.Handle("GET /meals/{id}", middleware.All(http.HandlerFunc(mealLogHandler.EditMeal)))
-	http.Handle("PUT /meals/{id}", middleware.All(http.HandlerFunc(mealLogHandler.HandleMealForm)))
-	http.Handle("GET /meals/new", middleware.All(http.HandlerFunc(mealLogHandler.NewMeal)))
-	http.Handle("POST /meals/new", middleware.All(http.HandlerFunc(mealLogHandler.HandleMealForm)))
-	http.Handle("GET /assets/", middleware.All(http.StripPrefix("/assets", assetsHandler)))
+	http.Handle("GET /auth/register", middleware.Chain(authHandler.RegisterUserForm))
+	http.Handle("POST /auth/register", middleware.Chain(authHandler.HandleRegisterUserForm))
+	http.Handle("GET /meals", middleware.Chain(mealHandler.ListMeals))
+	http.Handle("GET /meals/{id}", middleware.Chain(mealHandler.EditMealForm))
+	http.Handle("PUT /meals/{id}", middleware.Chain(mealHandler.HandleMealForm))
+	http.Handle("GET /meals/new", middleware.Chain(mealHandler.NewMealForm))
+	http.Handle("POST /meals/new", middleware.Chain(mealHandler.HandleMealForm))
+	http.Handle("GET /assets/", middleware.Chain(http.StripPrefix("/assets", assetHandler).ServeHTTP))
 
 	fmt.Println("Server started!")
 	http.ListenAndServe(":8000", nil)

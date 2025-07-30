@@ -21,19 +21,19 @@ func NewAuthHandler(repo *repository.UserRepo) AuthHandler {
 	}
 }
 
-func (h *AuthHandler) GetRegisterForm(w http.ResponseWriter, r *http.Request) {
-	view.Layout(view.RegisterForm(model.Auth{}, map[string]string{}), "Register User").Render(r.Context(), w)
+func (h *AuthHandler) RegisterUserForm(w http.ResponseWriter, r *http.Request) {
+	view.Layout(view.RegisterUserForm(model.User{}, map[string]string{}), "Register User").Render(r.Context(), w)
 }
 
-func (h *AuthHandler) PostRegisterForm(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Request) {
 	errors := map[string]string{}
 
-	auth := model.Auth{
-		FullName:        r.FormValue("full-name"),
-		EMail:           r.FormValue("email"),
-		Password:        r.FormValue("password"),
-		ConfirmPassword: r.FormValue("confirm-password"),
+	auth := model.User{
+		FullName: r.FormValue("full-name"),
+		EMail:    r.FormValue("email"),
 	}
+	password := r.FormValue("password")
+	confirmPassword := r.FormValue("confirm-password")
 
 	if len(auth.FullName) < 5 {
 		errors["full-name"] = "Full name must be at least 5 characters long."
@@ -44,11 +44,11 @@ func (h *AuthHandler) PostRegisterForm(w http.ResponseWriter, r *http.Request) {
 		errors["email"] = "Invalid email address"
 	}
 
-	if auth.Password != auth.ConfirmPassword {
+	if password != confirmPassword {
 		errors["password"] = "Passwords do not match"
 	}
 
-	if len(auth.Password) < 10 {
+	if len(password) < 10 {
 		errors["password"] = "Password must be at least 10 characters long."
 	}
 
@@ -63,11 +63,11 @@ func (h *AuthHandler) PostRegisterForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(errors) > 0 {
-		view.Layout(view.RegisterForm(auth, errors), "Register User").Render(r.Context(), w)
+		view.Layout(view.RegisterUserForm(auth, errors), "Register User").Render(r.Context(), w)
 		return
 	}
 
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(auth.Password), 12)
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
 		log.Fatal("Error generating hash:", err)
 	}

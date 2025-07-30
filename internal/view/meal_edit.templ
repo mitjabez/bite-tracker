@@ -3,15 +3,15 @@ package view
 import "fmt"
 import "github.com/mitjabez/bite-tracker/internal/model"
 
-templ MealNew(meal model.MealView, errors map[string]string, symptoms []string, topMeals []string) {
+templ NewMealForm(meal model.Meal, errors map[string]string, symptoms []string, topMeals []string) {
 	@mealForm("/meals/new", "POST", meal, errors, symptoms, topMeals)
 }
 
-templ MealEdit(meal model.MealView, errors map[string]string, symptoms []string, topMeals []string) {
+templ EditMealForm(meal model.Meal, errors map[string]string, symptoms []string, topMeals []string) {
 	@mealForm("/meals/"+meal.Id, "PUT", meal, errors, symptoms, topMeals)
 }
 
-templ mealForm(action string, method string, meal model.MealView, errors map[string]string, symptoms []string,
+templ mealForm(action string, method string, meal model.Meal, errors map[string]string, symptoms []string,
 	topMeals []string) {
 	<section class="section">
 		<div class="container">

@@ -13,56 +13,60 @@ import (
 )
 
 type MealRepo struct {
-	DBContext db.DBContext
+	dbContext *db.DBContext
 }
 
-func (r *MealRepo) ListMeals(ctx context.Context, userId uuid.UUID, date time.Time) ([]model.MealView, error) {
+func NewMealRepo(dbContext *db.DBContext) MealRepo {
+	return MealRepo{dbContext: dbContext}
+}
+
+func (r *MealRepo) ListMeals(ctx context.Context, userId uuid.UUID, date time.Time) ([]model.Meal, error) {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 	params := sqlc.ListMealsByUsernameAndDateParams{
 		UserID:  userId,
 		ForDate: date,
 	}
-	meals, err := r.DBContext.Queries.ListMealsByUsernameAndDate(ctx, params)
+	meals, err := r.dbContext.Queries.ListMealsByUsernameAndDate(ctx, params)
 	if err != nil {
-		return []model.MealView{}, err
+		return []model.Meal{}, err
 	}
 
-	mealsView := []model.MealView{}
+	mealsView := []model.Meal{}
 	for _, m := range meals {
 		mealsView = append(mealsView, mealToMealView(m))
 	}
 	return mealsView, nil
 }
 
-func (r *MealRepo) GetMeal(ctx context.Context, userId uuid.UUID) (model.MealView, error) {
-	meal, err := r.DBContext.Queries.GetMeal(ctx, userId)
+func (r *MealRepo) GetMeal(ctx context.Context, userId uuid.UUID) (model.Meal, error) {
+	meal, err := r.dbContext.Queries.GetMeal(ctx, userId)
 	if err != nil {
-		return model.MealView{}, nil
+		return model.Meal{}, nil
 	}
 
 	return mealToMealView(meal), nil
 }
 
-func (r *MealRepo) CreateMeal(ctx context.Context, userId uuid.UUID, mealView model.MealView) error {
+func (r *MealRepo) CreateMeal(ctx context.Context, userId uuid.UUID, mealView model.Meal) error {
 	return r.createOrUpdateMeal(ctx, true, userId, uuid.Nil, mealView)
 }
 
-func (r *MealRepo) UpdateMeal(ctx context.Context, userId uuid.UUID, mealId uuid.UUID, mealView model.MealView) error {
+func (r *MealRepo) UpdateMeal(ctx context.Context, userId uuid.UUID, mealId uuid.UUID, mealView model.Meal) error {
 	return r.createOrUpdateMeal(ctx, false, userId, mealId, mealView)
 }
 
-func (r *MealRepo) createOrUpdateMeal(ctx context.Context, isNewMeal bool, userId uuid.UUID, mealId uuid.UUID, mealView model.MealView) error {
+func (r *MealRepo) createOrUpdateMeal(ctx context.Context, isNewMeal bool, userId uuid.UUID, mealId uuid.UUID, mealView model.Meal) error {
 	ctx, cancel := context.WithTimeout(ctx, 4*time.Second)
 	defer cancel()
 
-	tx, err := r.DBContext.Pool.Begin(ctx)
+	tx, err := r.dbContext.Pool.Begin(ctx)
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback(ctx)
 
-	qtx := r.DBContext.Queries.WithTx(tx)
+	qtx := r.dbContext.Queries.WithTx(tx)
 
 	if isNewMeal {
 		_, err = qtx.CreateMeal(ctx, sqlc.CreateMealParams{
@@ -106,7 +110,7 @@ func (r *MealRepo) createOrUpdateMeal(ctx context.Context, isNewMeal bool, userI
 func (r *MealRepo) Top3Meals(ctx context.Context, userId uuid.UUID) ([]string, error) {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
-	top3MealsResult, err := r.DBContext.Queries.Top3Meals(ctx, sqlc.Top3MealsParams{
+	top3MealsResult, err := r.dbContext.Queries.Top3Meals(ctx, sqlc.Top3MealsParams{
 		UserID:     userId,
 		MealTypeID: model.ResolveMealType(time.Now()),
 	})
@@ -120,8 +124,8 @@ func (r *MealRepo) Top3Meals(ctx context.Context, userId uuid.UUID) ([]string, e
 	return top3Meals, nil
 }
 
-func mealToMealView(m sqlc.Meal) model.MealView {
-	return model.MealView{
+func mealToMealView(m sqlc.Meal) model.Meal {
+	return model.Meal{
 		Id:          m.ID.String(),
 		MealType:    cases.Title(language.English).String(m.MealTypeID),
 		TimeOfMeal:  m.TimeOfMeal,

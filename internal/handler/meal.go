@@ -38,13 +38,13 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal("Error querying users")
 	}
-	view.Layout(view.Meals(prevDate, nextDate, currentDate, mealsView), "Meal Log").Render(r.Context(), w)
+	view.Layout(view.ListMeals(prevDate, nextDate, currentDate, mealsView), "Meal Log").Render(r.Context(), w)
 }
 
-func (h Mealhandler) NewMeal(w http.ResponseWriter, r *http.Request) {
+func (h Mealhandler) NewMealForm(w http.ResponseWriter, r *http.Request) {
 	date := dateParam(r)
 	now := time.Now()
-	mealView := model.MealView{
+	mealView := model.Meal{
 		TimeOfMeal:  time.Date(date.Year(), date.Month(), date.Day(), now.Hour(), now.Minute(), now.Second(), now.Nanosecond(), now.Location()),
 		HungerLevel: 4,
 	}
@@ -54,10 +54,10 @@ func (h Mealhandler) NewMeal(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Error retrieving top meals for user: ", err)
 	}
 
-	view.Layout(view.MealNew(mealView, map[string]string{}, model.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
+	view.Layout(view.NewMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
 }
 
-func (h Mealhandler) EditMeal(w http.ResponseWriter, r *http.Request) {
+func (h Mealhandler) EditMealForm(w http.ResponseWriter, r *http.Request) {
 	userIdParam := r.PathValue("id")
 	userUUID, err := uuid.Parse(userIdParam)
 	if err != nil {
@@ -73,7 +73,7 @@ func (h Mealhandler) EditMeal(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal("Error retrieving top meals for user: ", err)
 	}
-	view.Layout(view.MealEdit(mealView, map[string]string{}, model.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
+	view.Layout(view.EditMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
 }
 
 func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
@@ -131,7 +131,7 @@ func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	mealView := model.MealView{
+	mealView := model.Meal{
 		Id:          mealIdParam,
 		MealType:    model.ResolveMealType(dateAndTime),
 		TimeOfMeal:  dateAndTime,
@@ -146,9 +146,9 @@ func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
 			log.Fatal("Error obtaining top 3 meals")
 		}
 		if isNewMeal {
-			view.Layout(view.MealNew(mealView, errors, model.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
+			view.Layout(view.NewMealForm(mealView, errors, model.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
 		} else {
-			view.Layout(view.MealEdit(mealView, errors, model.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
+			view.Layout(view.EditMealForm(mealView, errors, model.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
 		}
 		return
 	}

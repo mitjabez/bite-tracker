@@ -12,8 +12,8 @@ var middlewares = []func(next http.Handler) http.Handler{
 	Logger,
 }
 
-func All(next http.Handler) http.Handler {
-	n := next
+func Chain(next http.HandlerFunc) http.Handler {
+	n := http.Handler(next)
 	for _, m := range middlewares {
 		n = m(n)
 	}

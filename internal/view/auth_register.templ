@@ -2,68 +2,44 @@ package view
 
 import "github.com/mitjabez/bite-tracker/internal/model"
 
-templ RegisterForm(auth model.Auth, errors map[string]string) {
-	<section class="section">
-		<div class="container">
-			<h1 class="title">Register</h1>
-			<form class="box" hx-post="/auth/register" hx-target="body">
-				<div class="field">
-					<label class="label" for="full-name">Full Name</label>
-					<div class="control">
-						<input
-							class="input"
-							name="full-name"
-							minlength="5"
-							type="text"
-							placeholder="John Doe"
-							value={ auth.FullName }
-						/>
-					</div>
-					<p class="help is-danger">{ errors["full-name"] }</p>
+templ RegisterUserForm(user model.User, errors map[string]string) {
+<section class="section">
+	<div class="container">
+		<h1 class="title">Register</h1>
+		<form class="box" hx-post="/auth/register" hx-target="body">
+			<div class="field">
+				<label class="label" for="full-name">Full Name</label>
+				<div class="control">
+					<input class="input" name="full-name" minlength="5" type="text" placeholder="John Doe" value={
+						user.FullName } />
 				</div>
-				<div class="field">
-					<label class="label" for="email">Email</label>
-					<div class="control">
-						<input
-							class="input"
-							name="email"
-							type="email"
-							minlength="6"
-							placeholder="john@example.com"
-							value={ auth.EMail }
-						/>
-					</div>
-					<p class="help is-danger">{ errors["email"] }</p>
+				<p class="help is-danger">{ errors["full-name"] }</p>
+			</div>
+			<div class="field">
+				<label class="label" for="email">Email</label>
+				<div class="control">
+					<input class="input" name="email" type="email" minlength="6" placeholder="john@example.com" value={
+						user.EMail } />
 				</div>
-				<div class="field">
-					<label class="label" for="password">Password</label>
-					<div class="control">
-						<input
-							class="input"
-							name="password"
-							type="password"
-							minlength="10"
-							placeholder="Create a strong password"
-							value={ auth.Password }
-						/>
-					</div>
-					<p class="help is-danger">{ errors["password"] }</p>
+				<p class="help is-danger">{ errors["email"] }</p>
+			</div>
+			<div class="field">
+				<label class="label" for="password">Password</label>
+				<div class="control">
+					<input class="input" name="password" type="password" minlength="10"
+						placeholder="Create a strong password" />
 				</div>
-				<div class="field">
-					<label class="label" for="confirm-password">Confirm Password</label>
-					<div class="control">
-						<input
-							class="input"
-							type="password"
-							minlength="10"
-							name="confirm-password"
-							placeholder="Confirm you password"
-							value={ auth.ConfirmPassword }
-						/>
-					</div>
+				<p class="help is-danger">{ errors["password"] }</p>
+			</div>
+			<div class="field">
+				<label class="label" for="confirm-password">Confirm Password</label>
+				<div class="control">
+					<input class="input" type="password" minlength="10" name="confirm-password"
+						placeholder="Confirm you password" />
 				</div>
-				<button class="button is-primary">Register</button>
-			</form>
-		</div>
-	</section>
+			</div>
+			<button class="button is-primary">Register</button>
+		</form>
+	</div>
+</section>
 }
