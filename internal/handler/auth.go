@@ -30,7 +30,7 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 
 	auth := model.User{
 		FullName: r.FormValue("full-name"),
-		EMail:    r.FormValue("email"),
+		Email:    r.FormValue("email"),
 	}
 	password := r.FormValue("password")
 	confirmPassword := r.FormValue("confirm-password")
@@ -39,7 +39,7 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 		errors["full-name"] = "Full name must be at least 5 characters long."
 	}
 
-	_, err := mail.ParseAddress(auth.EMail)
+	_, err := mail.ParseAddress(auth.Email)
 	if err != nil {
 		errors["email"] = "Invalid email address"
 	}
@@ -53,7 +53,7 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 	}
 
 	if len(errors) == 0 {
-		userExists, err := h.repo.UserExists(r.Context(), auth.EMail)
+		userExists, err := h.repo.UserExists(r.Context(), auth.Email)
 		if err != nil {
 			log.Fatal("Error checking if user exists: ", err)
 		}
@@ -72,10 +72,34 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 		log.Fatal("Error generating hash:", err)
 	}
 
-	err = h.repo.CreateUser(r.Context(), auth.FullName, auth.EMail, string(passwordHash))
+	err = h.repo.CreateUser(r.Context(), auth.FullName, auth.Email, string(passwordHash))
 	if err != nil {
 		log.Fatal("Cannot create user:", err)
 	}
 	log.Println("User registered")
+}
 
+func (h *AuthHandler) LoginForm(w http.ResponseWriter, r *http.Request) {
+	view.Layout(view.LoginForm(model.User{}, map[string]string{}), "Login").Render(r.Context(), w)
+}
+
+func (h *AuthHandler) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
+	errors := map[string]string{}
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+	user, err := h.repo.GetUser(r.Context(), email)
+	if err == repository.ErrNotFound {
+		errors["email"] = "User not found"
+	} else if err != nil {
+		log.Fatal("Error reading user: ", err)
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	if err != nil {
+		errors["password"] = "Invalid email or password"
+	} else {
+		errors["password"] = "Valid user"
+	}
+
+	view.Layout(view.LoginForm(user, errors), "Login").Render(r.Context(), w)
 }

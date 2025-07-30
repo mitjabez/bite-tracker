@@ -1,0 +1,44 @@
+package view
+
+import "github.com/mitjabez/bite-tracker/internal/model"
+
+templ LoginForm(user model.User, errors map[string]string) {
+	<section class="section">
+		<div class="container is-max-tablet">
+			<h1 class="title">Login</h1>
+			<form class="box" hx-post="/auth/login" hx-target="body">
+				<div class="field">
+					<label class="label" for="email">Email</label>
+					<div class="control">
+						<input
+							class="input"
+							name="email"
+							type="email"
+							minlength="6"
+							placeholder="john@example.com"
+							value={ user.Email }
+						/>
+					</div>
+					<p class="help is-danger">{ errors["email"] }</p>
+				</div>
+				<div class="field">
+					<label class="label" for="password">Password</label>
+					<div class="control">
+						<input
+							class="input"
+							name="password"
+							type="password"
+							minlength="10"
+							placeholder="Enter your password"
+						/>
+					</div>
+					<p class="help is-danger">{ errors["password"] }</p>
+				</div>
+				<button class="button is-primary">Login</button>
+			</form>
+		</div>
+		<div class="container has-text-centered mt-4">
+			Don't have an account? <a href="/auth/register">Sign up</a>
+		</div>
+	</section>
+}

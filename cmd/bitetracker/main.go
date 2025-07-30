@@ -29,6 +29,8 @@ func main() {
 
 	http.Handle("GET /auth/register", middleware.Chain(authHandler.RegisterUserForm))
 	http.Handle("POST /auth/register", middleware.Chain(authHandler.HandleRegisterUserForm))
+	http.Handle("GET /auth/login", middleware.Chain(authHandler.LoginForm))
+	http.Handle("POST /auth/login", middleware.Chain(authHandler.HandleLoginForm))
 	http.Handle("GET /meals", middleware.Chain(mealHandler.ListMeals))
 	http.Handle("GET /meals/{id}", middleware.Chain(mealHandler.EditMealForm))
 	http.Handle("PUT /meals/{id}", middleware.Chain(mealHandler.HandleMealForm))
