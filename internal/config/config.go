@@ -8,6 +8,7 @@ type Config struct {
 	DBName           string
 	DBUsername       string
 	DBPassword       string
+	HmacTokenSecret  []byte
 }
 
 func LocalDev() Config {
@@ -18,5 +19,6 @@ func LocalDev() Config {
 		DBName:           "bite_tracker",
 		DBUsername:       "biteapp",
 		DBPassword:       "superburrito",
+		HmacTokenSecret:  []byte("1WSB6LaNNLfxi.JbTxrao0s3b4wTpH"),
 	}
 }

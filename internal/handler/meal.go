@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"log"
 	"net/http"
 	"slices"
@@ -9,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/mitjabez/bite-tracker/internal/model"
 	"github.com/mitjabez/bite-tracker/internal/repository"
@@ -31,34 +29,6 @@ func NewMealHandler(repo *repository.MealRepo, userId string) Mealhandler {
 }
 
 func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("token")
-	if err != nil {
-		switch {
-		case errors.Is(err, http.ErrNoCookie):
-			log.Println("No auth cookie found")
-			http.Redirect(w, r, "/auth/login", 302)
-		default:
-			log.Println(err)
-			http.Error(w, "server error", http.StatusInternalServerError)
-		}
-		return
-	}
-	hmacTokenSecret := []byte("1WSB6LaNNLfxi.JbTxrao0s3b4wTpH")
-	token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (any, error) {
-		return hmacTokenSecret, nil
-	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		userId := claims["sub"]
-		exp := claims["exp"]
-		log.Println("Got claims:", userId, exp)
-	} else {
-		log.Fatal("Error obtaining claims")
-	}
-
 	date := dateParam(r)
 	currentDate := date.Format("2006-01-02")
 	prevDate := date.AddDate(0, 0, -1).Format("2006-01-02")

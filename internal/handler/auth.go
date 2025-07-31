@@ -19,11 +19,10 @@ type AuthHandler struct {
 	hmacTokenSecret []byte
 }
 
-func NewAuthHandler(repo *repository.UserRepo) AuthHandler {
+func NewAuthHandler(repo *repository.UserRepo, hmacTokenSecret []byte) AuthHandler {
 	return AuthHandler{
-		repo: repo,
-		// TODO: move to config
-		hmacTokenSecret: []byte("1WSB6LaNNLfxi.JbTxrao0s3b4wTpH"),
+		repo:            repo,
+		hmacTokenSecret: hmacTokenSecret,
 	}
 }
 
@@ -107,7 +106,7 @@ func (h *AuthHandler) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
 		errors["password"] = "Valid user"
 	}
 
-	exp := time.Now().Add(time.Duration(time.Hour * 24))
+	exp := time.Now().Add(time.Duration(time.Hour * 24 * 5))
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.Id,
 		"iat": time.Now().Unix(),
@@ -122,7 +121,6 @@ func (h *AuthHandler) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("token: ", tokenString)
 
-	// TODO: Hardening
 	cookie := http.Cookie{
 		Name:     "token",
 		Value:    tokenString,
