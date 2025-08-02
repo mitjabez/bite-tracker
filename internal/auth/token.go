@@ -8,6 +8,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+var ErrTokenExpired = errors.New("token expired")
+
 func (a *Auth) VerifyToken(r *http.Request) (Claims, error) {
 	cookie, err := r.Cookie("token")
 	if err != nil {
@@ -41,11 +43,17 @@ func (a *Auth) VerifyToken(r *http.Request) (Claims, error) {
 		return Claims{}, errors.New("missing or invalid iat")
 	}
 
-	return Claims{
+	tokenClaims := Claims{
 		UserId: sub,
 		Exp:    time.Unix(int64(exp), 0),
 		Iat:    time.Unix(int64(iat), 0),
-	}, nil
+	}
+
+	if tokenClaims.Exp.Before(time.Now()) {
+		return tokenClaims, ErrTokenExpired
+	}
+
+	return tokenClaims, nil
 }
 
 func (a *Auth) IssueCookieToken(userId string) (http.Cookie, error) {

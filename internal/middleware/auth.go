@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"context"
 	"log"
 	"net/http"
-	"time"
+
+	"github.com/mitjabez/bite-tracker/internal/auth"
 )
 
 func (m *Middleware) authHandler(next http.Handler) http.Handler {
@@ -14,18 +14,16 @@ func (m *Middleware) authHandler(next http.Handler) http.Handler {
 			log.Println("No auth cookie found")
 			loginRedirect(w, r)
 			return
+		} else if err == auth.ErrTokenExpired {
+			log.Println("Token expired: ", claims.Exp)
+			loginRedirect(w, r)
 		} else if err != nil {
 			log.Println(err)
 			http.Error(w, "server error", http.StatusInternalServerError)
 			return
 		}
 
-		if claims.Exp.Before(time.Now()) {
-			log.Println("Token expired: ", claims.Exp)
-			loginRedirect(w, r)
-		}
-
-		ctx := context.WithValue(r.Context(), "userId", claims.UserId)
+		ctx := m.auth.PutUserIdToContext(r.Context(), claims.UserId)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

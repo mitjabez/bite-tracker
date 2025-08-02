@@ -33,6 +33,11 @@ WHERE id = $1;
 
 -- name: GetUser :one
 SELECT * FROM users
+WHERE id = @id
+LIMIT 1;
+
+-- name: GetUserByEmail :one
+SELECT * FROM users
 WHERE email = @email
 LIMIT 1;
 
@@ -40,6 +45,13 @@ LIMIT 1;
 INSERT INTO users (email, full_name, password_hash)
 VALUES (@email, @full_name, @password_hash)
 RETURNING *;
+
+-- name: UpdateUser :exec
+UPDATE users
+  SET email = @email,
+  full_name = @full_name,
+  password_hash = @password_hash
+WHERE id = @id;
 
 -- name: Top3Meals :many
 SELECT description, times_used FROM meals_catalog

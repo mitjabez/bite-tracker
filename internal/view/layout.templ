@@ -1,6 +1,14 @@
 package view
 
-templ Layout(component templ.Component, title string) {
+templ LoggedInLayout(component templ.Component, title string) {
+	@layout(true, component, title)
+}
+
+templ NotLoggedInLayout(component templ.Component, title string) {
+	@layout(false, component, title)
+}
+
+templ layout(isLoggedIn bool, component templ.Component, title string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -40,23 +48,28 @@ templ Layout(component templ.Component, title string) {
 					</div>
 					<div id="navbarMenu" class="navbar-menu" :class="{ 'is-active': open }">
 						<div class="navbar-end">
-							<div class="navbar-item has-dropdown is-hoverable">
-								<a class="navbar-link">
-									Account
-								</a>
-								<div class="navbar-dropdown">
-									<a class="navbar-item" href="/meals">
-										Meals
+							if isLoggedIn {
+								<div class="navbar-item has-dropdown is-hoverable">
+									<a class="navbar-link">
+										👤
 									</a>
-									<a class="navbar-item" href="/auth/profile">
-										Profile
-									</a>
-									<hr class="navbar-divider"/>
-									<a class="navbar-item" href="/auth/logout">
-										Logout
-									</a>
+									<div class="navbar-dropdown">
+										<a class="navbar-item" href="/meals">
+											Meals
+										</a>
+										<a class="navbar-item" href="/auth/profile">
+											Profile
+										</a>
+										<hr class="navbar-divider"/>
+										<a class="navbar-item" href="/auth/logout">
+											Logout
+										</a>
+									</div>
 								</div>
-							</div>
+							} else {
+								<a class="navbar-item" href="/auth/login">Login</a>
+								<a class="navbar-item" href="/auth/register">Sign up</a>
+							}
 						</div>
 					</div>
 				</div>

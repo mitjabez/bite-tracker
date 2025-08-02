@@ -3,10 +3,27 @@ package view
 import "github.com/mitjabez/bite-tracker/internal/model"
 
 templ RegisterUserForm(user model.User, password string, confirmPassword string, errors map[string]string) {
+	@registerUserForm("Register", "Register", "POST", user, password, confirmPassword, errors)
+}
+
+templ UserProfileForm(user model.User, password string, confirmPassword string, errors map[string]string) {
+	@registerUserForm("Profile", "Update Profile", "PUT", user, password, confirmPassword, errors)
+}
+
+templ registerUserForm(title string, buttonText string, method string, user model.User,
+	password string, confirmPassword string, errors map[string]string) {
 	<section class="section">
 		<div class="container">
-			<h1 class="title">Register</h1>
-			<form class="box" hx-post="/auth/register" hx-target="body">
+			<h1 class="title">{ title } </h1>
+			<form
+				class="box"
+				if method=="POST" {
+					hx-post="/auth/register"
+				} else {
+					hx-put="/auth/profile"
+				}
+				hx-target="body"
+			>
 				<div class="field">
 					<label class="label" for="full-name">Full Name</label>
 					<div class="control">
@@ -61,7 +78,7 @@ templ RegisterUserForm(user model.User, password string, confirmPassword string,
 					</div>
 					<p class="help is-danger">{ errors["confirmPassword"] }</p>
 				</div>
-				<button class="button is-primary">Register</button>
+				<button class="button is-primary">{ buttonText }</button>
 			</form>
 		</div>
 	</section>

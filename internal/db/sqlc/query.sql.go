@@ -109,12 +109,32 @@ func (q *Queries) GetMeal(ctx context.Context, id uuid.UUID) (Meal, error) {
 
 const getUser = `-- name: GetUser :one
 SELECT id, email, full_name, password_hash, created_at, updated_at FROM users
+WHERE id = $1
+LIMIT 1
+`
+
+func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUser, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FullName,
+		&i.PasswordHash,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, email, full_name, password_hash, created_at, updated_at FROM users
 WHERE email = $1
 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, email)
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, email)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -261,5 +281,30 @@ type UpdateMealsCatalogParams struct {
 
 func (q *Queries) UpdateMealsCatalog(ctx context.Context, arg UpdateMealsCatalogParams) error {
 	_, err := q.db.Exec(ctx, updateMealsCatalog, arg.UserID, arg.Description, arg.MealTypeID)
+	return err
+}
+
+const updateUser = `-- name: UpdateUser :exec
+UPDATE users
+  SET email = $1,
+  full_name = $2,
+  password_hash = $3
+WHERE id = $4
+`
+
+type UpdateUserParams struct {
+	Email        string
+	FullName     string
+	PasswordHash *string
+	ID           uuid.UUID
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
+	_, err := q.db.Exec(ctx, updateUser,
+		arg.Email,
+		arg.FullName,
+		arg.PasswordHash,
+		arg.ID,
+	)
 	return err
 }

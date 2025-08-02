@@ -31,6 +31,7 @@ func main() {
 
 	assetHandler := http.FileServer(http.Dir("internal/view/assets"))
 
+	// TODO: 404 handler (with logging)
 	// TODO: This redirects everything to /meals, even if it should be 404
 	// http.Handle("GET /", noAuthMwr.Chain(func(w http.ResponseWriter, r *http.Request) { http.Redirect(w, r, "/meals", 302) }))
 	http.Handle("GET /auth/register", noAuthMwr.Chain(authHandler.RegisterUserForm))
@@ -38,6 +39,8 @@ func main() {
 	http.Handle("GET /auth/login", noAuthMwr.Chain(authHandler.LoginForm))
 	http.Handle("POST /auth/login", noAuthMwr.Chain(authHandler.HandleLoginForm))
 	http.Handle("GET /auth/logout", noAuthMwr.Chain(authHandler.HandleLogout))
+	http.Handle("GET /auth/profile", authMwr.Chain(authHandler.UserProfileForm))
+	http.Handle("PUT /auth/profile", authMwr.Chain(authHandler.HandleUserProfileForm))
 	http.Handle("GET /meals", authMwr.Chain(mealHandler.ListMeals))
 	http.Handle("GET /meals/{id}", authMwr.Chain(mealHandler.EditMealForm))
 	http.Handle("PUT /meals/{id}", authMwr.Chain(mealHandler.HandleMealForm))

@@ -56,6 +56,7 @@ func (r *MealRepo) UpdateMeal(ctx context.Context, userId uuid.UUID, mealId uuid
 	return r.createOrUpdateMeal(ctx, false, userId, mealId, mealView)
 }
 
+// TODO: Pass string and use uuid.MustParse
 func (r *MealRepo) createOrUpdateMeal(ctx context.Context, isNewMeal bool, userId uuid.UUID, mealId uuid.UUID, mealView model.Meal) error {
 	ctx, cancel := context.WithTimeout(ctx, 4*time.Second)
 	defer cancel()

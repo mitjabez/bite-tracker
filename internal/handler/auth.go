@@ -36,11 +36,32 @@ func NewAuthHandler(repo *repository.UserRepo, auth *auth.Auth) *AuthHandler {
 }
 
 func (h *AuthHandler) RegisterUserForm(w http.ResponseWriter, r *http.Request) {
-	view.Layout(view.RegisterUserForm(model.User{}, "", "", map[string]string{}), "Register User").Render(r.Context(), w)
+	view.NotLoggedInLayout(view.RegisterUserForm(model.User{}, "", "", map[string]string{}), "Register User").Render(r.Context(), w)
+}
+
+func (h *AuthHandler) UserProfileForm(w http.ResponseWriter, r *http.Request) {
+	userId, err := h.auth.GetUserIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		redirectToLogin(w, r)
+		return
+	}
+	user, err := h.repo.GetUser(r.Context(), userId)
+	if err != nil {
+		log.Fatal("Error obtaining user: ", err)
+	}
+	view.LoggedInLayout(view.UserProfileForm(user, "", "", map[string]string{}), "User Profile").Render(r.Context(), w)
+}
+
+func (h *AuthHandler) HandleUserProfileForm(w http.ResponseWriter, r *http.Request) {
+	// If we would go directly auth would nott be checked
+	h.HandleRegisterUserForm(w, r)
 }
 
 func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Request) {
 	errors := map[string]string{}
+	// TODO: Check also for PUT
+	isNewUser := r.Method == "POST"
 
 	userForm := model.User{
 		FullName: r.FormValue("full-name"),
@@ -69,7 +90,7 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 		errors["confirmPassword"] = "Passwords do not match"
 	}
 
-	if len(errors) == 0 {
+	if isNewUser && len(errors) == 0 {
 		userExists, err := h.repo.UserExists(r.Context(), userForm.Email)
 		if err != nil {
 			log.Fatal("Error checking if user exists: ", err)
@@ -80,7 +101,11 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 	}
 
 	if len(errors) > 0 {
-		view.Layout(view.RegisterUserForm(userForm, password, confirmPassword, errors), "Register User").Render(r.Context(), w)
+		if isNewUser {
+			view.NotLoggedInLayout(view.RegisterUserForm(userForm, password, confirmPassword, errors), "Register User").Render(r.Context(), w)
+		} else {
+			view.LoggedInLayout(view.RegisterUserForm(userForm, password, confirmPassword, errors), "Register User").Render(r.Context(), w)
+		}
 		return
 	}
 
@@ -89,16 +114,30 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 		log.Fatal("Error generating hash:", err)
 	}
 
-	user, err := h.repo.CreateUser(r.Context(), userForm.FullName, userForm.Email, string(passwordHash))
-	if err != nil {
-		log.Fatal("Cannot create user:", err)
-	}
+	if isNewUser {
+		user, err := h.repo.CreateUser(r.Context(), userForm.FullName, userForm.Email, string(passwordHash))
+		if err != nil {
+			log.Fatal("Cannot create user:", err)
+		}
+		h.issueTokenAndRedirect(user.Id, w, r)
+	} else {
+		userId, err := h.auth.GetUserIdFromContext(r.Context())
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = h.repo.UpdateUser(r.Context(), userId, userForm.FullName, userForm.Email, string(passwordHash))
+		if err != nil {
+			log.Fatal("Cannot update user:", err)
+		}
+		invalidatedToken := h.auth.InvalidateCookieToken()
+		http.SetCookie(w, &invalidatedToken)
 
-	h.issueTokenAndRedirect(user.Id, w, r)
+		view.NotLoggedInLayout(view.ProfileUpdated(), "Profile Updated").Render(r.Context(), w)
+	}
 }
 
 func (h *AuthHandler) LoginForm(w http.ResponseWriter, r *http.Request) {
-	view.Layout(view.LoginForm(model.User{}, map[string]string{}), "Login").Render(r.Context(), w)
+	view.NotLoggedInLayout(view.LoginForm(model.User{}, map[string]string{}), "Login").Render(r.Context(), w)
 }
 
 func (h *AuthHandler) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
@@ -118,7 +157,7 @@ func (h *AuthHandler) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.repo.GetUser(r.Context(), email)
+	user, err := h.repo.GetUserByEmail(r.Context(), email)
 	if err == repository.ErrNotFound {
 		errors["email"] = "Invalid email or password"
 		handleInvalidLogin(errors, email, w, r)
@@ -146,12 +185,16 @@ func verifyPasswordComplexity(password string) bool {
 }
 
 func handleInvalidLogin(errors map[string]string, email string, w http.ResponseWriter, r *http.Request) {
-	view.Layout(view.LoginForm(model.User{Email: email}, errors), "Login").Render(r.Context(), w)
+	view.NotLoggedInLayout(view.LoginForm(model.User{Email: email}, errors), "Login").Render(r.Context(), w)
 }
 
 func (h *AuthHandler) HandleLogout(w http.ResponseWriter, r *http.Request) {
 	invalidatedToken := h.auth.InvalidateCookieToken()
 	http.SetCookie(w, &invalidatedToken)
+	redirectToLogin(w, r)
+}
+
+func redirectToLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/auth/login", 302)
 }
 

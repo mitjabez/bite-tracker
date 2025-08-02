@@ -38,7 +38,7 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal("Error querying users")
 	}
-	view.Layout(view.ListMeals(prevDate, nextDate, currentDate, mealsView), "Meal Log").Render(r.Context(), w)
+	view.LoggedInLayout(view.ListMeals(prevDate, nextDate, currentDate, mealsView), "Meal Log").Render(r.Context(), w)
 }
 
 func (h Mealhandler) NewMealForm(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +54,7 @@ func (h Mealhandler) NewMealForm(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Error retrieving top meals for user: ", err)
 	}
 
-	view.Layout(view.NewMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
+	view.LoggedInLayout(view.NewMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
 }
 
 func (h Mealhandler) EditMealForm(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +73,7 @@ func (h Mealhandler) EditMealForm(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal("Error retrieving top meals for user: ", err)
 	}
-	view.Layout(view.EditMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
+	view.LoggedInLayout(view.EditMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
 }
 
 func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
@@ -146,9 +146,9 @@ func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
 			log.Fatal("Error obtaining top 3 meals")
 		}
 		if isNewMeal {
-			view.Layout(view.NewMealForm(mealView, errors, model.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
+			view.LoggedInLayout(view.NewMealForm(mealView, errors, model.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
 		} else {
-			view.Layout(view.EditMealForm(mealView, errors, model.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
+			view.LoggedInLayout(view.EditMealForm(mealView, errors, model.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
 		}
 		return
 	}
