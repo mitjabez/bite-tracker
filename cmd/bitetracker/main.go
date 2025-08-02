@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/mitjabez/bite-tracker/internal/auth"
 	"github.com/mitjabez/bite-tracker/internal/config"
 	db "github.com/mitjabez/bite-tracker/internal/db/init"
 	"github.com/mitjabez/bite-tracker/internal/handler"
@@ -22,17 +23,21 @@ func main() {
 
 	mealRepo := repository.NewMealRepo(&dbContext)
 	userRepo := repository.NewUserRepo(&dbContext)
-	mealHandler := handler.NewMealHandler(&mealRepo, config.DefaultAppUserId)
-	authHandler := handler.NewAuthHandler(&userRepo, config.HmacTokenSecret)
+	auth := auth.NewAuth(config.HmacTokenSecret, config.TokenAge)
+	mealHandler := handler.NewMealHandler(mealRepo, config.DefaultAppUserId)
+	authHandler := handler.NewAuthHandler(userRepo, auth)
+	authMwr := middleware.NewChainWithAuth(auth)
 	noAuthMwr := middleware.NewChainNoAuth()
-	authMwr := middleware.NewChainWithAuth(config.HmacTokenSecret)
 
 	assetHandler := http.FileServer(http.Dir("internal/view/assets"))
 
+	// TODO: This redirects everything to /meals, even if it should be 404
+	// http.Handle("GET /", noAuthMwr.Chain(func(w http.ResponseWriter, r *http.Request) { http.Redirect(w, r, "/meals", 302) }))
 	http.Handle("GET /auth/register", noAuthMwr.Chain(authHandler.RegisterUserForm))
 	http.Handle("POST /auth/register", noAuthMwr.Chain(authHandler.HandleRegisterUserForm))
 	http.Handle("GET /auth/login", noAuthMwr.Chain(authHandler.LoginForm))
 	http.Handle("POST /auth/login", noAuthMwr.Chain(authHandler.HandleLoginForm))
+	http.Handle("GET /auth/logout", noAuthMwr.Chain(authHandler.HandleLogout))
 	http.Handle("GET /meals", authMwr.Chain(mealHandler.ListMeals))
 	http.Handle("GET /meals/{id}", authMwr.Chain(mealHandler.EditMealForm))
 	http.Handle("PUT /meals/{id}", authMwr.Chain(mealHandler.HandleMealForm))

@@ -2,45 +2,31 @@ package middleware
 
 import (
 	"context"
-	"errors"
 	"log"
 	"net/http"
-
-	"github.com/golang-jwt/jwt/v5"
+	"time"
 )
 
-func Auth(hmacTokenSecret []byte, next http.Handler) http.Handler {
+func (m *Middleware) authHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("token")
-		if err != nil {
-			switch {
-			case errors.Is(err, http.ErrNoCookie):
-				log.Println("No auth cookie found")
-				loginRedirect(w, r)
-			default:
-				log.Println(err)
-				http.Error(w, "server error", http.StatusInternalServerError)
-			}
-			return
-		}
-		token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (any, error) {
-			return hmacTokenSecret, nil
-		}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
-		if err != nil {
-			log.Printf("Invalid token %s\n", err)
+		claims, err := m.auth.VerifyToken(r)
+		if err == http.ErrNoCookie {
+			log.Println("No auth cookie found")
 			loginRedirect(w, r)
+			return
+		} else if err != nil {
+			log.Println(err)
+			http.Error(w, "server error", http.StatusInternalServerError)
 			return
 		}
 
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			log.Println("Error obtaining claims: ", err)
+		if claims.Exp.Before(time.Now()) {
+			log.Println("Token expired: ", claims.Exp)
 			loginRedirect(w, r)
-			return
 		}
-		ctx := context.WithValue(r.Context(), "userId", claims["sub"])
+
+		ctx := context.WithValue(r.Context(), "userId", claims.UserId)
 		next.ServeHTTP(w, r.WithContext(ctx))
-
 	})
 }
 

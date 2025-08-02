@@ -57,9 +57,9 @@ ADD CONSTRAINT uniq_user_meal_desc_type UNIQUE (user_id, description, meal_type_
 -- END: Schema --------------------------------------------------
 
 -- START: Seed data ---------------------------------------------
--- Insert user with fixed UUID
-INSERT INTO users (id, email, full_name)
-VALUES ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'sjimmy@example.com', 'Salsa Jimmy');
+-- User password: Tracker123
+INSERT INTO users (id, email, full_name, password_hash)
+VALUES ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'sj@dot.com', 'Salsa Jimmy', '$2a$12$F22j/9fE8wI2nfjFADc/reQgm/TpKAxUWIyPhzZybV3GuvZP49rtu');
 
 INSERT INTO meal_types (id, start_time, end_time)
 VALUES

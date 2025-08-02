@@ -20,12 +20,12 @@ type Mealhandler struct {
 	userId uuid.UUID
 }
 
-func NewMealHandler(repo *repository.MealRepo, userId string) Mealhandler {
+func NewMealHandler(repo *repository.MealRepo, userId string) *Mealhandler {
 	userUUID, err := uuid.Parse(userId)
 	if err != nil {
 		log.Fatal("Error parsing uuid", userId, err)
 	}
-	return Mealhandler{repo: repo, userId: userUUID}
+	return &Mealhandler{repo: repo, userId: userUUID}
 }
 
 func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {

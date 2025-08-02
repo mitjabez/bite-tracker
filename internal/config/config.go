@@ -1,5 +1,7 @@
 package config
 
+import "time"
+
 type Config struct {
 	// Temporary user shown by default - until we write a login page
 	DefaultAppUserId string
@@ -9,6 +11,7 @@ type Config struct {
 	DBUsername       string
 	DBPassword       string
 	HmacTokenSecret  []byte
+	TokenAge         time.Duration
 }
 
 func LocalDev() Config {
@@ -20,5 +23,6 @@ func LocalDev() Config {
 		DBUsername:       "biteapp",
 		DBPassword:       "superburrito",
 		HmacTokenSecret:  []byte("1WSB6LaNNLfxi.JbTxrao0s3b4wTpH"),
+		TokenAge:         time.Hour * 24,
 	}
 }

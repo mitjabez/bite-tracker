@@ -16,8 +16,8 @@ type MealRepo struct {
 	dbContext *db.DBContext
 }
 
-func NewMealRepo(dbContext *db.DBContext) MealRepo {
-	return MealRepo{dbContext: dbContext}
+func NewMealRepo(dbContext *db.DBContext) *MealRepo {
+	return &MealRepo{dbContext: dbContext}
 }
 
 func (r *MealRepo) ListMeals(ctx context.Context, userId uuid.UUID, date time.Time) ([]model.Meal, error) {

@@ -2,7 +2,7 @@ package view
 
 import "github.com/mitjabez/bite-tracker/internal/model"
 
-templ RegisterUserForm(user model.User, errors map[string]string) {
+templ RegisterUserForm(user model.User, password string, confirmPassword string, errors map[string]string) {
 	<section class="section">
 		<div class="container">
 			<h1 class="title">Register</h1>
@@ -13,9 +13,9 @@ templ RegisterUserForm(user model.User, errors map[string]string) {
 						<input
 							class="input"
 							name="full-name"
-							minlength="5"
 							type="text"
 							placeholder="John Doe"
+							x-init="$el.focus()"
 							value={ user.FullName }
 						/>
 					</div>
@@ -28,7 +28,6 @@ templ RegisterUserForm(user model.User, errors map[string]string) {
 							class="input"
 							name="email"
 							type="email"
-							minlength="6"
 							placeholder="john@example.com"
 							value={ user.Email }
 						/>
@@ -42,8 +41,8 @@ templ RegisterUserForm(user model.User, errors map[string]string) {
 							class="input"
 							name="password"
 							type="password"
-							minlength="10"
 							placeholder="Create a strong password"
+							value={ password }
 						/>
 					</div>
 					<p class="help is-danger">{ errors["password"] }</p>
@@ -57,8 +56,10 @@ templ RegisterUserForm(user model.User, errors map[string]string) {
 							minlength="10"
 							name="confirm-password"
 							placeholder="Confirm you password"
+							value={ confirmPassword }
 						/>
 					</div>
+					<p class="help is-danger">{ errors["confirmPassword"] }</p>
 				</div>
 				<button class="button is-primary">Register</button>
 			</form>

@@ -14,8 +14,8 @@ type UserRepo struct {
 	dbContext *db.DBContext
 }
 
-func NewUserRepo(dbContext *db.DBContext) UserRepo {
-	return UserRepo{dbContext}
+func NewUserRepo(dbContext *db.DBContext) *UserRepo {
+	return &UserRepo{dbContext}
 }
 
 func (r *UserRepo) UserExists(ctx context.Context, email string) (bool, error) {
@@ -30,7 +30,7 @@ func (r *UserRepo) UserExists(ctx context.Context, email string) (bool, error) {
 	return true, nil
 }
 
-func (r *UserRepo) CreateUser(ctx context.Context, fullName string, email string, passwordHash string) error {
+func (r *UserRepo) CreateUser(ctx context.Context, fullName string, email string, passwordHash string) (model.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 	params := sqlc.CreateUserParams{
@@ -38,12 +38,17 @@ func (r *UserRepo) CreateUser(ctx context.Context, fullName string, email string
 		FullName:     fullName,
 		PasswordHash: &passwordHash,
 	}
-	_, err := r.dbContext.Queries.CreateUser(ctx, params)
+	user, err := r.dbContext.Queries.CreateUser(ctx, params)
 	if err != nil {
-		return err
+		return model.User{}, err
 	}
 
-	return err
+	return model.User{
+		Id:           user.ID.String(),
+		FullName:     user.FullName,
+		Email:        user.Email,
+		PasswordHash: *user.PasswordHash,
+	}, nil
 }
 
 func (r *UserRepo) GetUser(ctx context.Context, email string) (model.User, error) {

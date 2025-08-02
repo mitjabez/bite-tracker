@@ -31,14 +31,14 @@ func LoginForm(user model.User, errors map[string]string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"section\"><div class=\"container is-max-tablet\"><h1 class=\"title\">Login</h1><form class=\"box\" hx-post=\"/auth/login\" hx-target=\"body\" hx-push-url=\"true\"><div class=\"field\"><label class=\"label\" for=\"email\">Email</label><div class=\"control\"><input class=\"input\" name=\"email\" type=\"email\" minlength=\"6\" placeholder=\"john@example.com\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"section\"><div class=\"container is-max-tablet\"><h1 class=\"title\">Login</h1><form class=\"box\" hx-post=\"/auth/login\" hx-target=\"body\" hx-push-url=\"true\"><div class=\"field\"><label class=\"label\" for=\"email\">Email</label><div class=\"control\"><input class=\"input\" name=\"email\" type=\"email\" required=\"true\" placeholder=\"john@example.com\" x-init=\"$el.focus()\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(user.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/auth_login.templ`, Line: 19, Col: 25}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/auth_login.templ`, Line: 20, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -51,20 +51,20 @@ func LoginForm(user model.User, errors map[string]string) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(errors["email"])
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/auth_login.templ`, Line: 22, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/auth_login.templ`, Line: 23, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><div class=\"field\"><label class=\"label\" for=\"password\">Password</label><div class=\"control\"><input class=\"input\" name=\"password\" type=\"password\" minlength=\"10\" placeholder=\"Enter your password\"></div><p class=\"help is-danger\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><div class=\"field\"><label class=\"label\" for=\"password\">Password</label><div class=\"control\"><input class=\"input\" name=\"password\" type=\"password\" required=\"true\" placeholder=\"Enter your password\"></div><p class=\"help is-danger\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(errors["password"])
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/auth_login.templ`, Line: 35, Col: 51}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/auth_login.templ`, Line: 36, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {

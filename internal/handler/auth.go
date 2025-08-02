@@ -1,64 +1,76 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/mail"
-	"time"
+	"regexp"
+	"strconv"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/mitjabez/bite-tracker/internal/auth"
 	"github.com/mitjabez/bite-tracker/internal/model"
 	"github.com/mitjabez/bite-tracker/internal/repository"
 	"github.com/mitjabez/bite-tracker/internal/view"
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	lowercaseRegex = regexp.MustCompile(".*[a-z].*")
+	uppercaseRegex = regexp.MustCompile(".*[A-Z].*")
+	numbersRegex   = regexp.MustCompile(".*[0-9].*")
+)
+
+const minPasswordLen = 10
+const maxPasswordLen = 100
+
 type AuthHandler struct {
-	repo            *repository.UserRepo
-	hmacTokenSecret []byte
+	repo *repository.UserRepo
+	auth *auth.Auth
 }
 
-func NewAuthHandler(repo *repository.UserRepo, hmacTokenSecret []byte) AuthHandler {
-	return AuthHandler{
-		repo:            repo,
-		hmacTokenSecret: hmacTokenSecret,
+func NewAuthHandler(repo *repository.UserRepo, auth *auth.Auth) *AuthHandler {
+	return &AuthHandler{
+		repo: repo,
+		auth: auth,
 	}
 }
 
 func (h *AuthHandler) RegisterUserForm(w http.ResponseWriter, r *http.Request) {
-	view.Layout(view.RegisterUserForm(model.User{}, map[string]string{}), "Register User").Render(r.Context(), w)
+	view.Layout(view.RegisterUserForm(model.User{}, "", "", map[string]string{}), "Register User").Render(r.Context(), w)
 }
 
 func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Request) {
 	errors := map[string]string{}
 
-	auth := model.User{
+	userForm := model.User{
 		FullName: r.FormValue("full-name"),
 		Email:    r.FormValue("email"),
 	}
 	password := r.FormValue("password")
 	confirmPassword := r.FormValue("confirm-password")
 
-	if len(auth.FullName) < 5 {
+	if len(userForm.FullName) < 5 {
 		errors["full-name"] = "Full name must be at least 5 characters long."
 	}
 
-	_, err := mail.ParseAddress(auth.Email)
+	_, err := mail.ParseAddress(userForm.Email)
 	if err != nil {
 		errors["email"] = "Invalid email address"
 	}
 
-	if password != confirmPassword {
-		errors["password"] = "Passwords do not match"
+	if !verifyPasswordComplexity(password) {
+		errors["password"] = "Invalid password. It must be between " + strconv.Itoa(minPasswordLen) + " and " +
+			strconv.Itoa(minPasswordLen) + " characters long. " +
+			"Must include at least one lowercase letter, one uppercase letter and one number."
 	}
 
-	if len(password) < 10 {
-		errors["password"] = "Password must be at least 10 characters long."
+	// Show only one password message at a time
+	if errors["password"] == "" && password != confirmPassword {
+		errors["confirmPassword"] = "Passwords do not match"
 	}
 
 	if len(errors) == 0 {
-		userExists, err := h.repo.UserExists(r.Context(), auth.Email)
+		userExists, err := h.repo.UserExists(r.Context(), userForm.Email)
 		if err != nil {
 			log.Fatal("Error checking if user exists: ", err)
 		}
@@ -68,7 +80,7 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 	}
 
 	if len(errors) > 0 {
-		view.Layout(view.RegisterUserForm(auth, errors), "Register User").Render(r.Context(), w)
+		view.Layout(view.RegisterUserForm(userForm, password, confirmPassword, errors), "Register User").Render(r.Context(), w)
 		return
 	}
 
@@ -77,11 +89,12 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 		log.Fatal("Error generating hash:", err)
 	}
 
-	err = h.repo.CreateUser(r.Context(), auth.FullName, auth.Email, string(passwordHash))
+	user, err := h.repo.CreateUser(r.Context(), userForm.FullName, userForm.Email, string(passwordHash))
 	if err != nil {
 		log.Fatal("Cannot create user:", err)
 	}
-	log.Println("User registered")
+
+	h.issueTokenAndRedirect(user.Id, w, r)
 }
 
 func (h *AuthHandler) LoginForm(w http.ResponseWriter, r *http.Request) {
@@ -92,45 +105,61 @@ func (h *AuthHandler) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
 	errors := map[string]string{}
 	email := r.FormValue("email")
 	password := r.FormValue("password")
+
+	if len(email) < 5 || len(email) > 100 {
+		errors["email"] = "Email must be between 5 and 100 characters long"
+	}
+	if len(password) < minPasswordLen || len(password) > maxPasswordLen {
+		errors["password"] = "Password must be between " + strconv.Itoa(minPasswordLen) + " and " + strconv.Itoa(maxPasswordLen) + " characters long"
+	}
+
+	if len(errors) > 0 {
+		handleInvalidLogin(errors, email, w, r)
+		return
+	}
+
 	user, err := h.repo.GetUser(r.Context(), email)
 	if err == repository.ErrNotFound {
-		errors["email"] = "User not found"
+		errors["email"] = "Invalid email or password"
+		handleInvalidLogin(errors, email, w, r)
+		return
 	} else if err != nil {
 		log.Fatal("Error reading user: ", err)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
-		errors["password"] = "Invalid email or password"
-	} else {
-		errors["password"] = "Valid user"
-	}
-
-	exp := time.Now().Add(time.Duration(time.Hour * 24 * 5))
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": user.Id,
-		"iat": time.Now().Unix(),
-		"exp": exp.Unix(),
-	})
-
-	tokenString, err := token.SignedString(h.hmacTokenSecret)
-	if err != nil {
-		fmt.Printf("Error creating token: %s\n", err)
-		http.Error(w, "Internal error signing in", 500)
+		errors["email"] = "Invalid email or password"
+		handleInvalidLogin(errors, email, w, r)
 		return
 	}
-	fmt.Println("token: ", tokenString)
 
-	cookie := http.Cookie{
-		Name:     "token",
-		Value:    tokenString,
-		Path:     "/",
-		Expires:  exp,
-		MaxAge:   3600 * 24,
-		Secure:   false,
-		HttpOnly: false,
-		SameSite: http.SameSiteStrictMode,
+	h.issueTokenAndRedirect(user.Id, w, r)
+}
+
+func verifyPasswordComplexity(password string) bool {
+	return len(password) >= minPasswordLen &&
+		len(password) <= maxPasswordLen &&
+		lowercaseRegex.MatchString(password) &&
+		uppercaseRegex.MatchString(password) &&
+		numbersRegex.MatchString(password)
+}
+
+func handleInvalidLogin(errors map[string]string, email string, w http.ResponseWriter, r *http.Request) {
+	view.Layout(view.LoginForm(model.User{Email: email}, errors), "Login").Render(r.Context(), w)
+}
+
+func (h *AuthHandler) HandleLogout(w http.ResponseWriter, r *http.Request) {
+	invalidatedToken := h.auth.InvalidateCookieToken()
+	http.SetCookie(w, &invalidatedToken)
+	http.Redirect(w, r, "/auth/login", 302)
+}
+
+func (h *AuthHandler) issueTokenAndRedirect(userId string, w http.ResponseWriter, r *http.Request) {
+	cookieToken, err := h.auth.IssueCookieToken(userId)
+	if err != nil {
+		log.Fatal("Error issuing cookie token: ", err)
 	}
-	http.SetCookie(w, &cookie)
-	http.Redirect(w, r, "/meals", 303)
+	http.SetCookie(w, &cookieToken)
+	http.Redirect(w, r, "/meals", 302)
 }

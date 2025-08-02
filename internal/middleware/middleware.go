@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"net/http"
+
+	"github.com/mitjabez/bite-tracker/internal/auth"
 )
 
 var middlewares = []func(next http.Handler) http.Handler{
@@ -11,14 +13,14 @@ var middlewares = []func(next http.Handler) http.Handler{
 }
 
 type Middleware struct {
-	isAuthenticated bool
-	hmacTokenSecret []byte
+	isAuthentication bool
+	auth             *auth.Auth
 }
 
-func NewChainWithAuth(hmacTokenSecret []byte) Middleware {
+func NewChainWithAuth(auth *auth.Auth) Middleware {
 	return Middleware{
-		isAuthenticated: true,
-		hmacTokenSecret: hmacTokenSecret,
+		isAuthentication: true,
+		auth:             auth,
 	}
 }
 
@@ -32,8 +34,8 @@ func (m *Middleware) Chain(next http.HandlerFunc) http.Handler {
 		n = middlewares[i](n)
 	}
 
-	if m.isAuthenticated {
-		return Auth(m.hmacTokenSecret, n)
+	if m.isAuthentication {
+		return m.authHandler(n)
 	}
 
 	return n

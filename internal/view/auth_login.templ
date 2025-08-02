@@ -14,8 +14,9 @@ templ LoginForm(user model.User, errors map[string]string) {
 							class="input"
 							name="email"
 							type="email"
-							minlength="6"
+							required="true"
 							placeholder="john@example.com"
+							x-init="$el.focus()"
 							value={ user.Email }
 						/>
 					</div>
@@ -28,7 +29,7 @@ templ LoginForm(user model.User, errors map[string]string) {
 							class="input"
 							name="password"
 							type="password"
-							minlength="10"
+							required="true"
 							placeholder="Enter your password"
 						/>
 					</div>
