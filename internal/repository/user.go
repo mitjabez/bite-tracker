@@ -45,18 +45,18 @@ func (r *UserRepo) CreateUser(ctx context.Context, fullName string, email string
 	}
 
 	return model.User{
-		Id:           user.ID.String(),
+		Id:           user.ID,
 		FullName:     user.FullName,
 		Email:        user.Email,
 		PasswordHash: *user.PasswordHash,
 	}, nil
 }
 
-func (r *UserRepo) UpdateUser(ctx context.Context, userId string, fullName string, email string, passwordHash string) error {
+func (r *UserRepo) UpdateUser(ctx context.Context, userId uuid.UUID, fullName string, email string, passwordHash string) error {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 	params := sqlc.UpdateUserParams{
-		ID:           uuid.MustParse(userId),
+		ID:           userId,
 		Email:        email,
 		FullName:     fullName,
 		PasswordHash: &passwordHash,
@@ -64,10 +64,10 @@ func (r *UserRepo) UpdateUser(ctx context.Context, userId string, fullName strin
 	return r.dbContext.Queries.UpdateUser(ctx, params)
 }
 
-func (r *UserRepo) GetUser(ctx context.Context, userId string) (model.User, error) {
+func (r *UserRepo) GetUser(ctx context.Context, userId uuid.UUID) (model.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
-	user, err := r.dbContext.Queries.GetUser(ctx, uuid.MustParse(userId))
+	user, err := r.dbContext.Queries.GetUser(ctx, userId)
 	if err == pgx.ErrNoRows {
 		return model.User{}, ErrNotFound
 	} else if err != nil {
@@ -97,7 +97,7 @@ func mapUser(user sqlc.User) model.User {
 	}
 
 	return model.User{
-		Id:           user.ID.String(),
+		Id:           user.ID,
 		FullName:     user.FullName,
 		Email:        user.Email,
 		PasswordHash: hash,

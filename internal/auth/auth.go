@@ -2,6 +2,8 @@ package auth
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Auth struct {
@@ -10,7 +12,7 @@ type Auth struct {
 }
 
 type Claims struct {
-	UserId string
+	UserId uuid.UUID
 	Exp    time.Time
 	Iat    time.Time
 }

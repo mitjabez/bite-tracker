@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/mitjabez/bite-tracker/internal/auth"
 	"github.com/mitjabez/bite-tracker/internal/model"
 	"github.com/mitjabez/bite-tracker/internal/repository"
@@ -198,7 +199,7 @@ func redirectToLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/auth/login", 302)
 }
 
-func (h *AuthHandler) issueTokenAndRedirect(userId string, w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) issueTokenAndRedirect(userId uuid.UUID, w http.ResponseWriter, r *http.Request) {
 	cookieToken, err := h.auth.IssueCookieToken(userId)
 	if err != nil {
 		log.Fatal("Error issuing cookie token: ", err)

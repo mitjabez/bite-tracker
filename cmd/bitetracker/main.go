@@ -24,7 +24,7 @@ func main() {
 	mealRepo := repository.NewMealRepo(&dbContext)
 	userRepo := repository.NewUserRepo(&dbContext)
 	auth := auth.NewAuth(config.HmacTokenSecret, config.TokenAge)
-	mealHandler := handler.NewMealHandler(mealRepo, config.DefaultAppUserId)
+	mealHandler := handler.NewMealHandler(mealRepo, auth)
 	authHandler := handler.NewAuthHandler(userRepo, auth)
 	authMwr := middleware.NewChainWithAuth(auth)
 	noAuthMwr := middleware.NewChainNoAuth()
@@ -33,7 +33,7 @@ func main() {
 
 	// TODO: 404 handler (with logging)
 	// TODO: This redirects everything to /meals, even if it should be 404
-	// http.Handle("GET /", noAuthMwr.Chain(func(w http.ResponseWriter, r *http.Request) { http.Redirect(w, r, "/meals", 302) }))
+	// http.Handle("GET /", noAuthMwr.Chain(func(w http.ResponseWrinter, r *http.Request) { http.Redirect(w, r, "/meals", 302) }))
 	http.Handle("GET /auth/register", noAuthMwr.Chain(authHandler.RegisterUserForm))
 	http.Handle("POST /auth/register", noAuthMwr.Chain(authHandler.HandleRegisterUserForm))
 	http.Handle("GET /auth/login", noAuthMwr.Chain(authHandler.LoginForm))

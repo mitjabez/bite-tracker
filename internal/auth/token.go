@@ -2,10 +2,12 @@ package auth
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 var ErrTokenExpired = errors.New("token expired")
@@ -32,7 +34,7 @@ func (a *Auth) VerifyToken(r *http.Request) (Claims, error) {
 
 	sub, ok := claims["sub"].(string)
 	if !ok {
-		return Claims{}, errors.New("missing or invalid sub")
+		return Claims{}, fmt.Errorf("missing or invalid sub: %v", claims["sub"])
 	}
 	exp, ok := claims["exp"].(float64)
 	if !ok {
@@ -43,8 +45,12 @@ func (a *Auth) VerifyToken(r *http.Request) (Claims, error) {
 		return Claims{}, errors.New("missing or invalid iat")
 	}
 
+	userId, err := uuid.Parse(sub)
+	if err != nil {
+		return Claims{}, fmt.Errorf("sub claim is not in correct format" + sub)
+	}
 	tokenClaims := Claims{
-		UserId: sub,
+		UserId: userId,
 		Exp:    time.Unix(int64(exp), 0),
 		Iat:    time.Unix(int64(iat), 0),
 	}
@@ -56,7 +62,7 @@ func (a *Auth) VerifyToken(r *http.Request) (Claims, error) {
 	return tokenClaims, nil
 }
 
-func (a *Auth) IssueCookieToken(userId string) (http.Cookie, error) {
+func (a *Auth) IssueCookieToken(userId uuid.UUID) (http.Cookie, error) {
 	now := time.Now()
 	exp := now.Add(time.Duration(a.tokenAge))
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
