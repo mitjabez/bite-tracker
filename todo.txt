@@ -1,9 +1,12 @@
+Features:
+- Delete meal
+
+Improvements:
 - Restart DB conection if not initially available
 - Pretty validation on all fields, not just meal
+- Tests
 - Check log.fatal handling
-- Remove node stuff
 - Remove CONVENTIONS.md
 - sqlc to tools
 - sqlc to air
-- Conolidate log/meallog naming
 - Logging
