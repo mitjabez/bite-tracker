@@ -73,7 +73,7 @@ func (a *Auth) VerifyToken(r *http.Request) (Claims, error) {
 	return tokenClaims, nil
 }
 
-func (a *Auth) GenerateCookieToken(user model.User) (http.Cookie, error) {
+func (a *Auth) SetCookieToken(w http.ResponseWriter, user model.User) error {
 	now := time.Now()
 	exp := now.Add(time.Duration(a.tokenAge))
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -86,10 +86,10 @@ func (a *Auth) GenerateCookieToken(user model.User) (http.Cookie, error) {
 
 	tokenString, err := token.SignedString(a.hmacTokenSecret)
 	if err != nil {
-		return http.Cookie{}, err
+		return err
 	}
 
-	return http.Cookie{
+	cookie := http.Cookie{
 		Name:    "token",
 		Value:   tokenString,
 		Path:    "/",
@@ -99,11 +99,13 @@ func (a *Auth) GenerateCookieToken(user model.User) (http.Cookie, error) {
 		Secure:   false,
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
-	}, nil
+	}
+	http.SetCookie(w, &cookie)
+	return nil
 }
 
-func (a *Auth) InvalidateCookieToken() http.Cookie {
-	return http.Cookie{
+func (a *Auth) InvalidateCookieToken(w http.ResponseWriter) {
+	cookie := http.Cookie{
 		Name:    "token",
 		Value:   "",
 		Path:    "/",
@@ -114,4 +116,5 @@ func (a *Auth) InvalidateCookieToken() http.Cookie {
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	}
+	http.SetCookie(w, &cookie)
 }

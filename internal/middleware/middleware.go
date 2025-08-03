@@ -13,29 +13,24 @@ var middlewares = []func(next http.Handler) http.Handler{
 }
 
 type Middleware struct {
-	isAuthentication bool
-	auth             *auth.Auth
+	auth *auth.Auth
 }
 
-func NewChainWithAuth(auth *auth.Auth) Middleware {
+func New(auth *auth.Auth) Middleware {
 	return Middleware{
-		isAuthentication: true,
-		auth:             auth,
+		auth: auth,
 	}
 }
 
-func NewChainNoAuth() Middleware {
-	return Middleware{}
+func (m *Middleware) AuthChain(next AuthenticatedHandler) http.Handler {
+	n := m.authHandler(next)
+	return m.Chain(n.ServeHTTP)
 }
 
 func (m *Middleware) Chain(next http.HandlerFunc) http.Handler {
 	n := http.Handler(next)
 	for i := len(middlewares) - 1; i >= 0; i-- {
 		n = middlewares[i](n)
-	}
-
-	if m.isAuthentication {
-		return m.authHandler(n)
 	}
 
 	return n

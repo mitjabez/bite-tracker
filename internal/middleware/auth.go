@@ -5,10 +5,13 @@ import (
 	"net/http"
 
 	"github.com/mitjabez/bite-tracker/internal/auth"
+	"github.com/mitjabez/bite-tracker/internal/httpx"
 	"github.com/mitjabez/bite-tracker/internal/model"
 )
 
-func (m *Middleware) authHandler(next http.Handler) http.Handler {
+type AuthenticatedHandler func(http.ResponseWriter, *http.Request, model.User)
+
+func (m *Middleware) authHandler(next AuthenticatedHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		claims, err := m.auth.VerifyToken(r)
 		if err == http.ErrNoCookie {
@@ -17,10 +20,11 @@ func (m *Middleware) authHandler(next http.Handler) http.Handler {
 			return
 		} else if err == auth.ErrTokenExpired {
 			log.Println("Token expired: ", claims.Exp)
+			m.auth.InvalidateCookieToken(w)
 			loginRedirect(w, r)
+			return
 		} else if err != nil {
-			log.Println(err)
-			http.Error(w, "server error", http.StatusInternalServerError)
+			httpx.InternalError(w, "Cannot verify token", err)
 			return
 		}
 
@@ -29,8 +33,7 @@ func (m *Middleware) authHandler(next http.Handler) http.Handler {
 			FullName: claims.FullName,
 			Email:    claims.Email,
 		}
-		ctx := m.auth.PutUserToContext(r.Context(), user)
-		next.ServeHTTP(w, r.WithContext(ctx))
+		next(w, r, user)
 	})
 }
 

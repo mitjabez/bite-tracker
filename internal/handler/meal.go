@@ -24,12 +24,11 @@ func NewMealHandler(repo *repository.MealRepo, auth *auth.Auth) *Mealhandler {
 	return &Mealhandler{repo: repo, auth: auth}
 }
 
-func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
+func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request, user model.User) {
 	date := dateParam(r)
 	currentDate := date.Format("2006-01-02")
 	prevDate := date.AddDate(0, 0, -1).Format("2006-01-02")
 	nextDate := date.AddDate(0, 0, 1).Format("2006-01-02")
-	user := h.getUser(r)
 
 	mealsView, err := h.repo.ListMeals(r.Context(), user.Id, date)
 	if err != nil {
@@ -38,10 +37,9 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	view.LoggedInLayout(view.ListMeals(prevDate, nextDate, currentDate, mealsView), "Meal Log", user).Render(r.Context(), w)
 }
 
-func (h Mealhandler) NewMealForm(w http.ResponseWriter, r *http.Request) {
+func (h Mealhandler) NewMealForm(w http.ResponseWriter, r *http.Request, user model.User) {
 	date := dateParam(r)
 	now := time.Now()
-	user := h.getUser(r)
 
 	mealView := model.Meal{
 		TimeOfMeal:  time.Date(date.Year(), date.Month(), date.Day(), now.Hour(), now.Minute(), now.Second(), now.Nanosecond(), now.Location()),
@@ -56,7 +54,7 @@ func (h Mealhandler) NewMealForm(w http.ResponseWriter, r *http.Request) {
 	view.LoggedInLayout(view.NewMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "New Meal", user).Render(r.Context(), w)
 }
 
-func (h Mealhandler) EditMealForm(w http.ResponseWriter, r *http.Request) {
+func (h Mealhandler) EditMealForm(w http.ResponseWriter, r *http.Request, user model.User) {
 	mealIdParam := r.PathValue("id")
 	mealUUID, err := uuid.Parse(mealIdParam)
 	if err != nil {
@@ -72,12 +70,11 @@ func (h Mealhandler) EditMealForm(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal("Error retrieving top meals for user: ", err)
 	}
-	view.LoggedInLayout(view.EditMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "Edit Meal", h.getUser(r)).Render(r.Context(), w)
+	view.LoggedInLayout(view.EditMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "Edit Meal", user).Render(r.Context(), w)
 }
 
-func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
+func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request, user model.User) {
 	var mealUUID uuid.UUID
-	user := h.getUser(r)
 	var err error
 	mealIdParam := r.PathValue("id")
 
@@ -179,12 +176,4 @@ func dateParam(r *http.Request) time.Time {
 		}
 	}
 	return date
-}
-
-func (h *Mealhandler) getUser(r *http.Request) model.User {
-	user, err := h.auth.GetUserFromContext(r.Context())
-	if err != nil {
-		log.Fatal(err)
-	}
-	return user
 }

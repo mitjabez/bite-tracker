@@ -39,22 +39,25 @@ func (h *AuthHandler) RegisterUserForm(w http.ResponseWriter, r *http.Request) {
 	view.NotLoggedInLayout(view.RegisterUserForm(model.User{}, "", "", map[string]string{}), "Register User").Render(r.Context(), w)
 }
 
-func (h *AuthHandler) UserProfileForm(w http.ResponseWriter, r *http.Request) {
-	userContext := h.getUser(r)
+func (h *AuthHandler) UserProfileForm(w http.ResponseWriter, r *http.Request, dbUser model.User) {
 	// Get user from DB just in case additional fields got added not yet in the token
-	user, err := h.repo.GetUser(r.Context(), userContext.Id)
+	dbUser, err := h.repo.GetUser(r.Context(), dbUser.Id)
 	if err != nil {
 		log.Fatal("Error obtaining user: ", err)
 	}
-	view.LoggedInLayout(view.UserProfileForm(user, "", "", map[string]string{}), "User Profile", user).Render(r.Context(), w)
+	view.LoggedInLayout(view.UserProfileForm(dbUser, "", "", map[string]string{}), "User Profile", dbUser).Render(r.Context(), w)
 }
 
-func (h *AuthHandler) HandleUserProfileForm(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) HandleUserProfileForm(w http.ResponseWriter, r *http.Request, dbUser model.User) {
 	// If we would go directly auth would not be checked
-	h.HandleRegisterUserForm(w, r)
+	h.handleUserForm(w, r, model.User{})
 }
 
 func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Request) {
+	h.handleUserForm(w, r, model.User{})
+}
+
+func (h *AuthHandler) handleUserForm(w http.ResponseWriter, r *http.Request, user model.User) {
 	errors := map[string]string{}
 	// TODO: Check also for PUT
 	isNewUser := r.Method == "POST"
@@ -100,7 +103,7 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 		if isNewUser {
 			view.NotLoggedInLayout(view.RegisterUserForm(userForm, password, confirmPassword, errors), "Register User").Render(r.Context(), w)
 		} else {
-			view.LoggedInLayout(view.RegisterUserForm(userForm, password, confirmPassword, errors), "Register User", h.getUser(r)).Render(r.Context(), w)
+			view.LoggedInLayout(view.RegisterUserForm(userForm, password, confirmPassword, errors), "Register User", user).Render(r.Context(), w)
 		}
 		return
 	}
@@ -117,14 +120,11 @@ func (h *AuthHandler) HandleRegisterUserForm(w http.ResponseWriter, r *http.Requ
 		}
 		view.NotLoggedInLayout(view.ProfileUpdated("Registration successful!"), "Profile Created").Render(r.Context(), w)
 	} else {
-		user := h.getUser(r)
 		err = h.repo.UpdateUser(r.Context(), user.Id, userForm.FullName, userForm.Email, string(passwordHash))
 		if err != nil {
 			log.Fatal("Cannot update user:", err)
 		}
-		invalidatedToken := h.auth.InvalidateCookieToken()
-		http.SetCookie(w, &invalidatedToken)
-
+		h.auth.InvalidateCookieToken(w)
 		view.NotLoggedInLayout(view.ProfileUpdated("Your profile has been successfully updated!"), "Profile Updated").Render(r.Context(), w)
 	}
 }
@@ -166,11 +166,10 @@ func (h *AuthHandler) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookieToken, err := h.auth.GenerateCookieToken(user)
+	err = h.auth.SetCookieToken(w, user)
 	if err != nil {
-		log.Fatal("Error creating cookie token: ", err)
+		log.Fatal("Error setting cookie token: ", err)
 	}
-	http.SetCookie(w, &cookieToken)
 	http.Redirect(w, r, "/meals", 302)
 }
 
@@ -187,19 +186,10 @@ func handleInvalidLogin(errors map[string]string, email string, w http.ResponseW
 }
 
 func (h *AuthHandler) HandleLogout(w http.ResponseWriter, r *http.Request) {
-	invalidatedToken := h.auth.InvalidateCookieToken()
-	http.SetCookie(w, &invalidatedToken)
+	h.auth.InvalidateCookieToken(w)
 	redirectToLogin(w, r)
 }
 
 func redirectToLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/auth/login", 302)
-}
-
-func (h *AuthHandler) getUser(r *http.Request) model.User {
-	user, err := h.auth.GetUserFromContext(r.Context())
-	if err != nil {
-		log.Fatal(err)
-	}
-	return user
 }
