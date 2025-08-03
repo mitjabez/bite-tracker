@@ -12,9 +12,11 @@ type Auth struct {
 }
 
 type Claims struct {
-	UserId uuid.UUID
-	Exp    time.Time
-	Iat    time.Time
+	UserId   uuid.UUID
+	FullName string
+	Email    string
+	Exp      time.Time
+	Iat      time.Time
 }
 
 func NewAuth(hmacTokenSecret []byte, tokenAge time.Duration) *Auth {

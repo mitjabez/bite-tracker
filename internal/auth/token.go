@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/mitjabez/bite-tracker/internal/model"
 )
 
 var ErrTokenExpired = errors.New("token expired")
@@ -36,6 +37,14 @@ func (a *Auth) VerifyToken(r *http.Request) (Claims, error) {
 	if !ok {
 		return Claims{}, fmt.Errorf("missing or invalid sub: %v", claims["sub"])
 	}
+	name, ok := claims["name"].(string)
+	if !ok {
+		return Claims{}, fmt.Errorf("missing or invalid name: %v", claims["name"])
+	}
+	email, ok := claims["email"].(string)
+	if !ok {
+		return Claims{}, fmt.Errorf("missing or invalid email: %v", claims["email"])
+	}
 	exp, ok := claims["exp"].(float64)
 	if !ok {
 		return Claims{}, errors.New("missing or invalid exp")
@@ -47,12 +56,14 @@ func (a *Auth) VerifyToken(r *http.Request) (Claims, error) {
 
 	userId, err := uuid.Parse(sub)
 	if err != nil {
-		return Claims{}, fmt.Errorf("sub claim is not in correct format" + sub)
+		return Claims{}, errors.New("sub claim is not in correct format" + sub)
 	}
 	tokenClaims := Claims{
-		UserId: userId,
-		Exp:    time.Unix(int64(exp), 0),
-		Iat:    time.Unix(int64(iat), 0),
+		UserId:   userId,
+		FullName: name,
+		Email:    email,
+		Exp:      time.Unix(int64(exp), 0),
+		Iat:      time.Unix(int64(iat), 0),
 	}
 
 	if tokenClaims.Exp.Before(time.Now()) {
@@ -62,13 +73,15 @@ func (a *Auth) VerifyToken(r *http.Request) (Claims, error) {
 	return tokenClaims, nil
 }
 
-func (a *Auth) IssueCookieToken(userId uuid.UUID) (http.Cookie, error) {
+func (a *Auth) GenerateCookieToken(user model.User) (http.Cookie, error) {
 	now := time.Now()
 	exp := now.Add(time.Duration(a.tokenAge))
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userId,
-		"iat": now.Unix(),
-		"exp": exp.Unix(),
+		"sub":   user.Id,
+		"name":  user.FullName,
+		"email": user.Email,
+		"iat":   now.Unix(),
+		"exp":   exp.Unix(),
 	})
 
 	tokenString, err := token.SignedString(a.hmacTokenSecret)

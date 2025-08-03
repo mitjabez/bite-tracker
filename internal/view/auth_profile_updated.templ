@@ -1,10 +1,10 @@
 package view
 
-templ ProfileUpdated() {
+templ ProfileUpdated(message string) {
 	<section class="section">
 		<div class="container">
-			<h1 class="title">Your profile has been successfully updated!</h1>
-			Please <a href="/meals">Log In</a> again to continue using Bite Tracker
+			<h1 class="title">{ message }</h1>
+			Please <a href="/meals">Log In</a> to continue using Bite Tracker
 		</div>
 	</section>
 }

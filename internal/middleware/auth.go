@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/mitjabez/bite-tracker/internal/auth"
+	"github.com/mitjabez/bite-tracker/internal/model"
 )
 
 func (m *Middleware) authHandler(next http.Handler) http.Handler {
@@ -23,7 +24,12 @@ func (m *Middleware) authHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := m.auth.PutUserIdToContext(r.Context(), claims.UserId)
+		user := model.User{
+			Id:       claims.UserId,
+			FullName: claims.FullName,
+			Email:    claims.Email,
+		}
+		ctx := m.auth.PutUserToContext(r.Context(), user)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

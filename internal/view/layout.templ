@@ -1,14 +1,16 @@
 package view
 
-templ LoggedInLayout(component templ.Component, title string) {
-	@layout(true, component, title)
+import "github.com/mitjabez/bite-tracker/internal/model"
+
+templ LoggedInLayout(component templ.Component, title string, user model.User) {
+	@layout(component, true, title, user)
 }
 
 templ NotLoggedInLayout(component templ.Component, title string) {
-	@layout(false, component, title)
+	@layout(component, false, title, model.User{})
 }
 
-templ layout(isLoggedIn bool, component templ.Component, title string) {
+templ layout(component templ.Component, isLoggedIn bool, title string, user model.User) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -51,7 +53,7 @@ templ layout(isLoggedIn bool, component templ.Component, title string) {
 							if isLoggedIn {
 								<div class="navbar-item has-dropdown is-hoverable">
 									<a class="navbar-link">
-										👤
+										{ user.FullName }
 									</a>
 									<div class="navbar-dropdown">
 										<a class="navbar-item" href="/meals">

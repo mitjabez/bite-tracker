@@ -29,58 +29,60 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request) {
 	currentDate := date.Format("2006-01-02")
 	prevDate := date.AddDate(0, 0, -1).Format("2006-01-02")
 	nextDate := date.AddDate(0, 0, 1).Format("2006-01-02")
+	user := h.getUser(r)
 
-	mealsView, err := h.repo.ListMeals(r.Context(), h.getUserId(r), date)
+	mealsView, err := h.repo.ListMeals(r.Context(), user.Id, date)
 	if err != nil {
 		log.Fatal(err)
 	}
-	view.LoggedInLayout(view.ListMeals(prevDate, nextDate, currentDate, mealsView), "Meal Log").Render(r.Context(), w)
+	view.LoggedInLayout(view.ListMeals(prevDate, nextDate, currentDate, mealsView), "Meal Log", user).Render(r.Context(), w)
 }
 
 func (h Mealhandler) NewMealForm(w http.ResponseWriter, r *http.Request) {
 	date := dateParam(r)
 	now := time.Now()
+	user := h.getUser(r)
+
 	mealView := model.Meal{
 		TimeOfMeal:  time.Date(date.Year(), date.Month(), date.Day(), now.Hour(), now.Minute(), now.Second(), now.Nanosecond(), now.Location()),
 		HungerLevel: 4,
 	}
 
-	top3Meals, err := h.repo.Top3Meals(r.Context(), h.getUserId(r))
+	top3Meals, err := h.repo.Top3Meals(r.Context(), user.Id)
 	if err != nil {
 		log.Fatal("Error retrieving top meals for user: ", err)
 	}
 
-	view.LoggedInLayout(view.NewMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
+	view.LoggedInLayout(view.NewMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "New Meal", user).Render(r.Context(), w)
 }
 
 func (h Mealhandler) EditMealForm(w http.ResponseWriter, r *http.Request) {
-	userIdParam := r.PathValue("id")
-	userUUID, err := uuid.Parse(userIdParam)
+	mealIdParam := r.PathValue("id")
+	mealUUID, err := uuid.Parse(mealIdParam)
 	if err != nil {
-		log.Fatal("Invalid uuid ", userIdParam)
+		log.Fatal("Invalid uuid ", mealIdParam)
 	}
 
-	mealView, err := h.repo.GetMeal(r.Context(), userUUID)
+	mealView, err := h.repo.GetMeal(r.Context(), mealUUID)
 	if err != nil {
 		log.Fatal("Error reading meal: ", err)
 	}
 
-	top3Meals, err := h.repo.Top3Meals(r.Context(), userUUID)
+	top3Meals, err := h.repo.Top3Meals(r.Context(), mealUUID)
 	if err != nil {
 		log.Fatal("Error retrieving top meals for user: ", err)
 	}
-	view.LoggedInLayout(view.EditMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
+	view.LoggedInLayout(view.EditMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "Edit Meal", h.getUser(r)).Render(r.Context(), w)
 }
 
 func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
 	var mealUUID uuid.UUID
-	var userId uuid.UUID
+	user := h.getUser(r)
 	var err error
 	mealIdParam := r.PathValue("id")
 
 	isNewMeal := r.Method == "POST"
 	if !isNewMeal {
-		userId = h.getUserId(r)
 		mealUUID, err = uuid.Parse(mealIdParam)
 		if err != nil {
 			log.Fatal("Invalid meal uuid ", mealIdParam)
@@ -140,22 +142,22 @@ func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(errors) > 0 {
-		top3Meals, err := h.repo.Top3Meals(r.Context(), userId)
+		top3Meals, err := h.repo.Top3Meals(r.Context(), user.Id)
 		if err != nil {
 			log.Fatal("Error obtaining top 3 meals")
 		}
 		if isNewMeal {
-			view.LoggedInLayout(view.NewMealForm(mealView, errors, model.Symptoms, top3Meals), "New Meal").Render(r.Context(), w)
+			view.LoggedInLayout(view.NewMealForm(mealView, errors, model.Symptoms, top3Meals), "New Meal", user).Render(r.Context(), w)
 		} else {
-			view.LoggedInLayout(view.EditMealForm(mealView, errors, model.Symptoms, top3Meals), "Edit Meal").Render(r.Context(), w)
+			view.LoggedInLayout(view.EditMealForm(mealView, errors, model.Symptoms, top3Meals), "Edit Meal", user).Render(r.Context(), w)
 		}
 		return
 	}
 
 	if isNewMeal {
-		h.repo.CreateMeal(r.Context(), userId, mealView)
+		h.repo.CreateMeal(r.Context(), user.Id, mealView)
 	} else {
-		h.repo.UpdateMeal(r.Context(), userId, mealUUID, mealView)
+		h.repo.UpdateMeal(r.Context(), user.Id, mealUUID, mealView)
 	}
 	if err != nil {
 		log.Fatal("Cannot create or update meal: ", err)
@@ -179,10 +181,10 @@ func dateParam(r *http.Request) time.Time {
 	return date
 }
 
-func (h *Mealhandler) getUserId(r *http.Request) uuid.UUID {
-	userId, err := h.auth.GetUserIdFromContext(r.Context())
+func (h *Mealhandler) getUser(r *http.Request) model.User {
+	user, err := h.auth.GetUserFromContext(r.Context())
 	if err != nil {
 		log.Fatal(err)
 	}
-	return userId
+	return user
 }

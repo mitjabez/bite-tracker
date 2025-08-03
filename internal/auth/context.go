@@ -3,24 +3,25 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 
-	"github.com/google/uuid"
+	"github.com/mitjabez/bite-tracker/internal/model"
 )
 
-const userIdKey = "userId"
+const userKey = "user"
 
-func (a *Auth) GetUserIdFromContext(ctx context.Context) (uuid.UUID, error) {
-	userId := ctx.Value(userIdKey)
-	if userId == nil {
-		return uuid.Nil, errors.New("userId not found in context")
+func (a *Auth) GetUserFromContext(ctx context.Context) (model.User, error) {
+	userAny := ctx.Value(userKey)
+	if userAny == nil {
+		return model.User{}, errors.New("user not found in context")
 	}
-	userUUID, ok := userId.(uuid.UUID)
+	user, ok := userAny.(model.User)
 	if !ok {
-		return uuid.Nil, errors.New("userId not in correct format")
+		return model.User{}, fmt.Errorf("user not in correct format: %v", userAny)
 	}
-	return userUUID, nil
+	return user, nil
 }
 
-func (a *Auth) PutUserIdToContext(ctx context.Context, userId uuid.UUID) context.Context {
-	return context.WithValue(ctx, userIdKey, userId)
+func (a *Auth) PutUserToContext(ctx context.Context, user model.User) context.Context {
+	return context.WithValue(ctx, userKey, user)
 }
