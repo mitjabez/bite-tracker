@@ -1,7 +1,8 @@
 # .PHONY: generate db-init db-start db-stop db-delete
 
 generate:
-	go tool templ generate
+	templ generate
+	sqlc generate
 
 db-init:
 	docker exec -i bite-tracker-db-1 psql -U biteapp -d bite_tracker < internal/db/queries/schema.sql

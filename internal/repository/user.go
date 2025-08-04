@@ -36,7 +36,7 @@ func (r *UserRepo) CreateUser(ctx context.Context, fullName string, email string
 	params := sqlc.CreateUserParams{
 		Email:        email,
 		FullName:     fullName,
-		PasswordHash: &passwordHash,
+		PasswordHash: passwordHash,
 	}
 	user, err := r.dbContext.Queries.CreateUser(ctx, params)
 	if err != nil {
@@ -47,7 +47,7 @@ func (r *UserRepo) CreateUser(ctx context.Context, fullName string, email string
 		Id:           user.ID,
 		FullName:     user.FullName,
 		Email:        user.Email,
-		PasswordHash: *user.PasswordHash,
+		PasswordHash: user.PasswordHash,
 	}, nil
 }
 
@@ -58,7 +58,7 @@ func (r *UserRepo) UpdateUser(ctx context.Context, userId uuid.UUID, fullName st
 		ID:           userId,
 		Email:        email,
 		FullName:     fullName,
-		PasswordHash: &passwordHash,
+		PasswordHash: passwordHash,
 	}
 	return r.dbContext.Queries.UpdateUser(ctx, params)
 }
@@ -90,15 +90,10 @@ func (r *UserRepo) GetUserByEmail(ctx context.Context, email string) (model.User
 }
 
 func mapUser(user sqlc.User) model.User {
-	var hash string
-	if user.PasswordHash != nil {
-		hash = *user.PasswordHash
-	}
-
 	return model.User{
 		Id:           user.ID,
 		FullName:     user.FullName,
 		Email:        user.Email,
-		PasswordHash: hash,
+		PasswordHash: user.PasswordHash,
 	}
 }

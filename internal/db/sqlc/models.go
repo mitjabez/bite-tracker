@@ -45,7 +45,7 @@ type User struct {
 	ID           uuid.UUID
 	Email        string
 	FullName     string
-	PasswordHash *string
+	PasswordHash string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }

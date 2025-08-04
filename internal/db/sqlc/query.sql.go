@@ -68,7 +68,7 @@ RETURNING id, email, full_name, password_hash, created_at, updated_at
 type CreateUserParams struct {
 	Email        string
 	FullName     string
-	PasswordHash *string
+	PasswordHash string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -305,7 +305,7 @@ WHERE id = $4
 type UpdateUserParams struct {
 	Email        string
 	FullName     string
-	PasswordHash *string
+	PasswordHash string
 	ID           uuid.UUID
 }
 
