@@ -127,7 +127,7 @@ func ListMeals(prevDate string, nextDate string, currentDate string, meals []mod
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-target=\"body\">Edit</button> <button class=\"button is-danger is-outlined is-fullwidth\" hx-swap=\"outerHTML\" hx-delete=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" hx-target=\"body\">Edit</button> <button class=\"button is-danger is-outlined is-fullwidth\" hx-swap=\"outerHTML swap:500ms\" hx-delete=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
