@@ -1,4 +1,8 @@
+Features:
+- Infra (Terraform)
+- CI
+- CD
+
 Improvements:
 - Tests
-- sqlc to tools
-- sqlc to air
+- App version
