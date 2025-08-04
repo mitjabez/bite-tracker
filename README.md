@@ -1,4 +1,4 @@
-# Bite Tracker
+# Bite Tracker [![Go](https://github.com/mitjabez/bite-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/mitjabez/bite-tracker/actions/workflows/ci.yml)
 
 ## About
 
