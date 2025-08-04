@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"net/mail"
 	"regexp"
 	"strconv"
 
 	"github.com/mitjabez/bite-tracker/internal/auth"
+	"github.com/mitjabez/bite-tracker/internal/httpx"
 	"github.com/mitjabez/bite-tracker/internal/model"
 	"github.com/mitjabez/bite-tracker/internal/repository"
 	"github.com/mitjabez/bite-tracker/internal/view"
@@ -43,7 +43,8 @@ func (h *AuthHandler) UserProfileForm(w http.ResponseWriter, r *http.Request, db
 	// Get user from DB just in case additional fields got added not yet in the token
 	dbUser, err := h.repo.GetUser(r.Context(), dbUser.Id)
 	if err != nil {
-		log.Fatal("Error obtaining user: ", err)
+		httpx.InternalError(w, "Failed obtaining user", err)
+		return
 	}
 	view.LoggedInLayout(view.UserProfileForm(dbUser, "", "", map[string]string{}), "User Profile", dbUser).Render(r.Context(), w)
 }
@@ -92,7 +93,8 @@ func (h *AuthHandler) handleUserForm(w http.ResponseWriter, r *http.Request, use
 	if isNewUser && len(errors) == 0 {
 		userExists, err := h.repo.UserExists(r.Context(), userForm.Email)
 		if err != nil {
-			log.Fatal("Error checking if user exists: ", err)
+			httpx.InternalError(w, "Failed checking if user exists", err)
+			return
 		}
 		if userExists {
 			errors["email"] = "Username unavailable — please choose another"
@@ -110,19 +112,22 @@ func (h *AuthHandler) handleUserForm(w http.ResponseWriter, r *http.Request, use
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
-		log.Fatal("Error generating hash:", err)
+		httpx.InternalError(w, "Failed generating hash", err)
+		return
 	}
 
 	if isNewUser {
 		_, err := h.repo.CreateUser(r.Context(), userForm.FullName, userForm.Email, string(passwordHash))
 		if err != nil {
-			log.Fatal("Cannot create user:", err)
+			httpx.InternalError(w, "Failed creating user", err)
+			return
 		}
 		view.NotLoggedInLayout(view.ProfileUpdated("Registration successful!"), "Profile Created").Render(r.Context(), w)
 	} else {
 		err = h.repo.UpdateUser(r.Context(), user.Id, userForm.FullName, userForm.Email, string(passwordHash))
 		if err != nil {
-			log.Fatal("Cannot update user:", err)
+			httpx.InternalError(w, "Failed updating user", err)
+			return
 		}
 		h.auth.InvalidateCookieToken(w)
 		view.NotLoggedInLayout(view.ProfileUpdated("Your profile has been successfully updated!"), "Profile Updated").Render(r.Context(), w)
@@ -156,7 +161,8 @@ func (h *AuthHandler) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
 		handleInvalidLogin(errors, email, w, r)
 		return
 	} else if err != nil {
-		log.Fatal("Error reading user: ", err)
+		httpx.InternalError(w, "Failed reading user ", err)
+		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
@@ -168,7 +174,8 @@ func (h *AuthHandler) HandleLoginForm(w http.ResponseWriter, r *http.Request) {
 
 	err = h.auth.SetCookieToken(w, user)
 	if err != nil {
-		log.Fatal("Error setting cookie token: ", err)
+		httpx.InternalError(w, "Failed setting cookie token ", err)
+		return
 	}
 	http.Redirect(w, r, "/meals", 302)
 }

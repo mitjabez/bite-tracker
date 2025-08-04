@@ -33,7 +33,8 @@ func (h Mealhandler) ListMeals(w http.ResponseWriter, r *http.Request, user mode
 
 	mealsView, err := h.repo.ListMeals(r.Context(), user.Id, date)
 	if err != nil {
-		log.Fatal(err)
+		httpx.InternalError(w, "Failed to list meals", err)
+		return
 	}
 	view.LoggedInLayout(view.ListMeals(prevDate, nextDate, currentDate, mealsView), "Meal Log", user).Render(r.Context(), w)
 }
@@ -49,7 +50,8 @@ func (h Mealhandler) NewMealForm(w http.ResponseWriter, r *http.Request, user mo
 
 	top3Meals, err := h.repo.Top3Meals(r.Context(), user.Id)
 	if err != nil {
-		log.Fatal("Error retrieving top meals for user: ", err)
+		httpx.InternalError(w, "Failed to retrieve top meals", err)
+		return
 	}
 
 	view.LoggedInLayout(view.NewMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "New Meal", user).Render(r.Context(), w)
@@ -59,17 +61,20 @@ func (h Mealhandler) EditMealForm(w http.ResponseWriter, r *http.Request, user m
 	mealIdParam := r.PathValue("id")
 	mealUUID, err := uuid.Parse(mealIdParam)
 	if err != nil {
-		log.Fatal("Invalid uuid ", mealIdParam)
+		httpx.InternalError(w, "Invalid uuid", err)
+		return
 	}
 
 	mealView, err := h.repo.GetMeal(r.Context(), mealUUID)
 	if err != nil {
-		log.Fatal("Error reading meal: ", err)
+		httpx.InternalError(w, "Failed reading meal", err)
+		return
 	}
 
 	top3Meals, err := h.repo.Top3Meals(r.Context(), mealUUID)
 	if err != nil {
-		log.Fatal("Error retrieving top meals for user: ", err)
+		httpx.InternalError(w, "Failed retrieving top meals", err)
+		return
 	}
 	view.LoggedInLayout(view.EditMealForm(mealView, map[string]string{}, model.Symptoms, top3Meals), "Edit Meal", user).Render(r.Context(), w)
 }
@@ -83,7 +88,8 @@ func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request, user
 	if !isNewMeal {
 		mealUUID, err = uuid.Parse(mealIdParam)
 		if err != nil {
-			log.Fatal("Invalid meal uuid ", mealIdParam)
+			httpx.InternalError(w, "Invalid meal uuid", err)
+			return
 		}
 	}
 
@@ -142,7 +148,8 @@ func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request, user
 	if len(errors) > 0 {
 		top3Meals, err := h.repo.Top3Meals(r.Context(), user.Id)
 		if err != nil {
-			log.Fatal("Error obtaining top 3 meals")
+			httpx.InternalError(w, "Failed obtaining top 3 meals", err)
+			return
 		}
 		if isNewMeal {
 			view.LoggedInLayout(view.NewMealForm(mealView, errors, model.Symptoms, top3Meals), "New Meal", user).Render(r.Context(), w)
@@ -158,7 +165,8 @@ func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request, user
 		h.repo.UpdateMeal(r.Context(), user.Id, mealUUID, mealView)
 	}
 	if err != nil {
-		log.Fatal("Cannot create or update meal: ", err)
+		httpx.InternalError(w, "Failed creating or update meal: ", err)
+		return
 	}
 
 	http.Redirect(w, r, "/meals", 303)

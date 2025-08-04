@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -10,15 +11,14 @@ import (
 	"github.com/mitjabez/bite-tracker/internal/db/sqlc"
 )
 
+const maxTries = 3
+
 type DBContext struct {
 	Queries *sqlc.Queries
 	Pool    *pgxpool.Pool
 }
 
 func Init(config config.Config) (DBContext, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
 	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		config.DBUsername,
 		config.DBPassword,
@@ -26,7 +26,27 @@ func Init(config config.Config) (DBContext, error) {
 		config.DBPort,
 		config.DBName,
 	)
-	pool, err := pgxpool.New(ctx, connectionString)
+	pool, err := pgxpool.New(context.Background(), connectionString)
+	if err != nil {
+		return DBContext{}, err
+	}
+
+	for i := 1; i <= maxTries; i++ {
+		ctx, cancel := context.WithTimeout(context.Background(), WriteTimeout)
+		err = pool.Ping(ctx)
+		cancel()
+
+		if err != nil {
+			log.Printf("DB ping failed (%d/%d): %v\n", i, maxTries, err)
+		} else {
+			break
+		}
+
+		if i < 3 {
+			time.Sleep(time.Duration(i*2) * time.Second)
+		}
+	}
+
 	if err != nil {
 		return DBContext{}, err
 	}

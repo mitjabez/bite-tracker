@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/mitjabez/bite-tracker/internal/auth"
 	"github.com/mitjabez/bite-tracker/internal/config"
-	db "github.com/mitjabez/bite-tracker/internal/db/init"
+	"github.com/mitjabez/bite-tracker/internal/db"
 	"github.com/mitjabez/bite-tracker/internal/handler"
 	"github.com/mitjabez/bite-tracker/internal/middleware"
 	"github.com/mitjabez/bite-tracker/internal/repository"
@@ -17,7 +16,7 @@ func main() {
 	config := config.LocalDev()
 	dbContext, err := db.Init(config)
 	if err != nil {
-		log.Fatal("Cannot initialize DB:", err)
+		log.Fatal("Failed initializing DB: ", err)
 	}
 	defer dbContext.Pool.Close()
 
@@ -30,9 +29,7 @@ func main() {
 
 	assetHandler := http.FileServer(http.Dir("internal/view/assets"))
 
-	// TODO: 404 handler (with logging)
-	// TODO: This redirects everything to /meals, even if it should be 404
-	// http.Handle("GET /", mwr.Chain(func(w http.ResponseWrinter, r *http.Request) { http.Redirect(w, r, "/meals", 302) }))
+	http.Handle("GET /", mwr.Chain(handler.Home))
 	http.Handle("GET /auth/register", mwr.Chain(authHandler.RegisterUserForm))
 	http.Handle("POST /auth/register", mwr.Chain(authHandler.HandleRegisterUserForm))
 	http.Handle("GET /auth/login", mwr.Chain(authHandler.LoginForm))
@@ -48,6 +45,9 @@ func main() {
 	http.Handle("POST /meals/new", mwr.AuthChain(mealHandler.HandleMealForm))
 	http.Handle("GET /assets/", mwr.Chain(http.StripPrefix("/assets", assetHandler).ServeHTTP))
 
-	fmt.Println("Server started!")
-	http.ListenAndServe(":8000", nil)
+	log.Printf("Bite Tracker started on %s\n", config.ListenAddr)
+	err = http.ListenAndServe(config.ListenAddr, nil)
+	if err != nil {
+		log.Fatalf("Failed starting server: %v\n", err)
+	}
 }

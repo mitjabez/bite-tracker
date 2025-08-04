@@ -2,11 +2,10 @@ package repository
 
 import (
 	"context"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	db "github.com/mitjabez/bite-tracker/internal/db/init"
+	"github.com/mitjabez/bite-tracker/internal/db"
 	"github.com/mitjabez/bite-tracker/internal/db/sqlc"
 	"github.com/mitjabez/bite-tracker/internal/model"
 )
@@ -20,7 +19,7 @@ func NewUserRepo(dbContext *db.DBContext) *UserRepo {
 }
 
 func (r *UserRepo) UserExists(ctx context.Context, email string) (bool, error) {
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, db.QueryTimeout)
 	defer cancel()
 	_, err := r.dbContext.Queries.GetUserByEmail(ctx, email)
 	if err == pgx.ErrNoRows {
@@ -32,7 +31,7 @@ func (r *UserRepo) UserExists(ctx context.Context, email string) (bool, error) {
 }
 
 func (r *UserRepo) CreateUser(ctx context.Context, fullName string, email string, passwordHash string) (model.User, error) {
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, db.QueryTimeout)
 	defer cancel()
 	params := sqlc.CreateUserParams{
 		Email:        email,
@@ -53,7 +52,7 @@ func (r *UserRepo) CreateUser(ctx context.Context, fullName string, email string
 }
 
 func (r *UserRepo) UpdateUser(ctx context.Context, userId uuid.UUID, fullName string, email string, passwordHash string) error {
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, db.WriteTimeout)
 	defer cancel()
 	params := sqlc.UpdateUserParams{
 		ID:           userId,
@@ -65,7 +64,7 @@ func (r *UserRepo) UpdateUser(ctx context.Context, userId uuid.UUID, fullName st
 }
 
 func (r *UserRepo) GetUser(ctx context.Context, userId uuid.UUID) (model.User, error) {
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, db.QueryTimeout)
 	defer cancel()
 	user, err := r.dbContext.Queries.GetUser(ctx, userId)
 	if err == pgx.ErrNoRows {
@@ -78,7 +77,7 @@ func (r *UserRepo) GetUser(ctx context.Context, userId uuid.UUID) (model.User, e
 }
 
 func (r *UserRepo) GetUserByEmail(ctx context.Context, email string) (model.User, error) {
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, db.QueryTimeout)
 	defer cancel()
 	user, err := r.dbContext.Queries.GetUserByEmail(ctx, email)
 	if err == pgx.ErrNoRows {

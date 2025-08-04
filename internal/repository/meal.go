@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	db "github.com/mitjabez/bite-tracker/internal/db/init"
+	"github.com/mitjabez/bite-tracker/internal/db"
 	"github.com/mitjabez/bite-tracker/internal/db/sqlc"
 	"github.com/mitjabez/bite-tracker/internal/model"
 	"golang.org/x/text/cases"
@@ -21,7 +21,7 @@ func NewMealRepo(dbContext *db.DBContext) *MealRepo {
 }
 
 func (r *MealRepo) ListMeals(ctx context.Context, userId uuid.UUID, date time.Time) ([]model.Meal, error) {
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, db.QueryTimeout)
 	defer cancel()
 	params := sqlc.ListMealsByUsernameAndDateParams{
 		UserID:  userId,
@@ -40,6 +40,8 @@ func (r *MealRepo) ListMeals(ctx context.Context, userId uuid.UUID, date time.Ti
 }
 
 func (r *MealRepo) GetMeal(ctx context.Context, userId uuid.UUID) (model.Meal, error) {
+	ctx, cancel := context.WithTimeout(ctx, db.QueryTimeout)
+	defer cancel()
 	meal, err := r.dbContext.Queries.GetMeal(ctx, userId)
 	if err != nil {
 		return model.Meal{}, nil
@@ -55,15 +57,15 @@ func (r *MealRepo) CreateMeal(ctx context.Context, userId uuid.UUID, mealView mo
 func (r *MealRepo) UpdateMeal(ctx context.Context, userId uuid.UUID, mealId uuid.UUID, mealView model.Meal) error {
 	return r.createOrUpdateMeal(ctx, false, userId, mealId, mealView)
 }
+
 func (r *MealRepo) DeleteMeal(ctx context.Context, mealId uuid.UUID) error {
-	ctxTimeout, cancel := context.WithTimeout(ctx, 2*time.Second)
+	ctxTimeout, cancel := context.WithTimeout(ctx, db.QueryTimeout)
 	defer cancel()
 	return r.dbContext.Queries.DeleteMeal(ctxTimeout, mealId)
 }
 
-// TODO: Pass string and use uuid.MustParse
 func (r *MealRepo) createOrUpdateMeal(ctx context.Context, isNewMeal bool, userId uuid.UUID, mealId uuid.UUID, mealView model.Meal) error {
-	ctx, cancel := context.WithTimeout(ctx, 4*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, db.WriteTimeout)
 	defer cancel()
 
 	tx, err := r.dbContext.Pool.Begin(ctx)
@@ -114,7 +116,7 @@ func (r *MealRepo) createOrUpdateMeal(ctx context.Context, isNewMeal bool, userI
 }
 
 func (r *MealRepo) Top3Meals(ctx context.Context, userId uuid.UUID) ([]string, error) {
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, db.QueryTimeout)
 	defer cancel()
 	top3MealsResult, err := r.dbContext.Queries.Top3Meals(ctx, sqlc.Top3MealsParams{
 		UserID:     userId,

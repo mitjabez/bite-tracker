@@ -3,6 +3,7 @@ package config
 import "time"
 
 type Config struct {
+	ListenAddr      string
 	DBHost          string
 	DBPort          int
 	DBName          string
@@ -14,6 +15,7 @@ type Config struct {
 
 func LocalDev() Config {
 	return Config{
+		ListenAddr:      ":8000",
 		DBHost:          "localhost",
 		DBPort:          5432,
 		DBName:          "bite_tracker",

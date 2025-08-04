@@ -9,8 +9,7 @@ CREATE TABLE users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text NOT NULL,
   full_name text NOT NULL,
-	-- TODO: Should be NOT NULL
-	password_hash text,
+	password_hash text NOT NULL,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now()
 );
