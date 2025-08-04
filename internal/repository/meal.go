@@ -55,6 +55,11 @@ func (r *MealRepo) CreateMeal(ctx context.Context, userId uuid.UUID, mealView mo
 func (r *MealRepo) UpdateMeal(ctx context.Context, userId uuid.UUID, mealId uuid.UUID, mealView model.Meal) error {
 	return r.createOrUpdateMeal(ctx, false, userId, mealId, mealView)
 }
+func (r *MealRepo) DeleteMeal(ctx context.Context, mealId uuid.UUID) error {
+	ctxTimeout, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+	return r.dbContext.Queries.DeleteMeal(ctxTimeout, mealId)
+}
 
 // TODO: Pass string and use uuid.MustParse
 func (r *MealRepo) createOrUpdateMeal(ctx context.Context, isNewMeal bool, userId uuid.UUID, mealId uuid.UUID, mealView model.Meal) error {

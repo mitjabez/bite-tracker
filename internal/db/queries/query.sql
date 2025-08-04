@@ -31,6 +31,10 @@ UPDATE meals
   updated_at = $7
 WHERE id = $1;
 
+-- name: DeleteMeal :exec
+DELETE FROM meals
+WHERE id = $1;
+
 -- name: GetUser :one
 SELECT * FROM users
 WHERE id = @id

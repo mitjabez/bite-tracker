@@ -3,6 +3,8 @@ Features:
 
 Improvements:
 - Restart DB conection if not initially available
+- Make sure timeout is on all queries
+- Handle http 400/500 in htmx
 - Pretty validation on all fields, not just meal
 - Tests
 - Check log.fatal handling

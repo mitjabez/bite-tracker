@@ -43,6 +43,7 @@ func main() {
 	http.Handle("GET /meals", mwr.AuthChain(mealHandler.ListMeals))
 	http.Handle("GET /meals/{id}", mwr.AuthChain(mealHandler.EditMealForm))
 	http.Handle("PUT /meals/{id}", mwr.AuthChain(mealHandler.HandleMealForm))
+	http.Handle("DELETE /meals/{id}", mwr.AuthChain(mealHandler.HandleDelete))
 	http.Handle("GET /meals/new", mwr.AuthChain(mealHandler.NewMealForm))
 	http.Handle("POST /meals/new", mwr.AuthChain(mealHandler.HandleMealForm))
 	http.Handle("GET /assets/", mwr.Chain(http.StripPrefix("/assets", assetHandler).ServeHTTP))

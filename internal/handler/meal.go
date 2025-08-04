@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mitjabez/bite-tracker/internal/auth"
+	"github.com/mitjabez/bite-tracker/internal/httpx"
 	"github.com/mitjabez/bite-tracker/internal/model"
 	"github.com/mitjabez/bite-tracker/internal/repository"
 	"github.com/mitjabez/bite-tracker/internal/view"
@@ -161,6 +162,21 @@ func (h Mealhandler) HandleMealForm(w http.ResponseWriter, r *http.Request, user
 	}
 
 	http.Redirect(w, r, "/meals", 303)
+}
+
+func (h Mealhandler) HandleDelete(w http.ResponseWriter, r *http.Request, user model.User) {
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		httpx.BadRequest(w, "Invalid uuid", err)
+		return
+	}
+
+	httpx.InternalError(w, "Cannot delete meal", err)
+	err = h.repo.DeleteMeal(r.Context(), id)
+	if err != nil {
+		httpx.InternalError(w, "Cannot delete meal", err)
+		return
+	}
 }
 
 func dateParam(r *http.Request) time.Time {
