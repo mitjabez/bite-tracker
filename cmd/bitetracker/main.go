@@ -19,6 +19,10 @@ func main() {
 		log.Fatal("Failed initializing DB: ", err)
 	}
 	defer dbContext.Pool.Close()
+	err = db.RunMigration(config)
+	if err != nil {
+		log.Printf("Error running DB migration. App may not run correctly. Error: %v\n", err)
+	}
 
 	mealRepo := repository.NewMealRepo(&dbContext)
 	userRepo := repository.NewUserRepo(&dbContext)
