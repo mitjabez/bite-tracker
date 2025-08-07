@@ -13,20 +13,24 @@ import (
 )
 
 func main() {
-	config := config.LocalDev()
-	dbContext, err := db.Init(config)
+	btConfig, err := config.Init()
+	if err != nil {
+		log.Fatal("Cannot load app config: ", err)
+	}
+
+	dbContext, err := db.Init(btConfig)
 	if err != nil {
 		log.Fatal("Failed initializing DB: ", err)
 	}
 	defer dbContext.Pool.Close()
-	err = db.RunMigration(config)
+	err = db.RunMigration(btConfig)
 	if err != nil {
 		log.Printf("Error running DB migration. App may not run correctly. Error: %v\n", err)
 	}
 
 	mealRepo := repository.NewMealRepo(&dbContext)
 	userRepo := repository.NewUserRepo(&dbContext)
-	auth := auth.NewAuth(config.HmacTokenSecret, config.TokenAge)
+	auth := auth.NewAuth(btConfig.HmacTokenSecret, btConfig.TokenAge)
 	mealHandler := handler.NewMealHandler(mealRepo, auth)
 	authHandler := handler.NewAuthHandler(userRepo, auth)
 	mwr := middleware.New(auth)
@@ -49,8 +53,8 @@ func main() {
 	http.Handle("POST /meals/new", mwr.AuthChain(mealHandler.HandleMealForm))
 	http.Handle("GET /assets/", mwr.Chain(http.StripPrefix("/assets", assetHandler).ServeHTTP))
 
-	log.Printf("Bite Tracker started on %s\n", config.ListenAddr)
-	err = http.ListenAndServe(config.ListenAddr, nil)
+	log.Printf("Bite Tracker started on %s\n", btConfig.ListenAddr)
+	err = http.ListenAndServe(btConfig.ListenAddr, nil)
 	if err != nil {
 		log.Fatalf("Failed starting server: %v\n", err)
 	}

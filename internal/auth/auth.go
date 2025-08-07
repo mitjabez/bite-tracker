@@ -19,9 +19,9 @@ type Claims struct {
 	Iat      time.Time
 }
 
-func NewAuth(hmacTokenSecret []byte, tokenAge time.Duration) *Auth {
+func NewAuth(hmacTokenSecret string, tokenAge time.Duration) *Auth {
 	return &Auth{
-		hmacTokenSecret: hmacTokenSecret,
+		hmacTokenSecret: []byte(hmacTokenSecret),
 		tokenAge:        tokenAge,
 	}
 }

@@ -1,31 +1,29 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	"github.com/kelseyhightower/envconfig"
+)
 
 type Config struct {
-	ListenAddr          string
-	DBHost              string
-	DBPort              int
-	DBName              string
-	DBUsername          string
-	DBPassword          string
-	DBMigrationUsername string
-	DBMigrationPassword string
-	HmacTokenSecret     []byte
-	TokenAge            time.Duration
+	ListenAddr          string        `required:"true"`
+	DBHost              string        `required:"true"`
+	DBPort              int           `required:"true"`
+	DBName              string        `required:"true"`
+	DBUsername          string        `required:"true"`
+	DBPassword          string        `required:"true"`
+	DBMigrationUsername string        `required:"true"`
+	DBMigrationPassword string        `required:"true"`
+	HmacTokenSecret     string        `required:"true"`
+	TokenAge            time.Duration `required:"true"`
 }
 
-func LocalDev() Config {
-	return Config{
-		ListenAddr:          ":8000",
-		DBHost:              "localhost",
-		DBPort:              5432,
-		DBName:              "bite_tracker",
-		DBUsername:          "biteapp",
-		DBPassword:          "superburrito",
-		DBMigrationUsername: "biteapp",
-		DBMigrationPassword: "superburrito",
-		HmacTokenSecret:     []byte("1WSB6LaNNLfxi.JbTxrao0s3b4wTpH"),
-		TokenAge:            time.Hour * 24,
+func Init() (Config, error) {
+	btConfig := Config{}
+	err := envconfig.Process("bt", &btConfig)
+	if err != nil {
+		return Config{}, err
 	}
+	return btConfig, nil
 }
