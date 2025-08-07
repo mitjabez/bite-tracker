@@ -8,8 +8,12 @@ build/
 # Vim
 *.sw*
 
-# Node
-node_modules/
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
 
 # Misc
 *~
