@@ -1,11 +1,18 @@
-# .PHONY: generate db-init db-start db-stop db-delete
+.PHONY: generate db-up db-down db-start db-stop build
+
+DB_URL = postgres://biteapp:superburrito@localhost:5432/bite_tracker?sslmode=disable
+DB_PATH = internal/db/migrations
+BIN = build/bite-tracker
 
 generate:
 	templ generate
 	sqlc generate
 
-db-init:
-	docker exec -i bite-tracker-db-1 psql -U biteapp -d bite_tracker < internal/db/queries/schema.sql
+db-up:
+	migrate -database $(DB_URL) -path $(DB_PATH) up
+
+db-down:
+	migrate -database $(DB_URL) -path $(DB_PATH) down -all
 
 db-start:
 	docker compose up -d
@@ -13,12 +20,8 @@ db-start:
 db-stop:
 	docker compose stop
 
-db-delete:
-	docker compose down -v
-
 build:
-	go build -o build/bite-tracker cmd/bitetracker/main.go
+	go build -o $(BIN) cmd/bitetracker/main.go
 
 run: build
-	build/bite-tracker
-
+	$(BIN)

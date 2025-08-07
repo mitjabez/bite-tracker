@@ -1,10 +1,3 @@
--- START: Schema --------------------------------------------------
-DROP TABLE IF EXISTS meals;
-DROP TABLE IF EXISTS meals_catalog;
-DROP TABLE IF EXISTS meal_types;
-DROP TABLE IF EXISTS users CASCADE;
-
-
 CREATE TABLE users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text NOT NULL,
@@ -53,10 +46,7 @@ ALTER TABLE meals_catalog
 ADD CONSTRAINT uniq_user_meal_desc_type UNIQUE (user_id, description, meal_type_id);
 
 
--- END: Schema --------------------------------------------------
-
--- START: Seed data ---------------------------------------------
--- User password: Tracker123
+-- Test user
 INSERT INTO users (id, email, full_name, password_hash)
 VALUES ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'sj@dot.com', 'Salsa Jimmy', '$2a$12$F22j/9fE8wI2nfjFADc/reQgm/TpKAxUWIyPhzZybV3GuvZP49rtu');
 
@@ -90,5 +80,3 @@ INSERT INTO meals_catalog (
 ) VALUES
 ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'dinner', 1, 'Ham&Cheese sandwich'),
 ('f41ad27a-881d-4f7f-a908-f16a26ce7b78', 'dinner', 3, 'Cucumber salad');
-
--- END: Seed data ---------------------------------------------
