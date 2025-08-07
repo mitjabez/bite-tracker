@@ -4,7 +4,7 @@ resource "aws_iam_role_policy_attachment" "bite_tracker" {
 }
 
 resource "aws_iam_role" "bite_tracker" {
-  name = "bite-tracker"
+  name = local.name
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -24,7 +24,7 @@ resource "aws_iam_role" "bite_tracker" {
 }
 
 resource "aws_iam_policy" "bite_tracker" {
-  name = "bite-tracker"
+  name = local.name
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -43,7 +43,7 @@ resource "aws_iam_policy" "bite_tracker" {
           "ecr:BatchGetImage",
           "ecr:DescribeImages",
         ],
-        Resource = "${aws_ecr_repository.arn}/*"
+        Resource = aws_ecr_repository.bite_tracker.arn
       }
     ]
   })
