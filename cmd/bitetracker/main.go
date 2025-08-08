@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/joho/godotenv"
 	"github.com/mitjabez/bite-tracker/internal/auth"
 	"github.com/mitjabez/bite-tracker/internal/config"
 	"github.com/mitjabez/bite-tracker/internal/db"
@@ -13,6 +14,11 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err == nil {
+		log.Printf("Configuration loaded from .env")
+	}
+
 	btConfig, err := config.Init()
 	if err != nil {
 		log.Fatal("Cannot load app config: ", err)

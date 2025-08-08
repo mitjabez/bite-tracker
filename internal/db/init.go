@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -22,14 +21,7 @@ type DBContext struct {
 }
 
 func Init(config config.Config) (DBContext, error) {
-	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		config.DBUsername,
-		config.DBPassword,
-		config.DBHost,
-		config.DBPort,
-		config.DBName,
-	)
-	pool, err := pgxpool.New(context.Background(), connectionString)
+	pool, err := pgxpool.New(context.Background(), config.DBAppUrl)
 	if err != nil {
 		return DBContext{}, err
 	}
@@ -61,23 +53,12 @@ func Init(config config.Config) (DBContext, error) {
 }
 
 func RunMigration(config config.Config) error {
-	// Migration is run with dedicated account
-	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		config.DBMigrationUsername,
-		config.DBMigrationPassword,
-		config.DBHost,
-		config.DBPort,
-		config.DBName,
-	)
-
-	m, err := migrate.New(
-		"file://internal/db/migrations",
-		connectionString)
+	// Don't run migration with app db account
+	m, err := migrate.New("file://internal/db/migrations", config.DBMigrateUrl)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("Running DB migration ...\n")
 	err = m.Up()
 	if err == migrate.ErrNoChange {
 		log.Printf("No DB migration needed\n")
@@ -85,6 +66,7 @@ func RunMigration(config config.Config) error {
 	} else if err != nil {
 		return err
 	}
-	log.Printf("DB migration successful!")
+	version, dirty, _ := m.Version()
+	log.Printf("Successfully performed DB migration to version %d, dirty=%t.\n", version, dirty)
 	return nil
 }
