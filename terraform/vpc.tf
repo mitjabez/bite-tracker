@@ -2,10 +2,17 @@ resource "aws_vpc" "main" {
   cidr_block       = "10.0.0.0/16"
   instance_tenancy = "default"
 
-  # TODO: Change name
   tags = {
     Name = "main"
   }
+}
+
+resource "aws_subnet" "dmz" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/28"
+  map_public_ip_on_launch = false
+  availability_zone       = local.zone_a
+  tags                    = merge({ Name = "dmz-a" }, local.default_tags)
 }
 
 resource "aws_subnet" "bite_tracker_db_a" {

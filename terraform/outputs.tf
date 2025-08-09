@@ -10,3 +10,6 @@ output "ecr_url" {
   value = aws_ecr_repository.bite_tracker.repository_url
 }
 
+output "jumpbox_public_ip" {
+  value = aws_instance.jumpbox.public_ip
+}
