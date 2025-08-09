@@ -15,7 +15,13 @@ resource "aws_apprunner_service" "bite_tracker" {
       image_configuration {
         port = "8080"
         runtime_environment_variables = {
-          DATABASE_URL = "postgresql://${aws_db_instance.bite_tracker.username}:${aws_db_instance.bite_tracker.password}@${aws_db_instance.bite_tracker.address}:${aws_db_instance.bite_tracker.port}/${aws_db_instance.bite_tracker.db_name}?sslmode=require"
+          BT_LISTENADDR = ":8080"
+          # TODO: Created dedicated user & use rsecret manager
+          BT_DBAPPURL        = "postgresql://${aws_db_instance.bite_tracker.username}:${aws_db_instance.bite_tracker.password}@${aws_db_instance.bite_tracker.address}:${aws_db_instance.bite_tracker.port}/${aws_db_instance.bite_tracker.db_name}?sslmode=require"
+          BT_DBMIGRATEURL    = "postgresql://${aws_db_instance.bite_tracker.username}:${aws_db_instance.bite_tracker.password}@${aws_db_instance.bite_tracker.address}:${aws_db_instance.bite_tracker.port}/${aws_db_instance.bite_tracker.db_name}?sslmode=require"
+          BT_HMACTOKENSECRET = "1WSB6LaNNLfxi.JbTxrao0s3b4wTpH"
+          BT_TOKENAGE        = "24h"
+
         }
       }
       image_identifier      = "${aws_ecr_repository.bite_tracker.repository_url}:latest"

@@ -1,7 +1,8 @@
 locals {
   name   = "bite-tracker"
-  zone_a = "eu-central-1a"
-  zone_b = "eu-central-1b"
+  region = "eu-central-1"
+  zone_a = "${local.region}a"
+  zone_b = "${local.region}b"
   default_tags = {
     App = local.name
     Env = "dev"
