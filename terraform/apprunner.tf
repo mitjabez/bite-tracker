@@ -4,8 +4,9 @@ resource "aws_apprunner_service" "bite_tracker" {
   auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration_version.bite_tracker.arn
 
   instance_configuration {
-    cpu    = "0.25 vCPU"
-    memory = 512
+    cpu               = "0.25 vCPU"
+    memory            = 512
+    instance_role_arn = aws_iam_role.bite_tracker.arn
   }
 
   source_configuration {

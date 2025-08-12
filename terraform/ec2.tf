@@ -6,7 +6,6 @@ resource "aws_instance" "jumpbox" {
   vpc_security_group_ids      = [aws_security_group.jumpbox.id]
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.jumpbox.name
-  key_name                    = aws_key_pair.jumpbox_admin.key_name
 
   user_data = <<-EOF
     #!/usr/bin/env bash
@@ -17,8 +16,3 @@ resource "aws_instance" "jumpbox" {
   tags = merge({ Name = "jumpbox" }, local.default_tags)
 }
 
-# TODO: Remove
-resource "aws_key_pair" "jumpbox_admin" {
-  key_name   = "jumpbox-admin"
-  public_key = file(var.ssh_public_key_path)
-}

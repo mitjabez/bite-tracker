@@ -51,6 +51,18 @@ main() {
   db_app_user_password=$(grep db_app_user_password terraform.tfvars | cut -f2 -d\")
   db_migrate_user_password=$(grep db_migrate_user_password terraform.tfvars | cut -f2 -d\")
 
+  aws ssm send-command \
+  --instance-id "i-06795194ff98899b0" \
+  --document-name "AWS-RunShellScript" \
+  --comment "Run psql bootstrap" \
+  --parameters 'commands=["pwd && psql --version"]'
+  aws ssm list-command-invocations \
+    --command-id "63447ff4-e597-4cd9-9c0c-3bd0926c955e" \
+    --details
+
+
+
+
   # TODO
   # docker exec -i bite-tracker-db-1 psql -U biteapp -d bite_tracker -v bt_app_user_password="'test123'" -v bt_migrate_user_password="'test1234'" < scripts/bootstrap.sql
   popd > /dev/null

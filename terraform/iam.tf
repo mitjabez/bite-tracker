@@ -14,7 +14,8 @@ resource "aws_iam_role" "bite_tracker" {
         Effect = "Allow"
         Principal = {
           Service : [
-            "build.apprunner.amazonaws.com"
+            "build.apprunner.amazonaws.com",
+            "tasks.apprunner.amazonaws.com",
           ]
         }
       },
@@ -44,8 +45,22 @@ resource "aws_iam_policy" "bite_tracker" {
           "ecr:DescribeImages",
         ],
         Resource = aws_ecr_repository.bite_tracker.arn
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "kms:Decrypt*",
+        ],
+        # Resource = [
+        #   aws_secretsmanager_secret.db_app_user_connection_string.arn,
+        #   aws_secretsmanager_secret.db_migrate_user_connection_string.arn,
+        #   aws_secretsmanager_secret.hmac_token_secret.arn,
+        # ]
+        Resource = "*"
       }
     ]
   })
+
   tags = local.default_tags
 }

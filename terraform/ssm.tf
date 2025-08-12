@@ -1,26 +1,28 @@
-data "aws_iam_policy_document" "ec2_assume" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-}
-
 resource "aws_iam_role" "jumpbox" {
-  name               = "jumpbox-ssm-role"
-  assume_role_policy = data.aws_iam_policy_document.ec2_assume.json
+  name = "jumpbox"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service : [
+            "ec2.amazonaws.com"
+          ]
+        }
+      },
+    ]
+  })
 }
 
-resource "aws_iam_role_policy_attachment" "jumpbox_ssm" {
+resource "aws_iam_role_policy_attachment" "jumpbox" {
   role       = aws_iam_role.jumpbox.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# TODO: Consistent naming
 resource "aws_iam_instance_profile" "jumpbox" {
-  name = "jumpbox-ssm-profile"
+  name = "jumpbox"
   role = aws_iam_role.jumpbox.name
 }
 
