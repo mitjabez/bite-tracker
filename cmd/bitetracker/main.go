@@ -24,15 +24,16 @@ func main() {
 		log.Fatal("Cannot load app config: ", err)
 	}
 
+	err = db.RunMigration(btConfig)
+	if err != nil {
+		log.Printf("Error running DB migration. App may not run correctly. Error: %v\n", err)
+	}
+
 	dbContext, err := db.Init(btConfig)
 	if err != nil {
 		log.Fatal("Failed initializing DB: ", err)
 	}
 	defer dbContext.Pool.Close()
-	err = db.RunMigration(btConfig)
-	if err != nil {
-		log.Printf("Error running DB migration. App may not run correctly. Error: %v\n", err)
-	}
 
 	mealRepo := repository.NewMealRepo(&dbContext)
 	userRepo := repository.NewUserRepo(&dbContext)

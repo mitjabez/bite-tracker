@@ -5,8 +5,8 @@ resource "aws_db_instance" "bite_tracker" {
   engine                 = "postgres"
   engine_version         = "17.4"
   instance_class         = "db.t4g.micro"
-  username               = var.db_admin_username
-  password               = var.db_admin_password
+  username               = var.db_admin_user_username
+  password               = var.db_admin_user_password
   multi_az               = false
   availability_zone      = local.zone_b
   vpc_security_group_ids = [aws_security_group.bite_tracker_db.id]

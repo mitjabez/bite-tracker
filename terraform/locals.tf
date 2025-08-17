@@ -5,7 +5,6 @@ locals {
   zone_b = "${local.region}b"
   default_tags = {
     App = local.name
-    Env = "dev"
   }
 }
 

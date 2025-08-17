@@ -18,6 +18,9 @@ type Config struct {
 	DbAppUserPassword     string        `required:"true" split_words:"true"`
 	DbMigrateUserUsername string        `required:"true" split_words:"true"`
 	DbMigrateUserPassword string        `required:"true" split_words:"true"`
+	// Whether to create roles at app startup
+	// Should be enabled only when starting the app for the first time or during development
+	DbBootstrapRoles bool `required:"true" split_words:"true"`
 }
 
 func Init() (Config, error) {

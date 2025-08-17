@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mitjabez/bite-tracker/internal/config"
 	"github.com/mitjabez/bite-tracker/internal/db/sqlc"
@@ -23,8 +25,8 @@ type DBContext struct {
 
 func Init(config config.Config) (DBContext, error) {
 	connectionString := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s",
-		config.DbAppUserUsername,
-		config.DbAppUserPassword,
+		url.QueryEscape(config.DbAppUserUsername),
+		url.QueryEscape(config.DbAppUserPassword),
 		config.DbHost,
 		config.DbPort,
 		config.DbName,
@@ -64,14 +66,23 @@ func Init(config config.Config) (DBContext, error) {
 
 func RunMigration(config config.Config) error {
 	connectionString := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s",
-		config.DbMigrateUserUsername,
-		config.DbMigrateUserPassword,
+		url.QueryEscape(config.DbMigrateUserUsername),
+		url.QueryEscape(config.DbMigrateUserPassword),
 		config.DbHost,
 		config.DbPort,
 		config.DbName,
 		config.DbSslMode,
 	)
 
+	if config.DbBootstrapRoles {
+		log.Println("Bootstrapping DB roles")
+		err := bootstrapDBRoles(connectionString, config)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Run standard migrations
 	m, err := migrate.New("file://internal/db/migrations", connectionString)
 	if err != nil {
 		return err
@@ -86,5 +97,46 @@ func RunMigration(config config.Config) error {
 	}
 	version, dirty, _ := m.Version()
 	log.Printf("Successfully performed DB migration to version %d, dirty=%t.\n", version, dirty)
+	return nil
+}
+
+func bootstrapDBRoles(connectionString string, config config.Config) error {
+	conn, err := pgx.Connect(context.Background(), connectionString)
+	if err != nil {
+		return fmt.Errorf("Cannot connect to DB for role bootstrapping: %v", err)
+	}
+	defer conn.Close(context.Background())
+	username := config.DbAppUserUsername
+	password := config.DbAppUserPassword
+	dbName := config.DbName
+	schema := "public"
+
+	sql := fmt.Sprintf(`
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '%s') THEN
+		CREATE ROLE %s LOGIN PASSWORD '%s';
+	END IF;
+
+	GRANT CONNECT ON DATABASE %s TO %s;
+	GRANT USAGE ON SCHEMA %s TO %s;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA %s TO %s;
+	ALTER DEFAULT PRIVILEGES IN SCHEMA %s
+	GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO %s;
+END
+$$;`,
+		username,
+		username, password,
+		dbName, username,
+		schema, username,
+		schema, username,
+		schema, username)
+
+	// Create initial user for app
+	ctx, close := context.WithTimeout(context.Background(), WriteTimeout)
+	defer close()
+	if _, err := conn.Exec(ctx, sql); err != nil {
+		return fmt.Errorf("Failed to bootstrap role %s: %w", username, err)
+	}
 	return nil
 }
