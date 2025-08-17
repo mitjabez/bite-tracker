@@ -16,17 +16,25 @@ resource "aws_apprunner_service" "bite_tracker" {
       image_configuration {
         port = "8080"
         runtime_environment_variables = {
-          BT_LISTENADDR = ":8080"
-          BT_TOKENAGE   = "24h"
+          BT_LISTENA_DDR = ":8080"
+          BT_TOKEN_AGE   = "24h"
+          BT_DB_NAME     = aws_db_instance.bite_tracker.db_name
+          BT_DB_HOST     = aws_db_instance.bite_tracker.address
+          BT_DB_PORT     = aws_db_instance.bite_tracker.port
+          BT_DB_SSL_MODE = "require"
         }
         runtime_environment_secrets = {
-          BT_DBAPPURL        = aws_secretsmanager_secret.db_app_user_connection_string.arn
-          BT_DBMIGRATEURL    = aws_secretsmanager_secret.db_migrate_user_connection_string.arn
-          BT_HMACTOKENSECRET = aws_secretsmanager_secret.hmac_token_secret.arn
+          BT_DB_APP_USER_USERNAME     = aws_secretsmanager_secret.db_app_user_username.arn
+          BT_DB_APP_USER_PASSWORD     = aws_secretsmanager_secret.db_app_user_paassword.arn
+          BT_DB_MIGRATE_USER_USERNAME = aws_secretsmanager_secret.db_migrate_user_username.arn
+          BT_DB_MIGRATE_USER_PASSWORD = aws_secretsmanager_secret.db_migrate_user_password.arn
+          BT_HMAC_TOKEN_SECRET        = aws_secretsmanager_secret.hmac_token_secret.arn
+
         }
       }
       image_identifier      = "${aws_ecr_repository.bite_tracker.repository_url}:latest"
       image_repository_type = "ECR"
+
     }
 
     authentication_configuration {

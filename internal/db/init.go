@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -21,7 +22,16 @@ type DBContext struct {
 }
 
 func Init(config config.Config) (DBContext, error) {
-	pool, err := pgxpool.New(context.Background(), config.DBAppUrl)
+	connectionString := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s",
+		config.DbAppUserUsername,
+		config.DbAppUserPassword,
+		config.DbHost,
+		config.DbPort,
+		config.DbName,
+		config.DbSslMode,
+	)
+
+	pool, err := pgxpool.New(context.Background(), connectionString)
 	if err != nil {
 		return DBContext{}, err
 	}
@@ -53,8 +63,16 @@ func Init(config config.Config) (DBContext, error) {
 }
 
 func RunMigration(config config.Config) error {
-	// Don't run migration with app db account
-	m, err := migrate.New("file://internal/db/migrations", config.DBMigrateUrl)
+	connectionString := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s",
+		config.DbMigrateUserUsername,
+		config.DbMigrateUserPassword,
+		config.DbHost,
+		config.DbPort,
+		config.DbName,
+		config.DbSslMode,
+	)
+
+	m, err := migrate.New("file://internal/db/migrations", connectionString)
 	if err != nil {
 		return err
 	}

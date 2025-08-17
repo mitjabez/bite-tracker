@@ -7,11 +7,17 @@ import (
 )
 
 type Config struct {
-	ListenAddr      string        `required:"true"`
-	DBAppUrl        string        `required:"true"`
-	DBMigrateUrl    string        `required:"true"`
-	HmacTokenSecret string        `required:"true"`
-	TokenAge        time.Duration `required:"true"`
+	ListenAddr            string        `required:"true" split_words:"true"`
+	HmacTokenSecret       string        `required:"true" split_words:"true"`
+	TokenAge              time.Duration `required:"true" split_words:"true"`
+	DbName                string        `required:"true" split_words:"true"`
+	DbHost                string        `required:"true" split_words:"true"`
+	DbPort                int           `required:"true" split_words:"true"`
+	DbSslMode             string        `required:"true" split_words:"true"`
+	DbAppUserUsername     string        `required:"true" split_words:"true"`
+	DbAppUserPassword     string        `required:"true" split_words:"true"`
+	DbMigrateUserUsername string        `required:"true" split_words:"true"`
+	DbMigrateUserPassword string        `required:"true" split_words:"true"`
 }
 
 func Init() (Config, error) {
