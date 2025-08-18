@@ -1,0 +1,9 @@
+# See variables.tf for descriptions
+env                    = "dev"
+region                 = "eu-central-1"
+db_admin_user_username = "postgres"
+db_admin_user_password = "CHANGEME"
+db_app_user_username   = "bt_app_user"
+db_app_user_password   = "CHANGEME"
+hmac_token_secret      = "CHANGEME"
+bootstrap_db_roles     = false
