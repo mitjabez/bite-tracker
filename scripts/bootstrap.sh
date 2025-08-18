@@ -23,6 +23,10 @@ die() {
   exit 1
 }
 
+log() {
+  echo "$@" >&2
+}
+
 requirements() {
   type -f terraform > /dev/null || die "terraform is not installed"
   type -f docker > /dev/null || die "docker is not installed"
@@ -39,24 +43,29 @@ main() {
   pushd "$MY_DIR/../terraform" > /dev/null
   [ -f terraform.tfvars ] || die "terraform.tfvars file is missing"
 
-  echo "Bootstrapping the whole environment"
-  echo "-----------------------------------"
+  log "*** Bootsrapping Bite Tracker infrastructure ***"
 
-  echo "Applying ECR and RDS first ..."
+	log
+  log "** Applying ECR and RDS first **"
   terraform init
-  terraform apply \
-    -target aws_ecr_repository.bite_tracker
+  terraform apply -target aws_ecr_repository.bite_tracker
   popd > /dev/null
 
-
-  echo "Pushing image to ECR ..."
+	log
+  log "* Pushing image to ECR *"
   "$MY_DIR"/deploy.sh push-image
-  echo
 
-  echo "Applying rest of infra ..."
+	log
+  log "** Applying rest of infra **"
   pushd "$MY_DIR/../terraform" > /dev/null
-	echo "Initial apply with DB role bootstrapping"
+	log "* Initial apply with DB role bootstrapping permission *"
   terraform apply -var bootstrap_db_roles=true
+	log "* Final apply to remove bootsrapping permissions *"
+	terraform apply
+
+	log
+	log "*** All done! ***"
+
   popd > /dev/null
 }
 

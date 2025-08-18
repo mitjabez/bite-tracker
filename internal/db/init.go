@@ -75,7 +75,7 @@ func RunMigration(config config.Config) error {
 	)
 
 	if config.DbBootstrapRoles {
-		log.Println("Bootstrapping DB roles")
+		log.Printf("Bootstrapping DB roles\n")
 		err := bootstrapDBRoles(connectionString, config)
 		if err != nil {
 			return err
@@ -96,7 +96,7 @@ func RunMigration(config config.Config) error {
 		return err
 	}
 	version, dirty, _ := m.Version()
-	log.Printf("Successfully performed DB migration to version %d, dirty=%t.\n", version, dirty)
+	log.Printf("Successfully performed DB migration to version %d, dirty=%t\n", version, dirty)
 	return nil
 }
 
@@ -106,6 +106,9 @@ func bootstrapDBRoles(connectionString string, config config.Config) error {
 		return fmt.Errorf("Cannot connect to DB for role bootstrapping: %v", err)
 	}
 	defer conn.Close(context.Background())
+
+	// Add DDL (migrations) and DML permission to appuser
+	// On live deployments we would use different roles for this
 	username := config.DbAppUserUsername
 	password := config.DbAppUserPassword
 	dbName := config.DbName
@@ -114,25 +117,49 @@ func bootstrapDBRoles(connectionString string, config config.Config) error {
 	sql := fmt.Sprintf(`
 DO $$
 BEGIN
-	IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '%s') THEN
-		CREATE ROLE %s LOGIN PASSWORD '%s';
-	END IF;
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '%s') THEN
+        CREATE ROLE %s LOGIN PASSWORD '%s';
+    ELSE
+        ALTER ROLE %s WITH PASSWORD '%s';
+    END IF;
 
-	GRANT CONNECT ON DATABASE %s TO %s;
-	GRANT USAGE ON SCHEMA %s TO %s;
-	GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA %s TO %s;
-	ALTER DEFAULT PRIVILEGES IN SCHEMA %s
-	GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO %s;
+    GRANT CONNECT ON DATABASE %s TO %s;
+
+    GRANT USAGE, CREATE ON SCHEMA %s TO %s;
+
+    -- basic DML
+    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA %s TO %s;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA %s
+        GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO %s;
+
+    -- migrations (DDL)
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA %s TO %s;
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA %s TO %s;
+    GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA %s TO %s;
+
+    ALTER DEFAULT PRIVILEGES IN SCHEMA %s
+        GRANT ALL PRIVILEGES ON TABLES TO %s;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA %s
+        GRANT ALL PRIVILEGES ON SEQUENCES TO %s;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA %s
+        GRANT ALL PRIVILEGES ON FUNCTIONS TO %s;
 END
 $$;`,
 		username,
 		username, password,
+		username, password,
 		dbName, username,
 		schema, username,
 		schema, username,
-		schema, username)
+		schema, username,
+		schema, username,
+		schema, username,
+		schema, username,
+		schema, username,
+		schema, username,
+		schema, username,
+	)
 
-	// Create initial user for app
 	ctx, close := context.WithTimeout(context.Background(), WriteTimeout)
 	defer close()
 	if _, err := conn.Exec(ctx, sql); err != nil {

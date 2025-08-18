@@ -27,9 +27,9 @@ resource "aws_apprunner_service" "bite_tracker" {
         runtime_environment_secrets = {
           BT_DB_APP_USER_USERNAME = aws_secretsmanager_secret.db_app_user_username.arn
           BT_DB_APP_USER_PASSWORD = aws_secretsmanager_secret.db_app_user_password.arn
-          # On production setup we would create a dedicate user just for migrations
-          BT_DB_MIGRATE_USER_USERNAME = aws_secretsmanager_secret.db_admin_user_username.arn
-          BT_DB_MIGRATE_USER_PASSWORD = aws_secretsmanager_secret.db_admin_user_password.arn
+          # Only use admin on first run for bootstrapping roles
+          BT_DB_MIGRATE_USER_USERNAME = var.bootstrap_db_roles ? aws_secretsmanager_secret.db_admin_user_username.arn : aws_secretsmanager_secret.db_app_user_username.arn
+          BT_DB_MIGRATE_USER_PASSWORD = var.bootstrap_db_roles ? aws_secretsmanager_secret.db_admin_user_password.arn : aws_secretsmanager_secret.db_app_user_password.arn
           BT_HMAC_TOKEN_SECRET        = aws_secretsmanager_secret.hmac_token_secret.arn
 
         }

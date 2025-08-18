@@ -86,13 +86,16 @@ resource "aws_iam_policy" "bite_tracker_instance_policy" {
           "secretsmanager:GetSecretValue",
           "kms:Decrypt*",
         ],
-        Resource = [
+        Resource = compact([
           aws_secretsmanager_secret.db_app_user_username.arn,
           aws_secretsmanager_secret.db_app_user_password.arn,
           aws_secretsmanager_secret.db_admin_user_username.arn,
           aws_secretsmanager_secret.db_admin_user_password.arn,
+          # No need to have access to admin secrets unless bootstapping roles
+          var.bootstrap_db_roles ? aws_secretsmanager_secret.db_admin_user_username.arn : null,
+          var.bootstrap_db_roles ? aws_secretsmanager_secret.db_admin_user_password.arn : null,
           aws_secretsmanager_secret.hmac_token_secret.arn,
-        ]
+        ])
       }
     ]
   })
