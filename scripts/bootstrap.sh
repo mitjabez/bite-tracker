@@ -43,28 +43,31 @@ main() {
   pushd "$MY_DIR/../terraform" > /dev/null
   [ -f terraform.tfvars ] || die "terraform.tfvars file is missing"
 
-  log "*** Bootsrapping Bite Tracker infrastructure ***"
+  log "Bootstrapping Bite Tracker infrastructure"
+	log "-----------------------------------------"
 
-	log
-  log "** Applying ECR and RDS first **"
+  log "Applying ECR and RDS first ..."
   terraform init
   terraform apply -target aws_ecr_repository.bite_tracker
   popd > /dev/null
 
 	log
-  log "* Pushing image to ECR *"
+  log "Pushing image to ECR ..."
   "$MY_DIR"/deploy.sh push-image
 
 	log
-  log "** Applying rest of infra **"
+  log "Applying rest of infra ..."
   pushd "$MY_DIR/../terraform" > /dev/null
-	log "* Initial apply with DB role bootstrapping permission *"
+	log "Initial apply with DB role bootstrapping permission ..."
   terraform apply -var bootstrap_db_roles=true
-	log "* Final apply to remove bootsrapping permissions *"
+	log "Final apply to remove bootsrapping permissions ..."
 	terraform apply
 
 	log
-	log "*** All done! ***"
+	log "Obtaining App Runner App URL ..."
+	url=$(terraform output -raw apprunner_service_url)
+
+	log "All done! App is available on https://$url"
 
   popd > /dev/null
 }
