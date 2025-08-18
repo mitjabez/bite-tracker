@@ -1,25 +1,25 @@
 resource "aws_secretsmanager_secret" "db_admin_user_username" {
-  name                    = "bt_db_admin_user_username"
+  name                    = "${local.name}-db-admin-user-username"
   recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret" "db_admin_user_password" {
-  name                    = "bt_db_admin_user_password"
+  name                    = "${local.name}-db-admin-user-password"
   recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret" "db_app_user_username" {
-  name                    = "bt_db_app_user_username"
+  name                    = "${local.name}-db-app-user-username"
   recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret" "db_app_user_password" {
-  name                    = "bt_db_app_user_password"
+  name                    = "${local.name}-db-app-user-password"
   recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret" "hmac_token_secret" {
-  name                    = "bt_hmac_token_secret"
+  name                    = "${local.name}-hmac-token-secret"
   recovery_window_in_days = 0
 }
 

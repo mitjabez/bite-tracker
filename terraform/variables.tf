@@ -1,6 +1,11 @@
 variable "env" {
   type        = string
-  description = "deployment environment"
+  description = "Deployment environment (dev, prod)"
+}
+
+variable "region" {
+  type        = string
+  description = "Region of the infrastructure"
 }
 
 variable "db_admin_user_username" {
