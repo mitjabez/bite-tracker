@@ -46,7 +46,7 @@ make db-up
 
 ### Running Locally
 
-After the [prerequisites](#prerequisites) have been meet you can run the app locally.
+After the [prerequisites](#prerequisites) have been met you can run the app locally.
 
 - Run locally with live reload and access on http://localhost:3000
 
@@ -64,4 +64,25 @@ make run
 
 ```sh
 make generate
+```
+
+## Infrastructure
+
+The infrastructure is defined in Terraform and is deployed to AWS. The stack consists of:
+
+- AWS App Runner
+- AWS RDS (PostgreSQL)
+- AWS Secrets Manager
+- AWS SSM for DB managementt
+
+To bootstrap the infrastructure, you need to have [Terraform](https://www.terraform.io/) and
+[AWS CLI](https://aws.amazon.com/cli/) installed and configured.
+
+Before running the bootstrap script, you need to create a `terraform.tfvars` file in the `terraform` directory. You can
+use `terraform.tfvars.example` as a template.
+
+To bootstrap the infrastructure, run the following command:
+
+```sh
+./scripts/bootstrap.sh
 ```
