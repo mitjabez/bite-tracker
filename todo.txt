@@ -1,6 +1,4 @@
 Features:
-- Infra (Terraform)
-- CI
 - CD
 
 Improvements:
