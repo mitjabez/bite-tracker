@@ -3,64 +3,81 @@ package repository
 import (
 	"context"
 	"log"
-	"path/filepath"
 	"testing"
 
-	"github.com/mitjabez/bite-tracker/internal/config"
-	"github.com/mitjabez/bite-tracker/internal/db"
+	"github.com/google/uuid"
+	"github.com/mitjabez/bite-tracker/internal/testhelpers"
 	"github.com/stretchr/testify/assert"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestContainer(t *testing.T) {
-	ctx := context.Background()
+type UserRepoTestSuite struct {
+	suite.Suite
+	pgContext *testhelpers.PostgresContext
+	repo      *UserRepo
+	ctx       context.Context
+}
 
-	dbName := "users"
-	dbUser := "user"
-	dbPassword := "password"
-
-	postgresContainer, err := postgres.Run(ctx,
-		"postgres:16-alpine",
-		postgres.WithInitScripts(filepath.Join("..", "testdata", "init-users-db.sql")),
-		postgres.WithDatabase(dbName),
-		postgres.WithUsername(dbUser),
-		postgres.WithPassword(dbPassword),
-		postgres.BasicWaitStrategies(),
-	)
-	defer func() {
-		if err := testcontainers.TerminateContainer(postgresContainer); err != nil {
-			log.Printf("failed to terminate container: %s", err)
-		}
-	}()
+func (suite *UserRepoTestSuite) SetupSuite() {
+	suite.ctx = context.Background()
+	pgContext, err := testhelpers.CreatePostgresContainer(suite.ctx)
 	if err != nil {
-		log.Printf("failed to start container: %s", err)
-		return
+		log.Fatal(err)
 	}
+	suite.pgContext = pgContext
+	suite.repo = NewUserRepo(&suite.pgContext.DBContext)
+}
 
-	dbPort, err := postgresContainer.MappedPort(ctx, "5432")
-	assert.NoError(t, err)
-	dbHost, err := postgresContainer.Host(ctx)
-	assert.NoError(t, err)
-	config := config.Config{
-		ListenAddr:            "",
-		HmacTokenSecret:       "",
-		TokenAge:              0,
-		DbName:                dbName,
-		DbHost:                dbHost,
-		DbPort:                dbPort.Int(),
-		DbSslMode:             "disable",
-		DbAppUserUsername:     dbUser,
-		DbAppUserPassword:     dbPassword,
-		DbMigrateUserUsername: dbUser,
-		DbMigrateUserPassword: dbPassword,
-		DbBootstrapRoles:      false,
+func (suite *UserRepoTestSuite) TeardownSuite() {
+	if err := suite.pgContext.PostgresContainer.Terminate(suite.ctx); err != nil {
+		log.Fatal("Error terminating container: ", err)
 	}
+}
 
-	dbContext, err := db.Init(config)
+func (suite *UserRepoTestSuite) TestUserExists() {
+	t := suite.T()
+
+	isUser, err := suite.repo.UserExists(suite.ctx, "sj@dot.com")
 	assert.NoError(t, err)
-	repo := NewUserRepo(&dbContext)
-	user, err := repo.GetUserByEmail(ctx, "sj@dot.com")
+	assert.True(t, isUser)
+}
+
+func (suite *UserRepoTestSuite) TestUserNotExists() {
+	t := suite.T()
+
+	isUser, err := suite.repo.UserExists(suite.ctx, "noname@dot.com")
 	assert.NoError(t, err)
+	assert.False(t, isUser)
+}
+
+func (suite *UserRepoTestSuite) TestCreateUser() {
+	t := suite.T()
+
+	fullName := "New User"
+	email := "new@email.com"
+	passwordHash := "123"
+	user, err := suite.repo.CreateUser(suite.ctx, fullName, email, passwordHash)
+	assert.NoError(t, err)
+	assert.Equal(t, fullName, user.FullName)
+	assert.Equal(t, email, user.Email)
+	assert.Equal(t, passwordHash, user.PasswordHash)
+
+	dbUser, err := suite.repo.GetUser(suite.ctx, user.Id)
+	assert.NoError(t, err)
+	assert.Equal(t, user, dbUser)
+}
+
+func (suite *UserRepoTestSuite) TestGetUserByEmail() {
+	t := suite.T()
+
+	user, err := suite.repo.GetUserByEmail(suite.ctx, "sj@dot.com")
+	assert.NoError(t, err)
+	assert.Equal(t, uuid.MustParse("f41ad27a-881d-4f7f-a908-f16a26ce7b78"), user.Id)
+	assert.Equal(t, "sj@dot.com", user.Email)
 	assert.Equal(t, "Salsa Jimmy", user.FullName)
+	assert.Equal(t, "$2a$12$F22j/9fE8wI2nfjFADc/reQgm/TpKAxUWIyPhzZybV3GuvZP49rtu", user.PasswordHash)
+}
+
+func TestUserRepoTestSuite(t *testing.T) {
+	suite.Run(t, new(UserRepoTestSuite))
 }
