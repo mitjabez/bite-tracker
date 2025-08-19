@@ -1,4 +1,4 @@
-.PHONY: generate db-up db-down db-start db-stop build
+.PHONY: generate db-up db-down db-start db-stop deps test build
 
 DB_URL = postgres://biteapp:superburrito@localhost:5432/bite_tracker?sslmode=disable
 DB_PATH = internal/db/migrations
@@ -19,6 +19,13 @@ db-start:
 
 db-stop:
 	docker compose stop
+
+deps:
+	go mod download
+	go mod verify
+
+test:
+	go test -v ./...
 
 build:
 	go build -o $(BIN) cmd/bitetracker/main.go
