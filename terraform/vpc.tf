@@ -31,11 +31,19 @@ resource "aws_subnet" "bite_tracker_db_b" {
   tags                    = merge({ Name = "${local.name}-b-db" }, local.default_tags)
 }
 
-resource "aws_subnet" "bite_tracker_app_a" {
+resource "aws_subnet" "bite_tracker_k8s_a" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = "10.0.11.0/28"
   map_public_ip_on_launch = false
   availability_zone       = local.zone_a
-  tags                    = merge({ Name = "${local.name}-a-app" }, local.default_tags)
+  tags                    = merge({ Name = "${local.name}-a-k8s" }, local.default_tags)
+}
+
+resource "aws_subnet" "bite_tracker_k8s_b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.11.32/28"
+  map_public_ip_on_launch = false
+  availability_zone       = local.zone_b
+  tags                    = merge({ Name = "${local.name}-b-k8s" }, local.default_tags)
 }
 
