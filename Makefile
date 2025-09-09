@@ -1,4 +1,4 @@
-.PHONY: generate db-up db-down db-start db-stop deps test build
+.PHONY: generate db-down db-start db-stop deps test build
 
 DB_URL = postgres://biteapp:superburrito@localhost:5432/bite_tracker?sslmode=disable
 DB_PATH = internal/db/migrations
@@ -7,9 +7,6 @@ BIN = build/bite-tracker
 generate:
 	templ generate
 	sqlc generate
-
-db-up:
-	migrate -database $(DB_URL) -path $(DB_PATH) up
 
 db-down:
 	migrate -database $(DB_URL) -path $(DB_PATH) down -all

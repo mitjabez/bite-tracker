@@ -17,6 +17,7 @@ Backend:
 - a-h/templ
 - Postgres
 - golang-migrate
+- testcontainers-go
 
 ## Local development
 
@@ -27,24 +28,15 @@ Backend:
 - [a-h/templ](https://templ.guide/): HTML templating
 - [sqlc](https://sqlc.dev/): SQL to Go code compiler
 - [golang-migrate](https://github.com/golang-migrate/migrate): DB Schema migrations
+- [testcontainers-go](https://testcontainers.com/): Isolated dependencies for testing
 
-### DB Init
+### Running Locally
 
-Make sure that the database has been set before [running locally](#running-locally).
-
-- Start Postgres DB in Docker:
+The application handles database migrations automatically on startup. To run the app locally, you first need to start the Postgres database in Docker:
 
 ```bash
 make db-start
 ```
-
-- Initialize schema:
-
-```bash
-make db-up
-```
-
-### Running Locally
 
 After the [prerequisites](#prerequisites) have been met you can run the app locally.
 
@@ -64,6 +56,14 @@ make run
 
 ```sh
 make generate
+```
+
+### Testing
+
+To run the unit tests:
+
+```sh
+make test
 ```
 
 ## Infrastructure
