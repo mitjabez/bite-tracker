@@ -2,7 +2,7 @@
 
 ## About
 
-A simple food tracker website. Stack:
+A simple food tracker website. Created for learnging myself Go on a real world example. Stack:
 
 Frontend:
 
